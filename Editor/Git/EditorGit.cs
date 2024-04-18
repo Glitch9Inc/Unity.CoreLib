@@ -59,6 +59,7 @@ namespace Glitch9.IO.Git
             {
                 _gitOutputs.Add(output);
                 _gitOutputUpdated++;
+                GoToBottom();
             };
 
             await _git.InitializeAsync();
@@ -202,6 +203,11 @@ namespace Glitch9.IO.Git
             GUILayout.EndVertical();
         }
 
+        private void GoToBottom()
+        {
+            _scrollPosition.y = int.MaxValue;
+        }
+
         private void DrawGitOutput(GitOutput gitOutput)
         {
             if (_gitOutputColors.TryGetValue(gitOutput.Status, out Color color))
@@ -227,6 +233,7 @@ namespace Glitch9.IO.Git
                 if (GUILayout.Button(EditorIcons.Enter, GUILayout.Height(18f), GUILayout.Width(30f)))
                 {
                     EnterGitCommand();
+                    GoToBottom();
                 }
             }
             GUILayout.EndHorizontal();
