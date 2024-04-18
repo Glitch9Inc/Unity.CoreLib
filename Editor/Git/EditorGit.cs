@@ -153,11 +153,15 @@ namespace Glitch9.IO.Git
             {
                 if (GUILayout.Button("Remote Add Origin"))
                 {
+                    // if the url doesn't end with .git, add it
+                    if (!_gitUrl.EndsWith(".git")) _gitUrl += ".git";
                     EnterGitCommand($"remote add origin {_gitUrl}");
                 }
 
                 if (GUILayout.Button("Remote Set URL"))
                 {
+                    // if the url doesn't end with .git, add it
+                    if (!_gitUrl.EndsWith(".git")) _gitUrl += ".git";
                     EnterGitCommand($"remote set-url origin {_gitUrl}");
                 }
 
