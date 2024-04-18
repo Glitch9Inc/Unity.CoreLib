@@ -21,6 +21,11 @@ namespace Glitch9.IO.Git
         private int _gitOutputUpdated = 0;
         private bool _isInitializing = false;
 
+        private bool _uploadMenuFoldout = false;
+        private bool _remoteMenuFoldout = false;
+        private bool _branchMenuFoldout = false;
+        private bool _debugMenuFoldout = false;
+
         private readonly Dictionary<GitOutputStatus, Color> _gitOutputColors = new()
         {
             { GitOutputStatus.Success, Color.blue },
@@ -54,7 +59,7 @@ namespace Glitch9.IO.Git
             _gitUrl = gitUrl;
             _repoName = gitUrl.Substring(gitUrl.LastIndexOf('/') + 1);
             _branchName = gitBranch;
-            
+
             _git = new GitManager(_repoName, gitUrl, gitBranch, localDir);
 
             _git.OnGitOutput += (output) =>
@@ -77,7 +82,14 @@ namespace Glitch9.IO.Git
                 GUILayout.Space(3);
                 DrawVersionInfo();
                 DrawGitPanel();
-                DrawButtons();
+                DrawPublicButtons();
+                // indent to 1
+                EditorGUI.indentLevel = 1;
+                DrawUploadMenu();
+                DrawRemoteMenu();
+                DrawBranchMenu();
+                DrawDebugMenu();
+                EditorGUI.indentLevel = 0;
             }
             GUILayout.EndVertical();
         }
@@ -120,24 +132,20 @@ namespace Glitch9.IO.Git
             GUILayout.EndVertical();
         }
 
-        private void DrawButtons()
+        private void DrawPublicButtons()
         {
-            if (GUILayout.Button("Download (Git Pull)"))
+            if (GUILayout.Button("Update Module"))
             {
-                Pull();
-            }
-
-            if (GUILayout.Button("Upload (Git Push)"))
-            {
-                if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
+                if (_git.PullAvailable) // check if there is a new version available
                 {
-                    string popupMessage = "Please select the version type.";
-                    string popupDescription = "Version type is used to determine the version number. \n" +
-                                              "Patch: 1.0.0 -> 1.0.1 \n" +
-                                              "Minor: 1.0.0 -> 1.1.0 \n" +
-                                              "Major: 1.0.0 -> 2.0.0 \n";
-
-                    VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, Push);
+                    if (ExGUI.Ask("Are you sure you want to update the module?"))
+                    {
+                        Pull();
+                    }
+                }
+                else
+                {
+                    Debug.Log(Texts.UP_TO_DATE);
                 }
             }
 
@@ -147,9 +155,52 @@ namespace Glitch9.IO.Git
             }
         }
 
-        internal void DrawRemoteMenu()
+        private void DrawUploadMenu()
         {
-            ExGUILayout.Foldout("Remote Menu", () =>
+            _uploadMenuFoldout = EditorGUILayout.Foldout(_uploadMenuFoldout, new GUIContent("Upload Menu"));
+
+            if (_uploadMenuFoldout)
+            {
+                if (GUILayout.Button("Save Changes (Git Commit)"))
+                {
+                    Commit();
+                }
+
+                if (GUILayout.Button("Upload (Git Push)"))
+                {
+                    if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
+                    {
+                        string popupMessage = "Please select the version type.";
+                        string popupDescription = "Version type is used to determine the version number. \n" +
+                                                  "Patch: 1.0.0 -> 1.0.1 \n" +
+                                                  "Minor: 1.0.0 -> 1.1.0 \n" +
+                                                  "Major: 1.0.0 -> 2.0.0 \n";
+
+                        VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, Push);
+                    }
+                }
+
+                if (GUILayout.Button("Force Upload (Git Push -f)"))
+                {
+                    if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
+                    {
+                        string popupMessage = "Are you sure you want to force push?";
+                        string popupDescription = "Version type is used to determine the version number. \n" +
+                                                  "Patch: 1.0.0 -> 1.0.1 \n" +
+                                                  "Minor: 1.0.0 -> 1.1.0 \n" +
+                                                  "Major: 1.0.0 -> 2.0.0 \n";
+
+                        VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, ForcePush);
+                    }
+                }
+            }
+        }
+
+        private void DrawRemoteMenu()
+        {
+            _remoteMenuFoldout = EditorGUILayout.Foldout(_remoteMenuFoldout, new GUIContent("Remote Menu"));
+
+            if (_remoteMenuFoldout)
             {
                 if (GUILayout.Button("Remote Add Origin"))
                 {
@@ -174,17 +225,41 @@ namespace Glitch9.IO.Git
                 {
                     EnterGitCommand("remote -v");
                 }
-            });
+            }
         }
 
-        internal void DrawDebugMenu()
+        private void DrawBranchMenu()
         {
-            ExGUILayout.Foldout("Debug Menu",() => {
-                if (GUILayout.Button("Commit"))
+            _branchMenuFoldout = EditorGUILayout.Foldout(_branchMenuFoldout, new GUIContent("Branch Menu"));
+
+            if (_branchMenuFoldout)
+            {
+                if (GUILayout.Button("Branch List"))
                 {
-                    Commit();
+                    EnterGitCommand("branch -a");
                 }
 
+                if (GUILayout.Button("Branch Checkout"))
+                {
+                    EnterGitCommand("checkout branch-name");
+                }
+
+                if (GUILayout.Button("Master => Main"))
+                {
+                    if (ExGUI.Ask("Are you sure you want to continue?"))
+                    {
+                        EnterGitCommand("branch -m master main");
+                    }
+                }
+            }
+        }
+
+        private void DrawDebugMenu()
+        {
+            _debugMenuFoldout = EditorGUILayout.Foldout(_debugMenuFoldout, new GUIContent("Debug Menu"));
+
+            if (_debugMenuFoldout)
+            {
                 if (GUILayout.Button("Normalize Line Endings"))
                 {
                     if (ExGUI.Ask("Are you sure you want to continue?"))
@@ -193,35 +268,18 @@ namespace Glitch9.IO.Git
                     }
                 }
 
-                if (GUILayout.Button("Configure core.autocrlf Globally [true]"))
+                if (GUILayout.Button("Configure core.autocrlf Globally to true"))
                 {
-                    if (ExGUI.Ask("Are you sure you want to continue?"))
-                    {
-                        ConfigureAutoCRLF(true);
-                    }
+                    ConfigureAutoCRLF(true);
                 }
 
-                if (GUILayout.Button("Configure core.autocrlf Globally [false]"))
-                {
-                    if (ExGUI.Ask("Are you sure you want to continue?"))
-                    {
-                        ConfigureAutoCRLF(false);
-                    }
-                }
-
-                if (GUILayout.Button("Force Push"))
-                {
-                    if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
-                    {
-                        string popupMessage = "Are you sure you want to force push?";
-                        string popupDescription = "Version type is used to determine the version number. \n" +
-                                                  "Patch: 1.0.0 -> 1.0.1 \n" +
-                                                  "Minor: 1.0.0 -> 1.1.0 \n" +
-                                                  "Major: 1.0.0 -> 2.0.0 \n";
-
-                        VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, ForcePush);
-                    }
-                }
+                // if (GUILayout.Button("Configure core.autocrlf Globally [false]"))
+                // {
+                //     if (ExGUI.Ask("Are you sure you want to continue?"))
+                //     {
+                //         ConfigureAutoCRLF(false);
+                //     }
+                // }
 
                 if (GUILayout.Button("Push Version Tag"))
                 {
@@ -232,7 +290,7 @@ namespace Glitch9.IO.Git
                 {
                     PullVersionTag();
                 }
-            });
+            }
         }
 
         private void GoToBottom()

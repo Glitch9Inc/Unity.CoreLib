@@ -26,26 +26,26 @@ namespace Glitch9.IO.Git
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            GUILayout.BeginVertical(ExGUI.Box(3, 7));
+            
+            ExGUILayout.Title("Git Module");
+            EditorGUILayout.PropertyField(gitUrl);
+
+            GUILayout.BeginHorizontal();
             {
-                GUILayout.Label("Git Module", EditorStyles.boldLabel);
-                EditorGUILayout.PropertyField(gitUrl);
-
-                GUILayout.BeginHorizontal();
+                EditorGUILayout.PropertyField(localDir);
+                if (GUILayout.Button("Find Directory", GUILayout.Width(100)))
                 {
-                    EditorGUILayout.PropertyField(localDir);
-                    if (GUILayout.Button("Find Directory", GUILayout.Width(100)))
-                    {
-                        gitModule.FindLocalDir();
-                    }
+                    gitModule.FindLocalDir();
                 }
-                GUILayout.EndHorizontal();
-
-                EditorGUILayout.PropertyField(gitBranch);
             }
-            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+
+            EditorGUILayout.PropertyField(gitBranch);
 
             serializedObject.ApplyModifiedProperties();
+
+            GUILayout.Space(10);
+            ExGUILayout.Title("Git Window");
 
             if (!_git.IsInitialized)
             {
@@ -57,10 +57,7 @@ namespace Glitch9.IO.Git
                 return;
             }
 
-            _git.DrawGit();
-            GUILayout.Space(10);
-            _git.DrawRemoteMenu();
-            _git.DrawDebugMenu();
+            _git.DrawGit();      
         }
     }
 }

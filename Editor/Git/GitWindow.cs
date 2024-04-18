@@ -9,7 +9,7 @@ namespace Glitch9.IO.Git
         protected abstract string WORKING_DIR { get; }
 
         private EditorGit _git;
-   
+
 
         private void OnEnable()
         {
@@ -36,11 +36,9 @@ namespace Glitch9.IO.Git
                 GUILayout.Label("Initializing Git...");
                 return;
             }
-            
-            _git.DrawGit(); 
-            GUILayout.Space(10);
-            _git.DrawDebugMenu();
+
+            _git.DrawGit();
         }
-    
+
     }
 }
