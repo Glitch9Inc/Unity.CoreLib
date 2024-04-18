@@ -12,13 +12,13 @@ namespace Glitch9.IO.Git
         private GitManager _git;
         private Vector2 _scrollPosition;
         private List<GitOutput> _gitOutputs;
+
+        private string _gitUrl;
         private string _repoName;
         private string _branchName;
 
         private string _commandLine;
         private int _gitOutputUpdated = 0;
-
-        private bool _debugMode = false;
         private bool _isInitializing = false;
 
         private readonly Dictionary<GitOutputStatus, Color> _gitOutputColors = new()
@@ -50,6 +50,8 @@ namespace Glitch9.IO.Git
             }
 
             _gitOutputs = new List<GitOutput>();
+
+            _gitUrl = gitUrl;
             _repoName = gitUrl.Substring(gitUrl.LastIndexOf('/') + 1);
             _branchName = gitBranch;
             
@@ -67,34 +69,41 @@ namespace Glitch9.IO.Git
             _isInitializing = false;
         }
 
-        internal void DrawLabelAndVersionInfo()
+        internal void DrawGit()
         {
             GUILayout.BeginVertical(ExGUI.Box(3, 7));
             {
                 GUILayout.Label($"{_repoName}-{_branchName} (Output {_gitOutputUpdated})", EditorStyles.boldLabel);
-
-                GUILayout.BeginVertical(ExGUI.box);
-                {
-                    GUILayout.Label($"Local: {_git.LocalVersion.CreateTagInfo()}");
-                    GUILayout.Label($"Remote: {_git.RemoteVersion.CreateTagInfo()}");
-
-                    if (_git.PullAvailable)
-                    {
-                        GUILayout.Label(Texts.NEW_VERSION_AVAILABLE, ExEditorStyles.centeredRedMiniLabel);
-                    }
-                    else
-                    {
-                        GUILayout.Label(Texts.UP_TO_DATE, ExEditorStyles.centeredBlueMiniLabel);
-                    }
-                }
-                GUILayout.EndVertical();
+                GUILayout.Space(3);
+                DrawVersionInfo();
+                DrawGitPanel();
+                DrawButtons();
             }
             GUILayout.EndVertical();
         }
 
-        internal void DrawGitPanel()
+        private void DrawVersionInfo()
         {
-            GUILayout.BeginVertical(ExGUI.Box(3, 7), GUILayout.MinHeight(500), GUILayout.ExpandHeight(true));
+            GUILayout.BeginVertical(ExGUI.box);
+            {
+                GUILayout.Label($"Local: {_git.LocalVersion.CreateTagInfo()}");
+                GUILayout.Label($"Remote: {_git.RemoteVersion.CreateTagInfo()}");
+
+                if (_git.PullAvailable)
+                {
+                    GUILayout.Label(Texts.NEW_VERSION_AVAILABLE, ExEditorStyles.centeredRedMiniLabel);
+                }
+                else
+                {
+                    GUILayout.Label(Texts.UP_TO_DATE, ExEditorStyles.centeredBlueMiniLabel);
+                }
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void DrawGitPanel()
+        {
+            GUILayout.BeginVertical(ExGUI.box, GUILayout.MinHeight(500), GUILayout.ExpandHeight(true));
             {
                 _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
 
@@ -111,7 +120,7 @@ namespace Glitch9.IO.Git
             GUILayout.EndVertical();
         }
 
-        internal void DrawButtons()
+        private void DrawButtons()
         {
             if (GUILayout.Button("Download (Git Pull)"))
             {
@@ -138,69 +147,88 @@ namespace Glitch9.IO.Git
             }
         }
 
+        internal void DrawRemoteMenu()
+        {
+            ExGUILayout.Foldout("Remote Menu", () =>
+            {
+                if (GUILayout.Button("Remote Add Origin"))
+                {
+                    EnterGitCommand($"remote add origin {_gitUrl}");
+                }
+
+                if (GUILayout.Button("Remote Set URL"))
+                {
+                    EnterGitCommand($"remote set-url origin {_gitUrl}");
+                }
+
+                if (GUILayout.Button("Remote Remove"))
+                {
+                    EnterGitCommand("remote remove origin");
+                }
+
+                if (GUILayout.Button("Remote Information"))
+                {
+                    EnterGitCommand("remote -v");
+                }
+            });
+        }
+
         internal void DrawDebugMenu()
         {
-            GUILayout.BeginVertical(ExGUI.Box(3, 7));
-            {
-                _debugMode = GUILayout.Toggle(_debugMode, "Debug Menu");
-
-                if (_debugMode)
+            ExGUILayout.Foldout("Debug Menu",() => {
+                if (GUILayout.Button("Commit"))
                 {
-                    if (GUILayout.Button("Commit"))
-                    {
-                        Commit();
-                    }
+                    Commit();
+                }
 
-                    if (GUILayout.Button("Normalize Line Endings"))
+                if (GUILayout.Button("Normalize Line Endings"))
+                {
+                    if (ExGUI.Ask("Are you sure you want to continue?"))
                     {
-                        if (ExGUI.Ask("Are you sure you want to continue?"))
-                        {
-                            NormalizeLineEndings();
-                        }
-                    }
-
-                    if (GUILayout.Button("Configure core.autocrlf Globally [true]"))
-                    {
-                        if (ExGUI.Ask("Are you sure you want to continue?"))
-                        {
-                            ConfigureAutoCRLF(true);
-                        }
-                    }
-
-                    if (GUILayout.Button("Configure core.autocrlf Globally [false]"))
-                    {
-                        if (ExGUI.Ask("Are you sure you want to continue?"))
-                        {
-                            ConfigureAutoCRLF(false);
-                        }
-                    }
-
-                    if (GUILayout.Button("Force Push"))
-                    {
-                        if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
-                        {
-                            string popupMessage = "Are you sure you want to force push?";
-                            string popupDescription = "Version type is used to determine the version number. \n" +
-                                                      "Patch: 1.0.0 -> 1.0.1 \n" +
-                                                      "Minor: 1.0.0 -> 1.1.0 \n" +
-                                                      "Major: 1.0.0 -> 2.0.0 \n";
-
-                            VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, ForcePush);
-                        }
-                    }
-
-                    if (GUILayout.Button("Push Version Tag"))
-                    {
-                        PushVersionTag();
-                    }
-
-                    if (GUILayout.Button("Pull Version Tag"))
-                    {
-                        PullVersionTag();
+                        NormalizeLineEndings();
                     }
                 }
-            }
-            GUILayout.EndVertical();
+
+                if (GUILayout.Button("Configure core.autocrlf Globally [true]"))
+                {
+                    if (ExGUI.Ask("Are you sure you want to continue?"))
+                    {
+                        ConfigureAutoCRLF(true);
+                    }
+                }
+
+                if (GUILayout.Button("Configure core.autocrlf Globally [false]"))
+                {
+                    if (ExGUI.Ask("Are you sure you want to continue?"))
+                    {
+                        ConfigureAutoCRLF(false);
+                    }
+                }
+
+                if (GUILayout.Button("Force Push"))
+                {
+                    if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
+                    {
+                        string popupMessage = "Are you sure you want to force push?";
+                        string popupDescription = "Version type is used to determine the version number. \n" +
+                                                  "Patch: 1.0.0 -> 1.0.1 \n" +
+                                                  "Minor: 1.0.0 -> 1.1.0 \n" +
+                                                  "Major: 1.0.0 -> 2.0.0 \n";
+
+                        VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, ForcePush);
+                    }
+                }
+
+                if (GUILayout.Button("Push Version Tag"))
+                {
+                    PushVersionTag();
+                }
+
+                if (GUILayout.Button("Pull Version Tag"))
+                {
+                    PullVersionTag();
+                }
+            });
         }
 
         private void GoToBottom()
@@ -242,6 +270,8 @@ namespace Glitch9.IO.Git
         private async void EnterGitCommand()
         {
             _commandLine = _commandLine.Trim();
+            // if it starts with git, remove it
+            if (_commandLine.StartsWith("git ")) _commandLine = _commandLine.Substring(4);
             if (string.IsNullOrEmpty(_commandLine))
             {
                 _gitOutputs.Add(new GitOutput("Empty Command"));
@@ -250,6 +280,17 @@ namespace Glitch9.IO.Git
             await _git.RunGitCommandAsync(_commandLine);
             _commandLine = "";
         }
+
+        private async void EnterGitCommand(string command)
+        {
+            if (string.IsNullOrEmpty(command))
+            {
+                _gitOutputs.Add(new GitOutput("Empty Command"));
+                return;
+            }
+            await _git.RunGitCommandAsync(command);
+        }
+
 
         private async void Pull()
         {

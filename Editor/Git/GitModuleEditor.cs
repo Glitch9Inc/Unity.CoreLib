@@ -57,10 +57,9 @@ namespace Glitch9.IO.Git
                 return;
             }
 
-            _git.DrawLabelAndVersionInfo();
-            _git.DrawGitPanel();
-            _git.DrawButtons();
+            _git.DrawGit();
             GUILayout.Space(10);
+            _git.DrawRemoteMenu();
             _git.DrawDebugMenu();
         }
     }
