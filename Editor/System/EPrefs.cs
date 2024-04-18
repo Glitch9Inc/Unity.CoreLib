@@ -36,11 +36,8 @@ namespace Glitch9.ExEditor
             try
             {
                 T savedValue = Load();
-                if (savedValue != null)
-                {
-                    _cache = savedValue;
-                }
-                else if (defaultValue != null)
+                _cache = savedValue ?? defaultValue; // 로드된 값이 null이면 defaultValue 사용
+                if (_cache == null || savedValue == null) // 로드된 값이 null이거나 첫 로드에서 값을 얻지 못한 경우
                 {
                     _cache = defaultValue;
                     Save();
@@ -49,6 +46,8 @@ namespace Glitch9.ExEditor
             catch (Exception e)
             {
                 GNLog.Exception(e);
+                _cache = defaultValue; // 예외 발생 시 defaultValue를 사용
+                Save();
             }
         }
 
@@ -58,37 +57,44 @@ namespace Glitch9.ExEditor
             {
                 return (T)Convert.ChangeType(EditorPrefs.GetInt(_prefsKey), typeof(T));
             }
-            else if (typeof(T) == typeof(float))
+
+            if (typeof(T) == typeof(float))
             {
                 return (T)Convert.ChangeType(EditorPrefs.GetFloat(_prefsKey), typeof(T));
             }
-            else if (typeof(T) == typeof(string))
+            
+            if (typeof(T) == typeof(string))
             {
                 return (T)Convert.ChangeType(EditorPrefs.GetString(_prefsKey), typeof(T));
             }
-            else if (typeof(T) == typeof(bool))
+            
+            if (typeof(T) == typeof(bool))
             {
                 return (T)Convert.ChangeType(EditorPrefs.GetBool(_prefsKey), typeof(T));
             }
-            else if (typeof(T) == typeof(UnixTime))
+            
+            if (typeof(T) == typeof(UnixTime))
             {
                 UnixTime unixTime = new(EditorPrefs.GetInt(_prefsKey));
                 return (T)(object)unixTime;
             }
-            else if (typeof(T) == typeof(Vector2))
+           
+            if (typeof(T) == typeof(Vector2))
             {
                 float x = EditorPrefs.GetFloat(_prefsKey + ".x");
                 float y = EditorPrefs.GetFloat(_prefsKey + ".y");
                 return (T)(object)new Vector2(x, y);
             }
-            else if (typeof(T) == typeof(Vector3))
+
+            if (typeof(T) == typeof(Vector3))
             {
                 float x = EditorPrefs.GetFloat(_prefsKey + ".x");
                 float y = EditorPrefs.GetFloat(_prefsKey + ".y");
                 float z = EditorPrefs.GetFloat(_prefsKey + ".z");
                 return (T)(object)new Vector3(x, y, z);
             }
-            else if (typeof(T) == typeof(Quaternion))
+
+            if (typeof(T) == typeof(Quaternion))
             {
                 float x = EditorPrefs.GetFloat(_prefsKey + ".x");
                 float y = EditorPrefs.GetFloat(_prefsKey + ".y");
@@ -96,25 +102,22 @@ namespace Glitch9.ExEditor
                 float w = EditorPrefs.GetFloat(_prefsKey + ".w");
                 return (T)(object)new Quaternion(x, y, z, w);
             }
-            else if (typeof(T).IsEnum)
+
+            if (typeof(T).IsEnum)
             {
                 // Correct approach for loading enums
                 int storedValue = EditorPrefs.GetInt(_prefsKey);
                 return (T)Enum.ToObject(typeof(T), storedValue);
             }
-            else if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>))
+
+            if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>))
             {
                 string json = EditorPrefs.GetString(_prefsKey, null);
-                if (string.IsNullOrEmpty(json))
-                {
-                    // 기본값으로 빈 리스트를 반환하거나, 또는 defaultValue를 사용
-                    return Activator.CreateInstance<T>();
-                }
+                if (string.IsNullOrEmpty(json)) return Activator.CreateInstance<T>();
 
                 try
                 {
-                    // JsonConvert.DeserializeObject<T>를 사용하는 대신, 리스트의 구체적인 타입을 지정
-                    Type itemType = typeof(T).GetGenericArguments()[0]; // 리스트 항목의 타입 추출
+                    Type itemType = typeof(T).GetGenericArguments()[0]; 
                     Type listType = typeof(List<>).MakeGenericType(itemType);
                     return (T)JsonConvert.DeserializeObject(json, listType, JsonUtils.DefaultSettings);
                 }
@@ -125,19 +128,17 @@ namespace Glitch9.ExEditor
                     return default;
                 }
             }
-            else
+
+            try
             {
-                try
-                {
-                    string json = EditorPrefs.GetString(_prefsKey, "{}");
-                    return JsonConvert.DeserializeObject<T>(json, JsonUtils.DefaultSettings);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Error occurred while deserializing list: {e.Message}");
-                    EditorPrefs.DeleteKey(_prefsKey);
-                    return default;
-                }
+                string json = EditorPrefs.GetString(_prefsKey, "{}");
+                return JsonConvert.DeserializeObject<T>(json, JsonUtils.DefaultSettings);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error occurred while deserializing list: {e.Message}");
+                EditorPrefs.DeleteKey(_prefsKey);
+                return default;
             }
         }
 
@@ -193,9 +194,6 @@ namespace Glitch9.ExEditor
                 string json = JsonConvert.SerializeObject(Value, JsonUtils.DefaultSettings);
                 EditorPrefs.SetString(_prefsKey, json);
             }
-
-            // log (debug)
-            // Debug.Log($"Saved {_prefsKey} = {Value}");
         }
     }
 }

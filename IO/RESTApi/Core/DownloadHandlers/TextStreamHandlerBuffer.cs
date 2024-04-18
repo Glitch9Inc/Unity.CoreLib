@@ -60,7 +60,8 @@ namespace Glitch9.IO.RESTApi
             // byte[] => string
             // Try to convert the bytes to string
             string text = Encoding.UTF8.GetString(fullDataChunk);
-            if (_enableLog) Debug.Log($"Received data: {text}");
+            //if (_enableLog) 
+            Debug.Log($"Received data: {text}");
             _onDataChunkReceived?.Invoke(text);
             // Here, you should invoke the onDataChunkReceived event or callback with the Text
 

@@ -1,6 +1,5 @@
 using Newtonsoft.Json;
 
-
 namespace Glitch9
 {
     public static class JsonUtils

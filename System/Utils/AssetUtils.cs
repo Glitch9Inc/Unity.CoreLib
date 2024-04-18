@@ -1,22 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Glitch9
 {
     public static class AssetUtils
     {
+#if UNITY_EDITOR
         private static T Create<T>(string name, T obj) where T : ScriptableObject
         {
-#if UNITY_EDITOR
             string path = $"Assets/{name}.asset";
             string dir = Path.GetDirectoryName(path);
             if (!Directory.Exists(dir) && dir != null) Directory.CreateDirectory(dir);
             AssetDatabase.CreateAsset(obj, path);
             EditorUtility.SetDirty(obj);
-#endif
             return obj;
         }
 
@@ -33,7 +35,7 @@ namespace Glitch9
             string path = AssetDatabase.GUIDToAssetPath(guids[0]);
             return AssetDatabase.LoadAssetAtPath<T>(path);
         }
-
+#endif
         public static Texture2D LoadTexture(string assetName, ref Dictionary<string, Texture2D> cache)
         {
             if (cache.TryGetValue(assetName, out Texture2D icon)) return icon;
@@ -76,8 +78,5 @@ namespace Glitch9
                 AssetDatabase.Refresh();
             }
         }
-
-
-
     }
 }
