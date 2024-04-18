@@ -8,9 +8,9 @@ namespace Glitch9
 {
     public abstract class EditorSelectorPopup<TWindow, TValue> : EditorWindow where TWindow : EditorSelectorPopup<TWindow, TValue>
     {
-        private const float WINDOW_MIN_HEIGHT = 100f;
-        private const float WINDOW_MAX_HEIGHT = 980f;
-        private const float WINDOW_WIDTH = 340f;
+        protected const float WINDOW_MIN_HEIGHT = 100f;
+        protected const float WINDOW_MAX_HEIGHT = 980f;
+        protected const float WINDOW_WIDTH = 340f;
         private Vector2 _scrollPos;
         protected Action<TValue> Callback;
 
@@ -22,7 +22,7 @@ namespace Glitch9
         private void OnGUI()
         {
             // Draw Title
-            EditorGUILayout.LabelField(Title, ExEditorStyles.title);
+            ExGUILayout.Title(Title);
             EditorGUILayout.LabelField(Description, EditorStyles.wordWrappedLabel);
             EditorGUILayout.Space();
 
@@ -70,14 +70,19 @@ namespace Glitch9
                 window.Callback = onComplete;
                 window.Value = defaultValue;
                 window.ValueList = valueList != null ? new List<TValue>(valueList) : null;
-                window.minSize = new Vector2(WINDOW_WIDTH, WINDOW_MIN_HEIGHT);
-                window.maxSize = new Vector2(WINDOW_WIDTH, WINDOW_MAX_HEIGHT);
+                window.Initialize();
                 window.Show();
             }
             catch
             {
                 Debug.LogError("Failed to create window of type " + typeof(TWindow));
             }
+        }
+
+        protected virtual void Initialize()
+        {
+            minSize = new Vector2(WINDOW_WIDTH, WINDOW_MIN_HEIGHT);
+            maxSize = new Vector2(WINDOW_WIDTH, WINDOW_MAX_HEIGHT);
         }
 
 

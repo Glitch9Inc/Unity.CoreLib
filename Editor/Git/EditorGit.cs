@@ -168,30 +168,24 @@ namespace Glitch9.IO.Git
 
                 if (GUILayout.Button("Upload (Git Push)"))
                 {
-                    if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
-                    {
-                        string popupMessage = "Please select the version type.";
-                        string popupDescription = "Version type is used to determine the version number. \n" +
-                                                  "Patch: 1.0.0 -> 1.0.1 \n" +
-                                                  "Minor: 1.0.0 -> 1.1.0 \n" +
-                                                  "Major: 1.0.0 -> 2.0.0 \n";
+                    string popupMessage = "Please select the version type.";
+                    string popupDescription = "Version type is used to determine the version number. \n" +
+                                              "Patch: 1.0.0 -> 1.0.1 \n" +
+                                              "Minor: 1.0.0 -> 1.1.0 \n" +
+                                              "Major: 1.0.0 -> 2.0.0 \n";
 
-                        VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, Push);
-                    }
+                    GitVersionSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, Push);
                 }
 
                 if (GUILayout.Button("Force Upload (Git Push -f)"))
                 {
-                    if (ExGUI.Ask("Are you sure you want to upload to the git repository?"))
-                    {
-                        string popupMessage = "Are you sure you want to force push?";
-                        string popupDescription = "Version type is used to determine the version number. \n" +
-                                                  "Patch: 1.0.0 -> 1.0.1 \n" +
-                                                  "Minor: 1.0.0 -> 1.1.0 \n" +
-                                                  "Major: 1.0.0 -> 2.0.0 \n";
+                    string popupMessage = "Are you sure you want to force push?";
+                    string popupDescription = "Version type is used to determine the version number. \n" +
+                                              "Patch: 1.0.0 -> 1.0.1 \n" +
+                                              "Minor: 1.0.0 -> 1.1.0 \n" +
+                                              "Major: 1.0.0 -> 2.0.0 \n";
 
-                        VersionTypeSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, ForcePush);
-                    }
+                    GitVersionSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, ForcePush);
                 }
             }
         }

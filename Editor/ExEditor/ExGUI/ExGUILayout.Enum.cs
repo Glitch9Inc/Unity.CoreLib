@@ -94,11 +94,16 @@ namespace Glitch9.ExEditor
         /// </summary>
         public static bool EnumToolbar<T>(T enumValue, out T newEnum, GUIStyle toolbarStyle, params GUILayoutOption[] options) where T : Enum
         {
+
             string[] enumNames = ExEnum.GetNames(typeof(T));
             int currentIndex = Convert.ToInt32(enumValue);
 
             toolbarStyle ??= new(EditorStyles.toolbarButton);
+            GUILayout.BeginHorizontal(EditorStyles.toolbar);
+
             int newIndex = GUILayout.Toolbar(currentIndex, enumNames, toolbarStyle, options);
+
+            GUILayout.EndHorizontal();
 
             if (newIndex != currentIndex)
             {
