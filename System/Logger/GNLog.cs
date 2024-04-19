@@ -90,10 +90,6 @@ namespace Glitch9
                 case LogType.Error:
                 case LogType.NativeError:
                 case LogType.Exception:
-#if UNITY_ANDROID
-#elif UNITY_EDITOR
-                    if (!Application.isPlaying && !IgnoreEditorLogs) EditorUtility.DisplayDialog("Error", log, "OK");
-#endif
                     Debug.LogError(log);
                     break;
             }
@@ -113,7 +109,7 @@ namespace Glitch9
                 log = "[ " + log;
             }
             return log;
-#elif UNITY_EDITOR
+#else
             return log;
 #endif
         }
