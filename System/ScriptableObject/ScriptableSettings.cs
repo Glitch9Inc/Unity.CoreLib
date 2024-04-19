@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Glitch9
 {
-    public abstract class ScriptableSettings<TSelf> : ScriptableObject
-        where TSelf : ScriptableSettings<TSelf>
+    public abstract class ScriptableSettings<TSelf> : ScriptableObject where TSelf : ScriptableSettings<TSelf>
     {
         protected static string AssetPath => $"Resources/Settings/{typeof(TSelf).Name}";
-        
+
         private static TSelf _instance;
+
         public static TSelf Instance
         {
             get
@@ -26,6 +26,7 @@ namespace Glitch9
 
                     _instance = res;
                 }
+
                 return _instance;
             }
         }
@@ -40,6 +41,14 @@ namespace Glitch9
             UnityEditor.EditorUtility.SetDirty(obj);
 #endif
             return obj;
+        }
+
+        public static void Save()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(Instance);
+            UnityEditor.AssetDatabase.SaveAssets();
+#endif
         }
     }
 }

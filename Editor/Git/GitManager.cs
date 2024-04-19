@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using Debug = UnityEngine.Debug;
 
 namespace Glitch9.IO.Git
@@ -85,7 +84,7 @@ namespace Glitch9.IO.Git
             _repoName = repoName;
         }
 
-        public async UniTask InitializeAsync()
+        public async Task InitializeAsync()
         {
             _localVersion = GitVersion.CreateCurrentVersion(_repoName);
 
@@ -102,7 +101,7 @@ namespace Glitch9.IO.Git
             }
         }
 
-        private async UniTask ValidateRemoteOrigin()
+        private async Task ValidateRemoteOrigin()
         {
             string currentRemoteOrigin = await GetCurrentRemoteOrigin();
             if (string.IsNullOrEmpty(currentRemoteOrigin)) return;
@@ -117,7 +116,7 @@ namespace Glitch9.IO.Git
             }
         }
 
-        private async UniTask ValidateBranch()
+        private async Task ValidateBranch()
         {
             string currentBranch = await GetCurrentBranch();
             if (string.IsNullOrEmpty(currentBranch)) return;
@@ -132,9 +131,9 @@ namespace Glitch9.IO.Git
             }
         }
 
-        public UniTask PullAsync() => RunGitCommandAsync("pull");
+        public Task PullAsync() => RunGitCommandAsync("pull");
 
-        public async UniTask PushAsync(VersionIncrement versionInc, bool force = false)
+        public async Task PushAsync(VersionIncrement versionInc, bool force = false)
         {
             string pushCommand = $"push origin {_gitBranch}";
             if (force) pushCommand += " --force";
@@ -149,7 +148,7 @@ namespace Glitch9.IO.Git
         /// git push origin--tags
         /// </summary>
         /// <returns></returns>
-        public async UniTask PushVersionTagAsync(VersionIncrement versionInc = VersionIncrement.Patch)
+        public async Task PushVersionTagAsync(VersionIncrement versionInc = VersionIncrement.Patch)
         {
             string tag = _remoteVersion.CreateUpdatedTag(versionInc);
             string tagInfo = _remoteVersion.CreateTagInfo();
@@ -158,7 +157,7 @@ namespace Glitch9.IO.Git
             _localVersion = _remoteVersion;
         }
 
-        public async UniTask PullVersionTagAsync()
+        public async Task PullVersionTagAsync()
         {
             Debug.Log("Getting version info...");
             // Fetch the tags from the remote repository
@@ -180,33 +179,33 @@ namespace Glitch9.IO.Git
             }
         }
 
-        public async UniTask CommitAsync()
+        public async Task CommitAsync()
         {
             await RunGitCommandAsync("add .");
             await RunGitCommandAsync("commit -m \"" + _remoteVersion.CreateTagInfo() + "\"");
         }
 
-        public UniTask StatusAsync() => RunGitCommandAsync("status");
-        public UniTask ConfigureLocalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}");
-        public UniTask ConfigureGlobalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}");
-        public UniTask NormalizeLineEndingsAsync() => RunGitCommandAsync("add --renormalize .");
+        public Task StatusAsync() => RunGitCommandAsync("status");
+        public Task ConfigureLocalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}");
+        public Task ConfigureGlobalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}");
+        public Task NormalizeLineEndingsAsync() => RunGitCommandAsync("add --renormalize .");
 
-        public async UniTask<string> PushVersionAsync()
+        public async Task<string> PushVersionAsync()
         {
             return await RunGitCommandAsync("remote get-url origin", returnOutput: true);
         }
 
-        public async UniTask<string> GetCurrentRemoteOrigin()
+        public async Task<string> GetCurrentRemoteOrigin()
         {
             return await RunGitCommandAsync("remote get-url origin", returnOutput: true);
         }
 
-        public async UniTask<string> GetCurrentBranch()
+        public async Task<string> GetCurrentBranch()
         {
             return await RunGitCommandAsync("rev-parse --abbrev-ref HEAD", returnOutput: true);
         }
 
-        public async UniTask<string> RunGitCommandAsync(string command, bool returnOutput = false)
+        public async Task<string> RunGitCommandAsync(string command, bool returnOutput = false)
         {
             Debug.Log($"Running Git command: {command}");
             OnGitOutput?.Invoke(new GitOutput(command));
@@ -309,7 +308,7 @@ namespace Glitch9.IO.Git
             OnGitOutput?.Invoke(new GitOutput(output, status));
         }
 
-        private async UniTask InitializeGitRepositoryAsync()
+        private async Task InitializeGitRepositoryAsync()
         {
             string gitDirectory = Path.Combine(_localDir, ".git");
             if (Directory.Exists(gitDirectory))
@@ -334,7 +333,7 @@ namespace Glitch9.IO.Git
 
     public static class TaskExtensions
     {
-        public static async UniTask WaitForExitAsync(this Process process, CancellationToken cancellationToken = default)
+        public static async Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default)
         {
             TaskCompletionSource<object> tcs = new();
 

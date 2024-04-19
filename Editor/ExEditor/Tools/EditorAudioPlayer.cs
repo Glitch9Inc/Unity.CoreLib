@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
 using System.Reflection;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,7 +28,7 @@ namespace Glitch9.ExEditor
             );
             _isPlaying = true;
             // Delay for the length of the audio clip using UniTask
-            await UniTask.Delay(TimeSpan.FromSeconds(audioClip.length));
+            await Task.Delay(TimeSpan.FromSeconds(audioClip.length));
 
             _isPlaying = false;
         }
