@@ -4,7 +4,7 @@ namespace Glitch9.ExEditor
 {
     public static partial class EditorGUITextures
     {
-        private static Texture2D BoxDefault => Get(DIR_BOX, "section-box-light.psd");
+        private static Texture2D BoxDefault => Get(DIR_BOX, "section-box.psd");
         private static Texture2D BoxGreen => Get(DIR_BOX, "section-box-green.psd");
         private static Texture2D BoxYellow => Get(DIR_BOX, "section-box-yellow.psd");
         private static Texture2D BoxOrange => Get(DIR_BOX, "section-box-orange.psd");

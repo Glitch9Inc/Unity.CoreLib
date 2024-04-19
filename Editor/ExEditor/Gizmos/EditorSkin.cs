@@ -17,7 +17,7 @@ namespace Glitch9.ExEditor
         {
             get
             {
-                if (_skinLightDefault == null) _skinLightDefault = LoadSkin(ResolveSkinPath(SKIN_NAME_DARK));
+                if (_skinLightDefault == null) _skinLightDefault = LoadSkin(ResolveSkinPath(SKIN_NAME_LIGHT));
                 return _skinLightDefault;
             }
         }
