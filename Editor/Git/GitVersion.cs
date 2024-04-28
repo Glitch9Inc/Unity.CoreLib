@@ -97,9 +97,12 @@ namespace Glitch9.IO.Git
             {
                 case VersionIncrement.Major:
                     Major++;
+                    Minor = 0;
+                    Patch = 0;
                     break;
                 case VersionIncrement.Minor:
                     Minor++;
+                    Patch = 0;
                     break;
                 case VersionIncrement.Patch:
                     Patch++;
@@ -108,8 +111,10 @@ namespace Glitch9.IO.Git
                     throw new ArgumentOutOfRangeException(nameof(increment), "Unsupported version increment specified.");
             }
 
-            int sumVersion = Major + Minor + Patch;
-            
+            int sumVersion = Patch;
+            sumVersion += Minor * 1000;
+            sumVersion += Major * 1000000;
+
             if (Build < sumVersion)
             {
                 Build = sumVersion;

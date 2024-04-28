@@ -1,7 +1,5 @@
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor; // Required for AssetDatabase and other editor functionalities
-#endif
+
 
 namespace Glitch9
 {
@@ -18,7 +16,7 @@ namespace Glitch9
 #if UNITY_EDITOR
         public void FindLocalDir()
         {
-            string assetPath = AssetDatabase.GetAssetPath(this);
+            string assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
             string directoryPath = System.IO.Path.GetDirectoryName(assetPath);
             localDir = directoryPath;
             Debug.Log("Local Directory: " + localDir);
