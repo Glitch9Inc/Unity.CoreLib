@@ -7,7 +7,7 @@ namespace Glitch9
         private static JsonSerializerSettings _defaultSettings;
         public static JsonSerializerSettings DefaultSettings => _defaultSettings ??= new JsonSerializerSettings
         {
-            TypeNameHandling = TypeNameHandling.All,
+            TypeNameHandling = TypeNameHandling.None,
             PreserveReferencesHandling = PreserveReferencesHandling.Objects,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             Formatting = Formatting.Indented,

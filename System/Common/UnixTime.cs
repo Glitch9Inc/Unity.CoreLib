@@ -131,11 +131,13 @@ namespace Glitch9
 
             return a.Value <= b.Value;
         }
+        
         public readonly override bool Equals(object obj)
         {
             return obj is UnixTime time &&
                    _value == time.Value;
         }
+        
         public readonly override int GetHashCode()
         {
             return -1937169414 + _value.GetHashCode();

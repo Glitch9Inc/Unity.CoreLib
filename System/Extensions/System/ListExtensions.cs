@@ -11,7 +11,7 @@ namespace Glitch9
             return list != null && list.Count > 0;
         }
 
-        public static bool IsNotValid<T>(this List<T> list)
+        public static bool IsInvalid<T>(this List<T> list)
         {
             return list == null || list.Count == 0;
         }
@@ -21,7 +21,7 @@ namespace Glitch9
             return hashSet != null && hashSet.Count > 0;
         }
 
-        public static bool IsNotValid<T>(this HashSet<T> hashSet)
+        public static bool IsInvalid<T>(this HashSet<T> hashSet)
         {
             return hashSet == null || hashSet.Count == 0;
         }
@@ -31,7 +31,7 @@ namespace Glitch9
             return collection != null && collection.Any();
         }
 
-        public static bool IsNotValid<T>(this IEnumerable<T> collection)
+        public static bool IsInvalid<T>(this IEnumerable<T> collection)
         {
             return collection == null || !collection.Any();
         }
@@ -41,7 +41,7 @@ namespace Glitch9
             return queue != null && queue.Count > 0;
         }
 
-        public static bool IsNotValid<T>(this Queue<T> queue)
+        public static bool IsInvalid<T>(this Queue<T> queue)
         {
             return queue == null || queue.Count == 0;
         }

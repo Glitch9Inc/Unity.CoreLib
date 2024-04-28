@@ -8,35 +8,33 @@ namespace Glitch9
         public static TaskResult Fail => new() { IsSuccess = false };
         
         public bool IsSuccess { get; set; }
-        public ErrorMessage ErrorMessage { get; set; }
-        public string ErrorText { get; set; }
+        public Error Error { get; set; }
+ 
 
-        public static TaskResult Error(string message)
+        public static TaskResult CreateError(string errorMessage, string errorResponseFromApi = null)
         {
             return new TaskResult
             {
                 IsSuccess = false,
-                ErrorMessage = new ErrorMessage(message)
+                Error = new Error(errorMessage, errorResponseFromApi)
             };
         }
 
-        public static TaskResult Error(Exception exception, string errorResponseFromApi = null)
+        public static TaskResult CreateError(Exception exception, string errorResponseFromApi = null)
         {
             return new TaskResult
             {
                 IsSuccess = false,
-                ErrorMessage = new ErrorMessage(exception),
-                ErrorText = errorResponseFromApi
+                Error = new Error(exception, errorResponseFromApi),
             };
         }
 
-        public static TaskResult Error(Issue issue, string errorResponseFromApi = null)
+        public static TaskResult CreateError(Issue issue, string errorResponseFromApi = null)
         {
             return new TaskResult
             {
                 IsSuccess = false,
-                ErrorMessage = new ErrorMessage(issue),
-                ErrorText = errorResponseFromApi
+                Error = new Error(issue, errorResponseFromApi),
             };
         }
     }

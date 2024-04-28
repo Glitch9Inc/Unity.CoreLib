@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,7 +32,15 @@ namespace Glitch9.ExEditor
 
         public EPrefs(string prefsKey, T defaultValue)
         {
+            if (string.IsNullOrEmpty(prefsKey)) throw new ArgumentException("prefsKey cannot be null or empty");
             _prefsKey = prefsKey;
+
+            if (!EditorPrefs.HasKey(_prefsKey))
+            {
+                _cache = defaultValue;
+                Save();
+                return;
+            }
 
             try
             {
@@ -62,23 +71,23 @@ namespace Glitch9.ExEditor
             {
                 return (T)Convert.ChangeType(EditorPrefs.GetFloat(_prefsKey), typeof(T));
             }
-            
+
             if (typeof(T) == typeof(string))
             {
                 return (T)Convert.ChangeType(EditorPrefs.GetString(_prefsKey), typeof(T));
             }
-            
+
             if (typeof(T) == typeof(bool))
             {
                 return (T)Convert.ChangeType(EditorPrefs.GetBool(_prefsKey), typeof(T));
             }
-            
+
             if (typeof(T) == typeof(UnixTime))
             {
                 UnixTime unixTime = new(EditorPrefs.GetInt(_prefsKey));
                 return (T)(object)unixTime;
             }
-           
+
             if (typeof(T) == typeof(Vector2))
             {
                 float x = EditorPrefs.GetFloat(_prefsKey + ".x");
@@ -117,14 +126,13 @@ namespace Glitch9.ExEditor
 
                 try
                 {
-                    Type itemType = typeof(T).GetGenericArguments()[0]; 
+                    Type itemType = typeof(T).GetGenericArguments()[0];
                     Type listType = typeof(List<>).MakeGenericType(itemType);
                     return (T)JsonConvert.DeserializeObject(json, listType, JsonUtils.DefaultSettings);
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error occurred while deserializing list: {e.Message}");
-                    EditorPrefs.DeleteKey(_prefsKey);
+                    HandleFailedDeserialization(e);
                     return default;
                 }
             }
@@ -136,10 +144,26 @@ namespace Glitch9.ExEditor
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error occurred while deserializing list: {e.Message}");
-                EditorPrefs.DeleteKey(_prefsKey);
+                HandleFailedDeserialization(e);
                 return default;
             }
+        }
+
+        private void HandleFailedDeserialization(Exception e)
+        {
+            string json = EditorPrefs.GetString(_prefsKey, string.Empty);
+            Debug.LogError($"Error occurred while deserializing {typeof(T).Name}: {e.Message}");
+            Debug.LogError($"Failed JSON: {json}");
+
+            if (!string.IsNullOrWhiteSpace(json))
+            {
+                // Create backup to a file
+                string backupPath = Path.Combine(Application.persistentDataPath, $"EPrefs_{_prefsKey}.json");
+                Debug.LogError($"Creating JSON backup at: {backupPath}");
+                File.WriteAllText(backupPath, json);
+            }
+            
+            EditorPrefs.DeleteKey(_prefsKey);
         }
 
 

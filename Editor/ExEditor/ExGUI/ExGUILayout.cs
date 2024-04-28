@@ -410,12 +410,12 @@ namespace Glitch9.ExEditor
         #endregion
 
         #region ListField
-        
+
         /// <summary>
         /// A custom inspector field for a list of T.
         /// This should resemble the default list inspector field.
         /// </summary>
-        public static List<T> CustomArrayField<T>(List<T> list, Func<T, T> customLayout, GUIContent label = null)
+        public static List<T> CustomArrayField<T>(List<T> list, Func<int, T, T> customLayout, GUIContent label = null)
         {
             // Create a foldout with the list name, on the far right show the size of the list
             label ??= new GUIContent("List");
@@ -461,7 +461,7 @@ namespace Glitch9.ExEditor
                     for (int i = 0; i < list.Count; i++)
                     {
                         GUILayout.BeginHorizontal();
-                        list[i] = customLayout(list[i]);
+                        list[i] = customLayout(i, list[i]);
                         if (GUILayout.Button(EditorIcons.Minus, ExEditorStyles.centeredIconButton))
                         {
                             list.RemoveAt(i);
@@ -574,7 +574,14 @@ namespace Glitch9.ExEditor
 
         private const int DEFAULT_FIELDS_BTN_WIDTH = 112;
         private const string DEFAULT_FIELDS_BTN_NAME = "Reset to Default";
+
+        
         public static int IntFieldWithDefault(string label, int value, int defaultValue)
+        {
+            return IntFieldWithDefault(new GUIContent(label), value, defaultValue);
+        }
+
+        public static int IntFieldWithDefault(GUIContent label, int value, int defaultValue)
         {
             GUILayout.BeginHorizontal();
             //label += $" (Default:{defaultValue})";
@@ -588,7 +595,13 @@ namespace Glitch9.ExEditor
             return newValue;
         }
 
+
         public static float FloatFieldWithDefault(string label, float value, float defaultValue)
+        {
+            return FloatFieldWithDefault(new GUIContent(label), value, defaultValue);
+        }
+
+        public static float FloatFieldWithDefault(GUIContent label, float value, float defaultValue)
         {
             GUILayout.BeginHorizontal();
             //label += $" (Default:{defaultValue})";
@@ -604,6 +617,11 @@ namespace Glitch9.ExEditor
 
         public static string StringFieldWithDefault(string label, string value, string defaultValue)
         {
+            return StringFieldWithDefault(new GUIContent(label), value, defaultValue);
+        }
+
+        public static string StringFieldWithDefault(GUIContent label, string value, string defaultValue)
+        {
             GUILayout.BeginHorizontal();
             //label += $" (Default:{defaultValue})";
             string newValue = EditorGUILayout.TextField(label, value);
@@ -616,6 +634,9 @@ namespace Glitch9.ExEditor
             return newValue;
         }
 
+        private const float PERSISTENT_DATA_PATH_FIELD_WIDTH = 126;
+        private const float ASSET_PATH_FIELD_WIDTH = 46;
+
         public static string PersistentDataPathFieldWithDefault(string label, string value, string defaultValue)
         {
             return PersistentDataPathFieldWithDefault(new GUIContent(label), value, defaultValue);
@@ -623,7 +644,7 @@ namespace Glitch9.ExEditor
 
         public static string PersistentDataPathFieldWithDefault(GUIContent label, string value, string defaultValue)
         {
-            return DataPathFieldWithDefault("Persistent Data Path", label, value, defaultValue);
+            return DataPathFieldWithDefault("Persistent Data Path/", label, value, defaultValue, PERSISTENT_DATA_PATH_FIELD_WIDTH);
         }
 
         public static string AssetPathFieldWithDefault(string label, string value, string defaultValue)
@@ -633,16 +654,17 @@ namespace Glitch9.ExEditor
 
         public static string AssetPathFieldWithDefault(GUIContent label, string value, string defaultValue)
         {
-            return DataPathFieldWithDefault("Asset Path", label, value, defaultValue);
+            return DataPathFieldWithDefault("Assets/", label, value, defaultValue, ASSET_PATH_FIELD_WIDTH);
         }
 
-        private static string DataPathFieldWithDefault(string pathName, GUIContent label, string value, string defaultValue)
+        private static string DataPathFieldWithDefault(string pathName, GUIContent label, string value, string defaultValue, float fieldWidth)
         {
             GUILayout.BeginHorizontal();
 
             EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth));
-            EditorGUILayout.LabelField($"{pathName}: ", EditorStyles.miniBoldLabel, GUILayout.Width(106));
-            string newValue = EditorGUILayout.TextField(value);
+            EditorGUILayout.LabelField(pathName, GUILayout.Width(fieldWidth));
+
+            string newValue = EditorGUILayout.TextField(value, GUILayout.MinWidth(20));
             if (GUILayout.Button(DEFAULT_FIELDS_BTN_NAME, GUILayout.Width(DEFAULT_FIELDS_BTN_WIDTH)))
             {
                 newValue = defaultValue;
@@ -654,6 +676,11 @@ namespace Glitch9.ExEditor
 
 
         public static T EnumPopupWithDefault<T>(string label, T value, T defaultValue) where T : Enum
+        {
+            return EnumPopupWithDefault(new GUIContent(label), value, defaultValue);
+        }
+
+        public static T EnumPopupWithDefault<T>(GUIContent label, T value, T defaultValue) where T : Enum
         {
             GUILayout.BeginHorizontal();
 

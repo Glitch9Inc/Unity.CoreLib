@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Glitch9
 {
@@ -74,6 +74,35 @@ namespace Glitch9
                 Directory.CreateDirectory(path);
                 AssetDatabase.Refresh();
             }
+        }
+
+        // Create Method Abstraction
+        public static TScriptableObject CreateScriptableObject<TScriptableObject>(string fileNameWithoutExt, string targetPath) where TScriptableObject : ScriptableObject
+        {
+            TScriptableObject res = Resources.Load(fileNameWithoutExt) as TScriptableObject;
+            if (res != null)
+            {
+                Debug.LogError($"{typeof(TScriptableObject).Name} already exists. {res.name}");
+                return res;
+            }
+
+            if (!Directory.Exists(targetPath)) Directory.CreateDirectory(targetPath);
+            // check if the file already exists, if it does, it means the file is broken somehow.
+            // create a backup by changing the filename to {filename}_{bk}.asset
+
+            string filePath = $"{targetPath}/{fileNameWithoutExt}.asset";
+            if (File.Exists(filePath))
+            {
+                string backupPath = $"{targetPath}/{fileNameWithoutExt}_bk.asset";
+                File.Move(filePath, backupPath);
+                Debug.LogError($"{typeof(TScriptableObject).Name} already exists, but there were issues loading the file. Backup created at {backupPath} and new file will be created.");
+            }
+
+
+            TScriptableObject obj = ScriptableObject.CreateInstance<TScriptableObject>();
+            AssetDatabase.CreateAsset(obj, filePath);
+            EditorUtility.SetDirty(obj);
+            return obj;
         }
     }
 }

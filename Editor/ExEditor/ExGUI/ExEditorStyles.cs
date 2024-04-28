@@ -12,7 +12,7 @@ namespace Glitch9.ExEditor
         private static readonly RectOffset _defaultBoxMargin = new(2, 2, 2, 2);
         private static readonly RectOffset _defaultBoxPadding = new(2, 2, 2, 2);
 
-    
+
         public static GUIStyle centeredRedMiniLabel
         {
             get
@@ -48,7 +48,7 @@ namespace Glitch9.ExEditor
                 return _centeredBlueMiniLabel;
             }
         }
-   
+
 
         public static GUIStyle background
         {
@@ -152,6 +152,25 @@ namespace Glitch9.ExEditor
             }
         }
 
+        public static GUIStyle iconButton
+        {
+            get
+            {
+                string key = "iconButton";
+                if (!_cache.TryGetValue(key, out GUIStyle style))
+                {
+                    style = new GUIStyle(EditorStyles.iconButton)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fixedHeight = 18,
+                        fixedWidth = 18,
+                    };
+                    _cache.Add(key, style);
+                }
+                return style;
+            }
+        }
+
 
         private static GUIStyle Border(GUIBorder direction, RectOffset padding)
         {
@@ -161,7 +180,7 @@ namespace Glitch9.ExEditor
                 Texture2D boxTex = direction == GUIBorder.Top ? EditorGUITextures.BorderTop : EditorGUITextures.BorderBottom;
                 style = new GUIStyle
                 {
-                    border = new RectOffset(10, 10, 10, 10),
+                    border = new RectOffset(5, 5, 5, 5),
                     margin = new RectOffset(0, 0, 0, 0),
                     padding = padding,
                     normal = { background = boxTex }

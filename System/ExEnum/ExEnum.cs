@@ -35,11 +35,11 @@ namespace Glitch9
             if (field != null)
             {
                 // 모든 ExEnumAttribute 어트리뷰트를 배열로 가져오기
-                ExEnumAttribute[] nameAttributes = field.GetCustomAttributes<ExEnumAttribute>().ToArray();
+                DisplayNameAttribute[] nameAttributes = field.GetCustomAttributes<DisplayNameAttribute>().ToArray();
 
                 if (nameAttributes.Length > 0)
                 {
-                    ExEnumAttribute nameAttribute = nameAttributes[0];
+                    DisplayNameAttribute nameAttribute = nameAttributes[0];
                     if (nameAttribute != null)
                     {
                         names[value] = nameAttribute.DisplayName;

@@ -70,7 +70,7 @@ namespace Glitch9
                         bool isExcluded = false;
                         foreach (string exclude in excludes)
                         {
-                            if (StringExtensions.Search(type.Name, exclude))
+                            if (type.Name.Search(exclude))
                             {
                                 isExcluded = true;
                                 break;

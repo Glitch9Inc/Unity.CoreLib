@@ -10,42 +10,8 @@ using Image = UnityEngine.UI.Image;
 
 namespace Glitch9.ExEditor
 {
-    public class ExGUIUtility
+    public static partial class ExGUIUtility
     {
-        public static Texture2D grayTexture
-        {
-            get
-            {
-                if (_grayTexture == null) _grayTexture = ExGUIUtility.CreateTexture(2, 2, new Color(0.7f, 0.7f, 0.7f, 1f));
-                return _grayTexture;
-            }
-        }
-
-        private static Texture2D _grayTexture;
-
-        public static Texture2D darkGrayTexture
-        {
-            get
-            {
-                if (_darkGrayTexture == null) _darkGrayTexture = ExGUIUtility.CreateTexture(2, 2, new Color(0.65f, 0.65f, 0.65f, 1f));
-                return _darkGrayTexture;
-            }
-        }
-
-        private static Texture2D _darkGrayTexture;
-
-        public static Texture2D borderTexture
-        {
-            get
-            {
-                if (_borderTexture == null) _borderTexture = ExGUIUtility.CreateTexture(2, 2, new Color(0.6f, 0.6f, 0.6f, 1f));
-                return _borderTexture;
-            }
-        }
-
-        private static Texture2D _borderTexture;
-
-
         private static string _glitch9Directory;
 
         public static string GetGlitch9Directory()

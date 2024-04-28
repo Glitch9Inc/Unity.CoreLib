@@ -49,6 +49,7 @@ namespace Glitch9.ExEditor
         public static Texture2D ToolBarButtonOff => Get(DIR_TOOLBAR, "btn-mid-off.psd");
         public static Texture2D BorderTop => Get(DIR_BORDER, "section-border-top.psd");
         public static Texture2D BorderBottom => Get(DIR_BORDER, "section-border-bottom.psd");
+        public static Texture2D BorderTopBottom => Get(DIR_BORDER, "section-border-top-bottom.psd");
         public static Texture2D BorderBottomWithBlueLine => Get(DIR_BORDER, "section-border-bottom-blueline.psd");
         public static Texture2D Background => Get(DIR_BACKGROUND, "section-background.psd");
 
