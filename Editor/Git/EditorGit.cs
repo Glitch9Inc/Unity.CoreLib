@@ -267,13 +267,10 @@ namespace Glitch9.IO.Git
                     ConfigureAutoCRLF(true);
                 }
 
-                // if (GUILayout.Button("Configure core.autocrlf Globally [false]"))
-                // {
-                //     if (ExGUI.Ask("Are you sure you want to continue?"))
-                //     {
-                //         ConfigureAutoCRLF(false);
-                //     }
-                // }
+                if (GUILayout.Button("Set Upstream to Origin"))
+                {
+                    SetUpstreamToOrigin();
+                }
 
                 if (GUILayout.Button("Push Version Tag"))
                 {
@@ -391,6 +388,11 @@ namespace Glitch9.IO.Git
         private async void ConfigureAutoCRLF(bool value)
         {
             await _git.ConfigureGlobalCoreAutoCRLFAsync(value);
+        }
+
+        private async void SetUpstreamToOrigin()
+        {
+            await _git.SetUpstreamToOrigin();
         }
     }
 }
