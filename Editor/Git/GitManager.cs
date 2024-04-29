@@ -190,6 +190,12 @@ namespace Glitch9.IO.Git
         public Task ConfigureGlobalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}");
         public Task NormalizeLineEndingsAsync() => RunGitCommandAsync("add --renormalize .");
 
+
+        public async Task SetUpstreamToOrigin()
+        {
+            await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}");
+        }
+
         public async Task<string> PushVersionAsync()
         {
             return await RunGitCommandAsync("remote get-url origin", returnOutput: true);
