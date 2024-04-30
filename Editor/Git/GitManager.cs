@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using Debug = UnityEngine.Debug;
 
 namespace Glitch9.IO.Git
@@ -214,6 +213,7 @@ namespace Glitch9.IO.Git
         public Task ConfigureLocalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}");
         public Task ConfigureGlobalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}");
         public Task NormalizeLineEndingsAsync() => RunGitCommandAsync("add --renormalize .");
+
 
         public async Task SetUpstreamToOrigin()
         {

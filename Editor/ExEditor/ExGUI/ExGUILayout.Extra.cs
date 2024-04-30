@@ -77,7 +77,7 @@ namespace Glitch9.ExEditor
             EditorGUILayout.EndVertical();
         }
 
-        public static bool BoolPropertyField(SerializedProperty p, string label = null)
+        public static bool ReverseBoolField(string label, SerializedProperty p)
         {
             GUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(p, GUIContent.none, GUILayout.Width(10));
@@ -85,6 +85,11 @@ namespace Glitch9.ExEditor
             GUILayout.Label(new GUIContent(label), GUILayout.MinWidth(10));
             GUILayout.EndHorizontal();
             return p.boolValue;
+        }
+
+        public static bool ReverseBoolField(SerializedProperty p)
+        {
+            return ReverseBoolField(null, p);
         }
 
         public static void SpriteField(SerializedProperty p, int size, int topMargin)
