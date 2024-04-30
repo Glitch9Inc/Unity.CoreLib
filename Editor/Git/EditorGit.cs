@@ -43,6 +43,14 @@ namespace Glitch9.IO.Git
             internal const string UP_TO_DATE = "You are up to date with the latest version.";
         }
 
+        private GUIStyle GetColoredStyle(Color color)
+        {
+            return new(EditorStyles.wordWrappedLabel)
+            {
+                normal = { textColor = color }
+            };
+        }
+
         internal async void InitializeAsync(string gitUrl, string gitBranch, string localDir, bool reinitialize = false)
         {
             if ((IsInitialized || _isInitializing) && !reinitialize) return;
@@ -103,11 +111,11 @@ namespace Glitch9.IO.Git
 
                 if (_git.PullAvailable)
                 {
-                    GUILayout.Label(Texts.NEW_VERSION_AVAILABLE, ExEditorStyles.centeredRedMiniLabel);
+                    GUILayout.Label(Texts.NEW_VERSION_AVAILABLE, GetColoredStyle(Color.red));
                 }
                 else
                 {
-                    GUILayout.Label(Texts.UP_TO_DATE, ExEditorStyles.centeredBlueMiniLabel);
+                    GUILayout.Label(Texts.UP_TO_DATE, GetColoredStyle(Color.blue));
                 }
             }
             GUILayout.EndVertical();
@@ -293,17 +301,16 @@ namespace Glitch9.IO.Git
         {
             if (_gitOutputColors.TryGetValue(gitOutput.Status, out Color color))
             {
-                GUIStyle coloredStyle = new(EditorStyles.wordWrappedLabel)
-                {
-                    normal = { textColor = color }
-                };
-                GUILayout.Label(gitOutput.Value, coloredStyle);
+                GUILayout.Label(gitOutput.Value, GetColoredStyle(color));
             }
             else
             {
                 GUILayout.Label(gitOutput.Value, EditorStyles.wordWrappedLabel);
             }
         }
+
+
+
 
         private void DrawCommandLineInput()
         {
