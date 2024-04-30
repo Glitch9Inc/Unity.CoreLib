@@ -126,6 +126,10 @@ namespace Glitch9.IO.Git
         public async Task PullVersionTagAsync()
         {
             Debug.Log("Getting version info...");
+            
+            // Set the current branch to track the remote branch
+            await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}");
+            
             // Fetch the tags from the remote repository
             await RunGitCommandAsync("fetch --tags");
 
