@@ -26,7 +26,7 @@ namespace Glitch9.IO.Git
             }
 
             _git = new EditorGit();
-            _git.InitializeAsync(GIT_URL, GIT_BRANCH, WORKING_DIR);
+            _git.InitializeAsync(GIT_URL, GIT_BRANCH, WORKING_DIR, Repaint);
         }
 
         protected override void OnGUIUpdate()

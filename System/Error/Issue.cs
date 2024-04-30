@@ -12,146 +12,146 @@ namespace Glitch9
         None,
 
         // Fallback
-        [IssueCode("An unknown error occurred.")]
+        [Message("An unknown error occurred.")]
         UnknownError = 0,
 
         // System - General Errors
-        [IssueCode("Invalid operation attempted.")]
+        [Message("Invalid operation attempted.")]
         InvalidOperation,
-        [IssueCode("Invalid argument provided.")]
+        [Message("Invalid argument provided.")]
         InvalidArgument,
-        [IssueCode("Invalid format.")]
+        [Message("Invalid format.")]
         InvalidFormat,
 
         // System - File and IO Errors
-        [IssueCode("File not found.")]
+        [Message("File not found.")]
         FileNotFound = 200,
-        [IssueCode("File format is not supported.")]
+        [Message("File format is not supported.")]
         FileFormatUnsupported,
-        [IssueCode("File size is too large.")]
+        [Message("File size is too large.")]
         FileSizeExceeded,
 
         // System - Resource Errors
-        [IssueCode("Resource not found.")]
+        [Message("Resource not found.")]
         ResourceNotFound = 300,
-        [IssueCode("Resource already exists.")]
+        [Message("Resource already exists.")]
         ResourceAlreadyExists = 301,
-        [IssueCode("Resource is locked.")]
+        [Message("Resource is locked.")]
         ResourceLocked = 302,
-        [IssueCode("Resource state conflict.")]
+        [Message("Resource state conflict.")]
         ResourceStateConflict = 303,
 
         // Network - General Errors / HTTP (API)
-        [IssueCode("[400] Invalid request. Please check your input.")]
+        [Message("[400] Invalid request. Please check your input.")]
         InvalidRequest = 400,
-        [IssueCode("[401] You don't have permission to execute this operation.")]
+        [Message("[401] You don't have permission to execute this operation.")]
         PermissionDenied,
-        [IssueCode("[402] Server is not available. Please try again later.")]
+        [Message("[402] Server is not available. Please try again later.")]
         ServiceUnavailable,
-        [IssueCode("[403] Server is forbidden. Please check your access rights.")]
+        [Message("[403] Server is forbidden. Please check your access rights.")]
         Forbidden,
-        [IssueCode("[404] Target endpoint is not available. Please check the URL.")]
+        [Message("[404] Target endpoint is not available. Please check the URL.")]
         InvalidEndpoint,
-        [IssueCode("Request Failed.")]
+        [Message("Request Failed.")]
         ProtocolError,
-        [IssueCode("Request timeout.")]
+        [Message("Request timeout.")]
         RequestTimeout,
-        [IssueCode("Please enter all required fields to send this request.")]
+        [Message("Please enter all required fields to send this request.")]
         MissingRequiredField,
-        [IssueCode("Access has been denied.")]
+        [Message("Access has been denied.")]
         UnauthorizedAccess,
-        [IssueCode("No internet connection. Please try again later.")]
+        [Message("No internet connection. Please try again later.")]
         NoInternet,
-        [IssueCode("Network error occurred. Please try again later.")]
+        [Message("Network error occurred. Please try again later.")]
         NetworkError, // Generic
-        [IssueCode("Too many requests. Please try again later.")]
+        [Message("Too many requests. Please try again later.")]
         TooManyRequests,
-        [IssueCode("Batch operation Failed.")]
+        [Message("Batch operation Failed.")]
         InvalidBatchOperation,
-        [IssueCode("There was an error while sending the request.")]
+        [Message("There was an error while sending the request.")]
         SendFailed,
-        [IssueCode("There was an error while receiving the response.")]
+        [Message("There was an error while receiving the response.")]
         ReceiveFailed,
-        [IssueCode("Request is not allowed by the server.")]
+        [Message("Request is not allowed by the server.")]
         RequestProhibitedByCachePolicy,
-        [IssueCode("Request is not allowed by the server.")]
+        [Message("Request is not allowed by the server.")]
         RequestProhibitedByProxy,
-        [IssueCode("A custom API error object was returned.")]
+        [Message("A custom API error object was returned.")]
         ErrorObjectReturned,
 
         // Network - Validation and Format Errors
-        [IssueCode("Server error occurred. Please try again later.")]
+        [Message("Server error occurred. Please try again later.")]
         InternalServerError = 500,
-        [IssueCode("Validation error occurred.")]
+        [Message("Validation error occurred.")]
         ValidationError,
-        [IssueCode("Response is empty.")]
+        [Message("Response is empty.")]
         EmptyResponse,
-        [IssueCode("Response is malformed.")]
+        [Message("Response is malformed.")]
         MalformedResponse,
-        [IssueCode("Data is out of range.")]
+        [Message("Data is out of range.")]
         DataOutOfRange,
-        [IssueCode("Data is duplicated.")]
+        [Message("Data is duplicated.")]
         DuplicateData,
 
         // Network - Authentication and Authorization Errors
-        [IssueCode("Authentication Failed.")]
+        [Message("Authentication Failed.")]
         AuthenticationFailed = 600,
-        [IssueCode("Invalid email address.")]
+        [Message("Invalid email address.")]
         InvalidEmail,
-        [IssueCode("Invalid password.")]
+        [Message("Invalid password.")]
         InvalidPassword,
-        [IssueCode("Invalid email or password.")]
+        [Message("Invalid email or password.")]
         InvalidEmailOrPassword,
-        [IssueCode("Token is Expired.")]
+        [Message("Token is Expired.")]
         TokenExpired,
-        [IssueCode("Invalid token.")]
+        [Message("Invalid token.")]
         TokenInvalid,
-        [IssueCode("Session is Expired.")]
+        [Message("Session is Expired.")]
         SessionExpired,
 
         // Conversion, Parsing and Serialization Errors
-        [IssueCode("Conversion Failed.")]
+        [Message("Conversion Failed.")]
         ConversionFailed = 700,
-        [IssueCode("Parsing Failed.")]
+        [Message("Parsing Failed.")]
         ParsingFailed,
-        [IssueCode("Serialization Failed.")]
+        [Message("Serialization Failed.")]
         SerializationFailed,
 
         // Game Errors
-        [IssueCode("Content is not ready.")]
+        [Message("Content is not ready.")]
         ContentNotReady = 800,
-        [IssueCode("Invalid amount.")]
+        [Message("Invalid amount.")]
         InvalidAmount,
-        [IssueCode("Your level is not high enough.")]
+        [Message("Your level is not high enough.")]
         NotEnoughLevel,
-        [IssueCode("Invalid item.")]
+        [Message("Invalid item.")]
         InvalidItem,
-        [IssueCode("Item is not found.")]
+        [Message("Item is not found.")]
         MissingItem,
-        [IssueCode("Invalid content.")]
+        [Message("Invalid content.")]
         InvalidContent,
-        [IssueCode("Content is not found.")]
+        [Message("Content is not found.")]
         MissingContent,
-        [IssueCode("Invalid character.")]
+        [Message("Invalid character.")]
         InvalidCharacter,
-        [IssueCode("Character is not found.")]
+        [Message("Character is not found.")]
         MissingCharacter,
-        [IssueCode("Not enough energy.")]
+        [Message("Not enough energy.")]
         InsufficientEnergy,
-        [IssueCode("Not enough stamina.")]
+        [Message("Not enough stamina.")]
         InsufficientStamina,
-        [IssueCode("You don't have required materials.")]
+        [Message("You don't have required materials.")]
         InsufficientMaterials,
-        [IssueCode("You don't have enough tokens.")]
+        [Message("You don't have enough tokens.")]
         InsufficientTokens,
-        [IssueCode("You don't have enough currency.")]
+        [Message("You don't have enough currency.")]
         InsufficientCurrency,
-        [IssueCode("You don't have season pass.")]
+        [Message("You don't have season pass.")]
         NoSeasonPass,
 
 #if GLITCH9_INTERNAL
 
-        [IssueCode("You don't have enough Glitch9 credits.")]
+        [Message("You don't have enough Glitch9 credits.")]
         InsufficientWallet,
 
 #endif

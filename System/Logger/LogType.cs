@@ -5,12 +5,21 @@ namespace Glitch9
     [Flags]
     public enum LogType
     {
-        Log = 1 << 0,
-        Warning = 1 << 1,
-        Error = 1 << 2,
-        Exception = 1 << 3,
-        Native = 1 << 4,
-        NativeWarning = 1 << 5,
-        NativeError = 1 << 6,
+        Info = 1 << 0,
+        Verbose = 1 << 1,
+        Warning = 1 << 2,
+        Error = 1 << 3,
+        Critical = 1 << 4,
+        NativeInfo = 1 << 5,
+        NativeVerbose = 1 << 6,
+        NativeWarning = 1 << 7,
+        NativeError = 1 << 8,
+        NativeCritical = 1 << 9
     }
+
+    //[Flags]
+    //public enum LogLevel
+    //{
+
+    //}
 }

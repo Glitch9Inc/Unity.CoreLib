@@ -13,6 +13,7 @@ namespace Glitch9.IO.Git
         private GitManager _git;
         private Vector2 _scrollPosition;
         private List<GitOutput> _gitOutputs;
+        private Action _onRepaint;
 
         private string _gitUrl;
         private string _repoName;
@@ -52,7 +53,7 @@ namespace Glitch9.IO.Git
             };
         }
 
-        internal async void InitializeAsync(string gitUrl, string gitBranch, string localDir, bool reinitialize = false)
+        internal async void InitializeAsync(string gitUrl, string gitBranch, string localDir, Action onRepaint, bool reinitialize = false)
         {
             if ((IsInitialized || _isInitializing) && !reinitialize) return;
             _isInitializing = true;
@@ -68,6 +69,7 @@ namespace Glitch9.IO.Git
             _gitUrl = gitUrl;
             _repoName = gitUrl.Substring(gitUrl.LastIndexOf('/') + 1);
             _branchName = gitBranch;
+            _onRepaint = onRepaint;
 
             _git = new GitManager(_repoName, gitUrl, gitBranch, localDir);
 
@@ -76,6 +78,7 @@ namespace Glitch9.IO.Git
                 _gitOutputs.Add(output);
                 _gitOutputUpdated++;
                 GoToBottom();
+                _onRepaint?.Invoke();
             };
 
             await _git.InitializeAsync();

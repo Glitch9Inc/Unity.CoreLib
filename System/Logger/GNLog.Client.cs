@@ -11,12 +11,12 @@ namespace Glitch9
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(msg, LogType.Log, showCallerInfo, callerMemberName, callerFilePath);
+            ContinueWithLogger(msg, LogType.Info, showCallerInfo, callerMemberName, callerFilePath);
         }
 
         public static void Info(string tag, string msg)
         {
-            ContinueWithLogger(msg, LogType.Log, false, null, null, tag);
+            ContinueWithLogger(msg, LogType.Info, false, null, null, tag);
         }
 
         public static void Warning(string msg, bool showCallerInfo = false,
@@ -53,7 +53,7 @@ namespace Glitch9
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(msg, LogType.Exception, showCallerInfo, callerMemberName, callerFilePath);
+            ContinueWithLogger(msg, LogType.Critical, showCallerInfo, callerMemberName, callerFilePath);
         }
 
         public static void Exception(Exception e, bool showCallerInfo = false,
@@ -61,12 +61,12 @@ namespace Glitch9
             [CallerFilePath] string callerFilePath = "")
         {
             string msg = e.Message + "\n" + e.StackTrace;
-            ContinueWithLogger(msg, LogType.Exception, showCallerInfo, callerMemberName, callerFilePath);
+            ContinueWithLogger(msg, LogType.Critical, showCallerInfo, callerMemberName, callerFilePath);
         }
 
         public static void Native(string msg)
         {
-            ContinueWithLogger(msg, LogType.Native, false, null, null, NATIVE_PLUGIN_TAG);
+            ContinueWithLogger(msg, LogType.NativeInfo, false, null, null, NATIVE_PLUGIN_TAG);
         }
 
         public static void NativeWarning(string msg)

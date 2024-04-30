@@ -20,7 +20,7 @@ namespace Glitch9.IO.Git
             gitBranch = serializedObject.FindProperty(nameof(gitBranch));
             localDir = serializedObject.FindProperty(nameof(localDir));
             _git = new EditorGit();
-            _git.InitializeAsync(gitUrl.stringValue, gitBranch.stringValue, localDir.stringValue);
+            _git.InitializeAsync(gitUrl.stringValue, gitBranch.stringValue, localDir.stringValue, Repaint);
         }
 
         public override void OnInspectorGUI()

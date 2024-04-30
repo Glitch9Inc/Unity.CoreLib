@@ -9,29 +9,37 @@ namespace Glitch9
 {
     public partial class GNLog
     {
-        public static Stack<LogData> CachedLogs = new();
-        public static event Action<LogData> OnLogAdded;
-        public static bool IgnoreEditorLogs { get; set; } = false;
+        private static class DefaultValues
+        {
+            internal const bool ENABLED = true;
+            internal const bool COLORED = false;
+        }
         
+        public static bool IsEnabled { get; set; } = DefaultValues.ENABLED;
+        public static bool IsColored { get; set; } = DefaultValues.COLORED;
+
         internal static readonly ObjectPool<StringBuilder> Pool = new(() => new StringBuilder(), null, sb => sb.Clear());
         public static StringBuilder Get() => Pool.Get();
         public static PooledObject<StringBuilder> Get(out StringBuilder value) => Pool.Get(out value);
         public static void Release(StringBuilder toRelease) => Pool.Release(toRelease);
 
         private static readonly Dictionary<LogType, string> k_CachedColors = new();
-        private const bool COLOR_LOGS = false;
-    
+
+        public static Stack<LogData> CachedLogs = new();
+        public static event Action<LogData> OnLogAdded;
+        
         public static void ClearCachedColorHex() => k_CachedColors.Clear();
         public static string GetColorHex(LogType logType)
         {
             if (k_CachedColors.TryGetValue(logType, out string hex)) return hex;
             switch (logType)
             {
-                case LogType.Log: k_CachedColors.Add(logType, ExColor.charcoal.ToHex()); break;
+                case LogType.Info: k_CachedColors.Add(logType, Color.black.ToHex()); break;
+                case LogType.Verbose: k_CachedColors.Add(logType, Color.blue.ToHex()); break;
                 case LogType.Warning: k_CachedColors.Add(logType, ExColor.orange.ToHex()); break;
                 case LogType.Error: k_CachedColors.Add(logType, ExColor.clementine.ToHex()); break;
-                case LogType.Exception: k_CachedColors.Add(logType, ExColor.purple.ToHex()); break;
-                case LogType.Native: k_CachedColors.Add(logType, ExColor.gold.ToHex()); break;
+                case LogType.Critical: k_CachedColors.Add(logType, ExColor.purple.ToHex()); break;
+                case LogType.NativeInfo: k_CachedColors.Add(logType, ExColor.gold.ToHex()); break;
                 case LogType.NativeError: k_CachedColors.Add(logType, ExColor.garnet.ToHex()); break;
             }
             return k_CachedColors[logType];
@@ -51,17 +59,24 @@ namespace Glitch9
                     }
                     else
                     {
-                        sb.Append(Path.GetFileNameWithoutExtension(callerFilePath));
-                        sb.Append("|");
-                        sb.Append(callerMemberName);
+                        if (!string.IsNullOrEmpty(callerFilePath))
+                        {
+                            sb.Append(Path.GetFileNameWithoutExtension(callerFilePath));
+
+                            if (!string.IsNullOrEmpty(callerMemberName))
+                            {
+                                sb.Append("|");
+                                sb.Append(callerMemberName);
+                            }
+                        }
                     }
                  
                     sb.Append("]</color> ");
                 }
               
-                if (COLOR_LOGS) sb.Append($"<color={GetColorHex(logType)}>");
+                if (IsColored) sb.Append($"<color={GetColorHex(logType)}>");
                 sb.Append(msg);
-                if (COLOR_LOGS) sb.Append("</color>");
+                if (IsColored) sb.Append("</color>");
 
                 string log = sb.ToString();
 
@@ -69,8 +84,10 @@ namespace Glitch9
 
                 switch (logType)
                 {
-                    case LogType.Log:
-                    case LogType.Native:
+                    case LogType.Info:
+                    case LogType.Verbose:
+                    case LogType.NativeInfo:
+                    case LogType.NativeVerbose:
                         Debug.Log(log);
                         break;
                     case LogType.Warning:
@@ -79,7 +96,8 @@ namespace Glitch9
                         break;
                     case LogType.Error:
                     case LogType.NativeError:
-                    case LogType.Exception:
+                    case LogType.Critical:
+                    case LogType.NativeCritical:
                         Debug.LogError(log);
                         break;
                 }
