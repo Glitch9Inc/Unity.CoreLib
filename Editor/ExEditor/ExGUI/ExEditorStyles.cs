@@ -196,7 +196,7 @@ namespace Glitch9.ExEditor
                       7,
                       7,
                       direction == GUIBorder.Top ? 7 : 10,
-                      direction == GUIBorder.Top ? 10 : 4
+                      direction == GUIBorder.Top ? 7 : 4
                   );
 
             return Border(direction, padding);

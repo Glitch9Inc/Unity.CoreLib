@@ -3,14 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+
 
 namespace Glitch9
 {
     public static class ReflectionUtils
     {
+        public static T CreateInstance<T>(params object[] args)
+        {
+            try
+            {
+                if (args == null || args.Length == 0)
+                {
+                    T instance = Activator.CreateInstance<T>();
+                    return instance;
+                }
+                else
+                {
+                    Type type = typeof(T);
+                    T instance = (T)Activator.CreateInstance(type, args);
+                    return instance;
+                }
+            }
+            catch (Exception e)
+            {
+                GNLog.Exception(e);
+                return default;
+            }
+        }
+
+        
         public static string TypeNameWithNamespace(Type type)
         {
             if (string.IsNullOrEmpty(type.Namespace))
@@ -107,7 +129,7 @@ namespace Glitch9
             {
                 Debug.LogError($"ApiEnumDE {enumName} not found");
 #if UNITY_EDITOR
-                EditorUtility.DisplayDialog("Error", $"ApiEnumDE {enumName} not found", "OK");
+                UnityEditor.EditorUtility.DisplayDialog("Error", $"ApiEnumDE {enumName} not found", "OK");
 #endif
             }
             return enumType;
@@ -124,7 +146,7 @@ namespace Glitch9
             {
                 Debug.LogError($"ApiEnumDE {enumName} has no values");
 #if UNITY_EDITOR
-                EditorUtility.DisplayDialog("Error", $"ApiEnumDE {enumName} has no values", "OK");
+                UnityEditor.EditorUtility.DisplayDialog("Error", $"ApiEnumDE {enumName} has no values", "OK");
 #endif
                 return null;
             }

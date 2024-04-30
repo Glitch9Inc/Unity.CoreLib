@@ -10,15 +10,15 @@ namespace Glitch9.IO.Git
         Minor,
         Patch
     }
-    
-    /// <summary>
-    /// Version.txt looks like below
-    /// Version: 1.4.3 (major, minor, patch)
-    /// Build: 456
-    /// Release Date: 2023-11-01
-    /// </summary>
+
     public struct GitVersion : IEquatable<GitVersion>, IComparable<GitVersion>
     {
+        /*
+             Version.txt looks like below
+             Version: 1.4.3 (major, minor, patch)
+             Build: 456
+             Release: 2023-11-01
+        */
         public static GitVersion CreateCurrentVersion(string projectName)
         {
             string envPrefix = CreateEnvPrefix(projectName);
