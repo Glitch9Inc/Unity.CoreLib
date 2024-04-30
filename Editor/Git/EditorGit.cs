@@ -1,3 +1,4 @@
+using System;
 using Glitch9.ExEditor;
 using System.Collections.Generic;
 using UnityEditor;
@@ -146,15 +147,17 @@ namespace Glitch9.IO.Git
             {
                 if (_git.PullAvailable) // check if there is a new version available
                 {
-                    if (ExGUI.Ask("Are you sure you want to update the module?"))
-                    {
-                        Pull();
-                    }
+                    Pull();
                 }
                 else
                 {
                     Debug.Log(Texts.UP_TO_DATE);
                 }
+            }
+
+            if (GUILayout.Button("Force Update Module"))
+            {
+                Pull();
             }
 
             if (GUILayout.Button("Git Status"))
@@ -169,33 +172,27 @@ namespace Glitch9.IO.Git
 
             if (_uploadMenuFoldout)
             {
-                if (GUILayout.Button("Save Changes (Git Commit)"))
+                if (GUILayout.Button("Upload (Commit and Push)"))
                 {
-                    Commit();
-                }
-
-                if (GUILayout.Button("Upload (Git Push)"))
-                {
-                    string popupMessage = "Please select the version type.";
-                    string popupDescription = "Version type is used to determine the version number. \n" +
-                                              "Patch: 1.0.0 -> 1.0.1 \n" +
-                                              "Minor: 1.0.0 -> 1.1.0 \n" +
-                                              "Major: 1.0.0 -> 2.0.0 \n";
-
-                    GitVersionSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, Push);
+                    ShowGitVersionSelector(Push);
                 }
 
                 if (GUILayout.Button("Force Upload (Git Push -f)"))
                 {
-                    string popupMessage = "Are you sure you want to force push?";
-                    string popupDescription = "Version type is used to determine the version number. \n" +
-                                              "Patch: 1.0.0 -> 1.0.1 \n" +
-                                              "Minor: 1.0.0 -> 1.1.0 \n" +
-                                              "Major: 1.0.0 -> 2.0.0 \n";
-
-                    GitVersionSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, ForcePush);
+                    ShowGitVersionSelector(ForcePush);
                 }
             }
+        }
+
+        private void ShowGitVersionSelector(Action<VersionIncrement> callback)
+        {
+            string popupMessage = "Are you sure you want to force push?";
+            string popupDescription = "Version type is used to determine the version number. \n" +
+                                      "Patch: 1.0.0 -> 1.0.1 \n" +
+                                      "Minor: 1.0.0 -> 1.1.0 \n" +
+                                      "Major: 1.0.0 -> 2.0.0 \n";
+
+            GitVersionSelector.Show(popupMessage, popupDescription, VersionIncrement.Patch, callback);
         }
 
         private void DrawRemoteMenu()
@@ -380,11 +377,6 @@ namespace Glitch9.IO.Git
         private async void PullVersionTag()
         {
             await _git.PullVersionTagAsync();
-        }
-
-        private async void Commit()
-        {
-            await _git.CommitAsync();
         }
 
         private async void NormalizeLineEndings()

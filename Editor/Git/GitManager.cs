@@ -91,7 +91,7 @@ namespace Glitch9.IO.Git
 
             try
             {
-                await InitializeGitRepositoryAsync();
+                await InitGitRepositoryAsync();
                 await PullVersionTagAsync();
                 await ValidateRemoteOrigin();
                 await ValidateBranch();
@@ -99,6 +99,50 @@ namespace Glitch9.IO.Git
             catch (Exception e)
             {
                 Debug.LogError(e);
+            }
+        }
+        
+        private async Task InitGitRepositoryAsync()
+        {
+            string gitDirectory = Path.Combine(_localDir, ".git");
+            if (Directory.Exists(gitDirectory))
+            {
+                Debug.Log("Git repository already initialized.");
+                return;
+            }
+
+            try
+            {
+                await RunGitCommandAsync("init");
+                Debug.Log(Directory.Exists(gitDirectory) ? "Git repository initialized." : "Failed to initialize Git repository.");
+            }
+            catch (Exception ex)
+            {
+                string error = $"Failed to initialize Git repository:  {ex.Message}";
+                Debug.LogError(error);
+                OnGitOutput?.Invoke(new GitOutput(error, GitOutputStatus.Error));
+            }
+        }
+
+        public async Task PullVersionTagAsync()
+        {
+            Debug.Log("Getting version info...");
+            // Fetch the tags from the remote repository
+            await RunGitCommandAsync("fetch --tags");
+
+            // Get the latest tag from the fetched tags
+            string latestTag = await RunGitCommandAsync("describe --tags --abbrev=0", true);
+
+            // Check if the latestTag is not null or empty after trimming
+            if (!string.IsNullOrEmpty(latestTag))
+            {
+                _remoteVersion = new GitVersion(_repoName, latestTag);
+                Debug.Log($"Latest version tag pulled: {_remoteVersion}");
+            }
+            else
+            {
+                Debug.LogWarning("No valid version tag found.");
+                _remoteVersion = new GitVersion();
             }
         }
 
@@ -132,13 +176,21 @@ namespace Glitch9.IO.Git
             }
         }
 
-        public Task PullAsync() => RunGitCommandAsync("pull");
+        public async Task PullAsync()
+        {
+            await RunGitCommandAsync("pull");
+        }
 
         public async Task PushAsync(VersionIncrement versionInc, bool force = false)
         {
             string pushCommand = $"push origin {_gitBranch}";
             if (force) pushCommand += " --force";
+            
+            // Commit changes
             await RunGitCommandAsync("add .");
+            await RunGitCommandAsync("commit -m \"" + _remoteVersion.CreateTagInfo() + "\"");
+
+            // Push changes
             await RunGitCommandAsync(pushCommand);
             await PushVersionTagAsync(versionInc);
             _localVersion = _remoteVersion;
@@ -156,34 +208,6 @@ namespace Glitch9.IO.Git
             await RunGitCommandAsync($"tag -a {tag} -m \"{tagInfo}\"");
             await RunGitCommandAsync("push origin --tags");
             _localVersion = _remoteVersion;
-        }
-
-        public async Task PullVersionTagAsync()
-        {
-            Debug.Log("Getting version info...");
-            // Fetch the tags from the remote repository
-            await RunGitCommandAsync("fetch --tags");
-
-            // Get the latest tag from the fetched tags
-            string latestTag = await RunGitCommandAsync("describe --tags --abbrev=0", true);
-
-            // Check if the latestTag is not null or empty after trimming
-            if (!string.IsNullOrEmpty(latestTag))
-            {
-                _remoteVersion = new GitVersion(_repoName, latestTag);
-                Debug.Log($"Latest version tag pulled: {_remoteVersion}");
-            }
-            else
-            {
-                Debug.LogWarning("No valid version tag found.");
-                _remoteVersion = new GitVersion();
-            }
-        }
-
-        public async Task CommitAsync()
-        {
-            await RunGitCommandAsync("add .");
-            await RunGitCommandAsync("commit -m \"" + _remoteVersion.CreateTagInfo() + "\"");
         }
 
         public Task StatusAsync() => RunGitCommandAsync("status");
@@ -314,27 +338,7 @@ namespace Glitch9.IO.Git
             OnGitOutput?.Invoke(new GitOutput(output, status));
         }
 
-        private async Task InitializeGitRepositoryAsync()
-        {
-            string gitDirectory = Path.Combine(_localDir, ".git");
-            if (Directory.Exists(gitDirectory))
-            {
-                Debug.Log("Git repository already initialized.");
-                return;
-            }
 
-            try
-            {
-                await RunGitCommandAsync("init");
-                Debug.Log(Directory.Exists(gitDirectory) ? "Git repository initialized." : "Failed to initialize Git repository.");
-            }
-            catch (Exception ex)
-            {
-                string error = $"Failed to initialize Git repository:  {ex.Message}";
-                Debug.LogError(error);
-                OnGitOutput?.Invoke(new GitOutput(error, GitOutputStatus.Error));
-            }
-        }
     }
 
     public static class TaskExtensions
