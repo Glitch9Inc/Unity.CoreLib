@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Glitch9
@@ -7,7 +8,20 @@ namespace Glitch9
     {
         [SerializeField] private string packageName;
         [SerializeField] private string buildPath;
-        [SerializeField] private int versionNumber;
+        [SerializeField] private Version version;
         [SerializeField] private string[] assetPaths;
+
+        public Version Version => version;
+        public string PackageName => packageName;
+
+        public void IncreasePatchVersion(int amount = 1)
+        {
+            version.Patch += amount;
+        }
+
+        public void SetBuildNumber(int buildNumber)
+        {
+            version.Build = buildNumber;
+        }
     }
 }

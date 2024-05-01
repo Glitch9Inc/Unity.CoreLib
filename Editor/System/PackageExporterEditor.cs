@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Glitch9
@@ -12,16 +11,19 @@ namespace Glitch9
         private const string FILE_NAME_FORMAT = "{0}_{1}.unitypackage"; // 0 is the package name, 1 is the version number
         private const string ASSET_PATHS_HELP = "Asset Paths must start with 'Assets/' and can contain wildcards (*).";
 
+        private PackageExporter _target;
         private SerializedProperty packageName;
         private SerializedProperty buildPath;
-        private SerializedProperty versionNumber;
+        private SerializedProperty version;
         private SerializedProperty assetPaths;
+       
 
         private void OnEnable()
         {
+            _target = (PackageExporter)target;
             packageName = serializedObject.FindProperty(nameof(packageName));
             buildPath = serializedObject.FindProperty(nameof(buildPath));
-            versionNumber = serializedObject.FindProperty(nameof(versionNumber));
+            version = serializedObject.FindProperty(nameof(version));
             assetPaths = serializedObject.FindProperty(nameof(assetPaths));
         }
 
@@ -42,8 +44,7 @@ namespace Glitch9
             }
             GUILayout.EndHorizontal();
 
-            EditorGUILayout.PropertyField(versionNumber);
-
+            EditorGUILayout.PropertyField(version);
             EditorGUILayout.PropertyField(assetPaths, true);
             EditorGUILayout.HelpBox(ASSET_PATHS_HELP, MessageType.Info);
 
@@ -54,9 +55,9 @@ namespace Glitch9
                 Export();
             }
 
-            if (GUILayout.Button("Export Package (+1 Version)", GUILayout.Height(30)))
+            if (GUILayout.Button("Export Package (Version +)", GUILayout.Height(30)))
             {
-                versionNumber.intValue++;
+                _target.IncreasePatchVersion();
                 Export();
             }
 
@@ -72,8 +73,8 @@ namespace Glitch9
                 list.Add(this.assetPaths.GetArrayElementAtIndex(i).stringValue);
             }
 
-            int newVersionNumber = ExportPackage(packageName.stringValue, versionNumber.intValue, buildPath.stringValue, list);
-            if (newVersionNumber != -1) versionNumber.intValue = newVersionNumber;
+            int newBuildNum = ExportPackage(packageName.stringValue, _target.Version.Build, buildPath.stringValue, list);
+            if (newBuildNum != -1) _target.SetBuildNumber(newBuildNum);
         }
 
 
@@ -99,7 +100,7 @@ namespace Glitch9
 
             // 폴더 내의 모든 에셋 가져오기
             string[] allAssetPaths = AssetDatabase.GetAllAssetPaths();
-            System.Collections.Generic.List<string> assetList = new();
+            List<string> assetList = new();
             foreach (string path in allAssetPaths)
             {
                 if (Contains(path, assetPaths))
@@ -116,6 +117,8 @@ namespace Glitch9
 
             // 패키지로 만들 에셋 배열
             string[] assetsToPackage = assetList.ToArray();
+
+            packageName = packageName.Replace(" ", "_").ToLower();
 
             // 에셋 패키지 저장 경로 및 파일 이름 지정
             string fileName = string.Format(FILE_NAME_FORMAT, packageName, versionNumber);

@@ -111,13 +111,11 @@ namespace Glitch9.IO.Git
                     throw new ArgumentOutOfRangeException(nameof(increment), "Unsupported version increment specified.");
             }
 
-            int sumVersion = Patch;
-            sumVersion += Minor * 1000;
-            sumVersion += Major * 1000000;
-
-            if (Build < sumVersion)
+            int newBuildNumber = Version.CalcBuildNumber(Major, Minor, Patch);
+         
+            if (Build < newBuildNumber)
             {
-                Build = sumVersion;
+                Build = newBuildNumber;
             }
             else
             {

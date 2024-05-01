@@ -199,12 +199,12 @@ namespace Glitch9.ExEditor
         #endregion
 
         #region TextureField
-        public static void TextureField(Texture texture, Vector2? size = null)
+        public static void TextureField(Texture texture, Vector2? size = null, float yOffset = 0)
         {
             try
             {
                 size ??= new Vector2(texture.width, texture.height);
-                Rect rect = GUILayoutUtility.GetRect(size.Value.x, size.Value.y);
+                Rect rect = GUILayoutUtility.GetRect(size.Value.x, size.Value.y + yOffset);
                 GUI.DrawTexture(rect, texture != null ? texture : EditorIcons.NoImageHighRes, ScaleMode.ScaleToFit);
             }
             catch
