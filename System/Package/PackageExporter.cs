@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Version = Glitch9.Version;
 
 namespace Glitch9
 {

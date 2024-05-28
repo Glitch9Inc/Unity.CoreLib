@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using UnityEditor;
 using UnityEngine;
 
@@ -218,6 +219,14 @@ namespace Glitch9.ExEditor
                 string json = JsonConvert.SerializeObject(Value, JsonUtils.DefaultSettings);
                 EditorPrefs.SetString(_prefsKey, json);
             }
+        }
+    }
+
+    public static class EditorPrefsExtensions
+    {
+        public static bool HasValue<T>(this EPrefs<T> prefs)
+        {
+            return prefs != null && prefs.Value != null;
         }
     }
 }

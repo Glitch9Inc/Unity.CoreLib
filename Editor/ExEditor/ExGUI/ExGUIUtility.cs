@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using UnityEditorInternal;
 using UnityEngine;
 using Image = UnityEngine.UI.Image;
 
@@ -270,5 +271,66 @@ namespace Glitch9.ExEditor
         {
             GUI.DrawTexture(new Rect(0, yPos, EditorGUIUtility.currentViewWidth, 1.2f), borderTexture);
         }
+
+
+        public static ReorderableList CreateReorderableList<T>(T[] array, Func<Rect, int, T, T> customElementDrawer, GUIContent label = null, int rectHeightMultiplier = 1)
+        {
+            label ??= new GUIContent("List");
+   
+            ReorderableList reorderableList = new(array, typeof(T), true, true, true, true);
+
+            // Draw Header
+            reorderableList.drawHeaderCallback = (Rect rect) =>
+            {
+                EditorGUI.LabelField(rect, label);
+            };
+
+            const float PADDING_HORIZONTAL = 7;
+            const float PADDING_VERTICAL = 4;
+            const float SPACE = 3;
+            const float Y_OFFSET = 2;
+
+            reorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                T element = array[index];
+
+                rect.y += Y_OFFSET;
+
+                Rect boxRect = rect;
+                boxRect.height -= SPACE;
+
+                // Draw a help box behind the custom element drawer
+                GUI.Box(boxRect, GUIContent.none, EditorStyles.helpBox);
+
+                // Adjust rect for the custom element to be drawn inside the help box
+                Rect contentRect = new Rect(boxRect.x + PADDING_HORIZONTAL,
+                    boxRect.y + PADDING_VERTICAL,
+                    boxRect.width - PADDING_HORIZONTAL * 2,
+                    boxRect.height - PADDING_VERTICAL * 2 - SPACE);
+
+                array[index] = customElementDrawer(contentRect, index, element);
+            };
+
+            float sumAllSpaces = PADDING_VERTICAL * 2 + SPACE;
+            // Element height
+            reorderableList.elementHeightCallback = (int index) => EditorGUIUtility.singleLineHeight * rectHeightMultiplier + sumAllSpaces;
+
+            reorderableList.onAddCallback = (ReorderableList rl) =>
+            {
+                rl.list.Add(default(T));
+            };
+
+            reorderableList.onRemoveCallback = (ReorderableList rl) =>
+            {
+                if (EditorUtility.DisplayDialog("Warning", "Are you sure you want to delete this element?", "Yes", "No"))
+                {
+                    ReorderableList.defaultBehaviours.DoRemoveButton(rl);
+                }
+            };
+
+            return reorderableList;
+        }
+
+
     }
 }

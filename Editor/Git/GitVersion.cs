@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using Version = Glitch9.Version;
 
 
 namespace Glitch9.IO.Git

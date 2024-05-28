@@ -14,7 +14,7 @@ namespace Glitch9.ExEditor
 
             // Get all values and names of the ApiEnumDE
             Array values = Enum.GetValues(typeof(T));
-            string[] names = ExEnum.GetNames(typeof(T));
+            string[] names = EnumUtils.GetNames(typeof(T));
 
             EditorGUILayout.BeginHorizontal();
 
@@ -95,7 +95,7 @@ namespace Glitch9.ExEditor
         public static bool EnumToolbar<T>(T enumValue, out T newEnum, GUIStyle toolbarStyle, params GUILayoutOption[] options) where T : Enum
         {
 
-            string[] enumNames = ExEnum.GetNames(typeof(T));
+            string[] enumNames = EnumUtils.GetNames(typeof(T));
             int currentIndex = Convert.ToInt32(enumValue);
 
             toolbarStyle ??= new(EditorStyles.toolbarButton);

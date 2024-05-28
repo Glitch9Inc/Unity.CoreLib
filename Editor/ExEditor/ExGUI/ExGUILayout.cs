@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using MessageType = UnityEditor.MessageType;
 using Object = UnityEngine.Object;
@@ -409,85 +411,6 @@ namespace Glitch9.ExEditor
             => ExColorPicker(label, selectedColor);
         #endregion
 
-        #region ListField
-
-        /// <summary>
-        /// A custom inspector field for a list of T.
-        /// This should resemble the default list inspector field.
-        /// </summary>
-        public static List<T> CustomArrayField<T>(List<T> list, Func<int, T, T> customLayout, GUIContent label = null)
-        {
-            // Create a foldout with the list name, on the far right show the size of the list
-            label ??= new GUIContent("List");
-            int oldSize = list?.Count ?? 0;
-            list ??= new List<T>();
-            string prefskey = "CustomArrayFieldFoldout_" + label.text; // Unique key per label text
-            bool foldout = EditorPrefs.GetBool(prefskey, true);
-
-            EditorGUILayout.BeginHorizontal();
-            bool newFoldout = EditorGUILayout.Foldout(foldout, label, true);
-            GUILayout.FlexibleSpace();
-
-            // int field
-            int newSize = EditorGUILayout.IntField(oldSize, GUILayout.Width(48));
-            if (newSize != oldSize)
-            {
-                if (newSize < 0) newSize = 0;
-                while (newSize < list.Count)
-                    list.RemoveAt(list.Count - 1);
-                while (newSize > list.Count)
-                    list.Add(default);
-            }
-
-            if (GUILayout.Button(EditorIcons.Plus, ExEditorStyles.centeredIconButton))
-            {
-                list.Add(default);
-            }
-
-            EditorGUILayout.EndHorizontal();
-
-            if (newFoldout != foldout)
-            {
-                EditorPrefs.SetBool(prefskey, newFoldout);
-                foldout = newFoldout; // Update the foldout variable
-            }
-
-            if (foldout)
-            {
-                // Draw the box with the list elements
-                GUILayout.BeginVertical(ExEditorStyles.array);
-                if (list.Count > 0)
-                {
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        GUILayout.BeginHorizontal();
-                        list[i] = customLayout(i, list[i]);
-                        if (GUILayout.Button(EditorIcons.Minus, ExEditorStyles.centeredIconButton))
-                        {
-                            list.RemoveAt(i);
-                            GUILayout.EndHorizontal();
-                            break; // Exit the loop to prevent errors due to list modification
-                        }
-                        GUILayout.EndHorizontal();
-                    }
-
-                    GUILayout.Space(2);
-                }
-                else
-                {
-                    GUILayout.Label("List is Empty");
-                }
-                GUILayout.EndVertical();
-            }
-
-            return list;
-        }
-
-
-
-
-        #endregion
-
         #region ListDropdownField
         private static T GenericDropdownField<T>(T currentValue, IList<T> list, GUIContent label = null, params GUILayoutOption[] options)
         {
@@ -575,7 +498,7 @@ namespace Glitch9.ExEditor
         private const int DEFAULT_FIELDS_BTN_WIDTH = 112;
         private const string DEFAULT_FIELDS_BTN_NAME = "Reset to Default";
 
-        
+
         public static int IntFieldWithDefault(string label, int value, int defaultValue)
         {
             return IntFieldWithDefault(new GUIContent(label), value, defaultValue);
@@ -695,7 +618,7 @@ namespace Glitch9.ExEditor
             //T newValue = (T)Enum.Parse(typeof(T), names[newIndex]);
 
             // #2
-            string[] displayNames = ExEnum.GetNames(typeof(T));
+            string[] displayNames = EnumUtils.GetNames(typeof(T));
             int enumIndex = Convert.ToInt32(value);
             int newEnumIndex = EditorGUILayout.Popup(label, enumIndex, displayNames);
             T newValue = (T)Enum.ToObject(typeof(T), newEnumIndex);
@@ -713,7 +636,7 @@ namespace Glitch9.ExEditor
 
         public static TEnum ResizableEnumPopup<TEnum>(TEnum selected, GUIContent label, params GUILayoutOption[] options) where TEnum : Enum
         {
-            string[] names = ExEnum.GetNames(typeof(TEnum));
+            string[] names = EnumUtils.GetNames(typeof(TEnum));
             int index = Array.IndexOf(names, selected.ToString());
             // The regular EnumPopup has a fixed height, so we need to use a custom implementation to make it resizable.
             // Make a button that shows the currently selected enum value, with a dropdown arrow to the right.

@@ -1,8 +1,8 @@
-using UnityEngine;
+using System;
 
 namespace Glitch9
 {
-    [System.Serializable]
+    [Serializable]
     public abstract class Variable
     {
         public abstract object GetValue();

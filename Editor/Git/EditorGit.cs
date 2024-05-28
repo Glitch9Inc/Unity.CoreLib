@@ -289,6 +289,11 @@ namespace Glitch9.IO.Git
                 {
                     PullVersionTag();
                 }
+
+                if (GUILayout.Button("Delete 'index.lock'"))
+                {
+                    DeleteIndexLock();
+                }
             }
         }
 
@@ -308,9 +313,6 @@ namespace Glitch9.IO.Git
                 GUILayout.Label(gitOutput.Value, EditorStyles.wordWrappedLabel);
             }
         }
-
-
-
 
         private void DrawCommandLineInput()
         {
@@ -395,6 +397,11 @@ namespace Glitch9.IO.Git
         private async void SetUpstreamToOrigin()
         {
             await _git.SetUpstreamToOrigin();
+        }
+
+        private async void DeleteIndexLock()
+        {
+            await _git.DeleteIndexLock();
         }
     }
 }

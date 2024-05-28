@@ -239,6 +239,11 @@ namespace Glitch9.IO.Git
             return await RunGitCommandAsync("rev-parse --abbrev-ref HEAD", returnOutput: true);
         }
 
+        public async Task<string> DeleteIndexLock()
+        {
+            return await RunGitCommandAsync("update-index --really-refresh");
+        }
+
         public async Task<string> RunGitCommandAsync(string command, bool returnOutput = false)
         {
             Debug.Log($"Running Git command: {command}");

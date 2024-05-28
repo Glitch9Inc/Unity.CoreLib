@@ -54,7 +54,7 @@ namespace Glitch9
         public static void HideAllChildren(this Transform transform) => RunActionOnAllChildren(transform, (child) => child.gameObject.SetActive(false));
         public static void RunActionOnAllChildren(this Transform transform, Action<Transform> action)
         {
-            if (transform.IsNull()) return;
+            if (transform.LogIfNull()) return;
             if (transform.childCount <= 0) return;
             foreach (Transform child in transform)
             {

@@ -15,7 +15,7 @@ namespace Glitch9
                 EditorGUI.BeginProperty(position, label, property);
 
                 System.Type enumType = fieldInfo.FieldType;
-                string[] enumNames = ExEnum.GetNames(enumType);
+                string[] enumNames = EnumUtils.GetNames(enumType);
                 int[] enumValues = Enum.GetValues(enumType) as int[];
 
                 string[] displayedOptions = new string[enumNames.Length];

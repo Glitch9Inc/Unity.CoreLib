@@ -1,9 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using System.Linq;
-
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,10 +10,10 @@ using UnityEditor;
 
 namespace Glitch9
 {
-    public static class ExEnum
+    public static class EnumUtils
     {
         // cache the enum names
-        private static readonly Dictionary<Type, Dictionary<Enum, string>> _enumDisplayNames = new();
+        private static readonly ConcurrentDictionary<Type, Dictionary<Enum, string>> _enumDisplayNames = new();
 
         public static string GetName(this Enum value)
         {
@@ -34,17 +33,12 @@ namespace Glitch9
             FieldInfo field = type.GetField(enumName);
             if (field != null)
             {
-                // 모든 ExEnumAttribute 어트리뷰트를 배열로 가져오기
-                DisplayNameAttribute[] nameAttributes = field.GetCustomAttributes<DisplayNameAttribute>().ToArray();
+                DisplayNameAttribute nameAttribute = CachedAttribute<DisplayNameAttribute>.Get(field);
 
-                if (nameAttributes.Length > 0)
+                if (nameAttribute != null)
                 {
-                    DisplayNameAttribute nameAttribute = nameAttributes[0];
-                    if (nameAttribute != null)
-                    {
-                        names[value] = nameAttribute.DisplayName;
-                        return nameAttribute.DisplayName;
-                    }
+                    names[value] = nameAttribute.DisplayName;
+                    return nameAttribute.DisplayName;
                 }
             }
 

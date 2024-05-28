@@ -56,7 +56,7 @@ namespace Glitch9
         {
             try
             {
-                return args.IsInvalid() ? text : string.Format(text, args);
+                return args.IsNullOrEmpty() ? text : string.Format(text, args);
             }
             catch (Exception e)
             {

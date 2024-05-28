@@ -3,31 +3,40 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace Glitch9
 {
     public partial class GNLog
     {
+        public static event Action<LogData> OnLogAdded;
+
+        private static class PrefsKeys
+        {
+            internal const string ENABLED = "GNLog.Enabled";
+            internal const string COLORED = "GNLog.Colored";
+            internal const string LOG_ERROR_ON_ERROR_INSTANCE_CREATED = "GNLog.LogErrorOnErrorInstanceCreated";
+            internal const string LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED = "GNLog.LogStackTraceOnErrorInstanceCreated";
+        }
+
         private static class DefaultValues
         {
             internal const bool ENABLED = true;
             internal const bool COLORED = false;
+            internal const bool LOG_ERROR_ON_ERROR_INSTANCE_CREATED = true;
+            internal const bool LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED = false;
         }
-        
-        public static bool IsEnabled { get; set; } = DefaultValues.ENABLED;
-        public static bool IsColored { get; set; } = DefaultValues.COLORED;
 
-        internal static readonly ObjectPool<StringBuilder> Pool = new(() => new StringBuilder(), null, sb => sb.Clear());
-        public static StringBuilder Get() => Pool.Get();
-        public static PooledObject<StringBuilder> Get(out StringBuilder value) => Pool.Get(out value);
-        public static void Release(StringBuilder toRelease) => Pool.Release(toRelease);
+        public static Prefs<bool> IsEnabled { get; set; } = new(PrefsKeys.ENABLED, DefaultValues.ENABLED);
+        public static Prefs<bool> IsColored { get; set; } = new(PrefsKeys.COLORED, DefaultValues.COLORED);
+        public static Prefs<bool> LogErrorOnErrorInstanceCreated { get; set; } = new(PrefsKeys.LOG_ERROR_ON_ERROR_INSTANCE_CREATED, DefaultValues.LOG_ERROR_ON_ERROR_INSTANCE_CREATED);
+        public static Prefs<bool> LogStackTraceOnErrorInstanceCreated { get; set; } = new(PrefsKeys.LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED, DefaultValues.LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED);
+
 
         private static readonly Dictionary<LogType, string> k_CachedColors = new();
 
         public static Stack<LogData> CachedLogs = new();
-        public static event Action<LogData> OnLogAdded;
-        
+
+
         public static void ClearCachedColorHex() => k_CachedColors.Clear();
         public static string GetColorHex(LogType logType)
         {
@@ -45,9 +54,14 @@ namespace Glitch9
             return k_CachedColors[logType];
         }
 
+        public static void ContinueWithLogger(Issue issue, LogType logType, bool showCallerInfo = false, string callerMemberName = null, string callerFilePath = null, string tag = null)
+        {
+            ContinueWithLogger(issue.ToString(), logType, showCallerInfo, callerMemberName, callerFilePath, tag);
+        }
+
         public static void ContinueWithLogger(string msg, LogType logType, bool showCallerInfo = false, string callerMemberName = null, string callerFilePath = null, string tag = null)
         {
-            using (Get(out StringBuilder sb))
+            using (StringBuilderPool.Get(out StringBuilder sb))
             {
                 bool tagAvailable = !string.IsNullOrEmpty(tag);
                 if (showCallerInfo || tagAvailable)
@@ -70,10 +84,10 @@ namespace Glitch9
                             }
                         }
                     }
-                 
+
                     sb.Append("]</color> ");
                 }
-              
+
                 if (IsColored) sb.Append($"<color={GetColorHex(logType)}>");
                 sb.Append(msg);
                 if (IsColored) sb.Append("</color>");

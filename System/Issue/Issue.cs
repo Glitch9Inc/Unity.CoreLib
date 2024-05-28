@@ -53,7 +53,7 @@ namespace Glitch9
         [Message("[404] Target endpoint is not available. Please check the URL.")]
         InvalidEndpoint,
         [Message("Request Failed.")]
-        ProtocolError,
+        RequestFailed,
         [Message("Request timeout.")]
         RequestTimeout,
         [Message("Please enter all required fields to send this request.")]
@@ -157,13 +157,13 @@ namespace Glitch9
 #endif
     }
 
-    public static class ErrorCodeExtensions
+    public static class IssueExtensions
     {
         public static Issue Convert(this Exception e)
         {
             return e switch
             {
-                GNException restEx => restEx.Issue,
+                IssueException restEx => restEx.Issue,
                 HttpRequestException _ => Issue.NetworkError,
                 WebException webEx => ConvertWebException(webEx),
                 TimeoutException _ => Issue.RequestTimeout,
@@ -196,7 +196,7 @@ namespace Glitch9
             return status switch
             {
                 WebExceptionStatus.ConnectFailure => Issue.ServiceUnavailable,
-                WebExceptionStatus.ProtocolError => Issue.ProtocolError,
+                WebExceptionStatus.ProtocolError => Issue.RequestFailed,
                 WebExceptionStatus.NameResolutionFailure => Issue.NoInternet,
                 WebExceptionStatus.Timeout => Issue.RequestTimeout,
                 WebExceptionStatus.SendFailure => Issue.SendFailed,

@@ -18,11 +18,20 @@ namespace Glitch9
         protected string Description = "";
         protected TValue Value;
         protected List<TValue> ValueList;
+        protected bool ShowTitle = true;
 
         private void OnGUI()
         {
             // Draw Title
-            ExGUILayout.Title(Title);
+            if (ShowTitle)
+            {
+                ExGUILayout.Title(Title);
+            }
+            else
+            {
+                GUILayout.Space(7);
+            }
+        
             EditorGUILayout.LabelField(Description, EditorStyles.wordWrappedLabel);
             EditorGUILayout.Space();
 
@@ -45,20 +54,40 @@ namespace Glitch9
 
         public static void Show(string title, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
         {
-            Show(title, null, default(TValue), onComplete, valueList);
+            Show(title, null, default(TValue), true, onComplete, valueList);
+        }
+
+        public static void Show(string title, bool showTitle, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
+        {
+            Show(title, null, default(TValue), showTitle, onComplete, valueList);
         }
 
         public static void Show(string title, TValue defaultValue, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
         {
-            Show(title, null, defaultValue, onComplete, valueList);
+            Show(title, null, defaultValue, true, onComplete, valueList);
+        }
+
+        public static void Show(string title, TValue defaultValue, bool showTitle, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
+        {
+            Show(title, null, defaultValue, showTitle, onComplete, valueList);
         }
 
         public static void Show(string title, string description, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
         {
-            Show(title, description, default(TValue), onComplete, valueList);
+            Show(title, description, default(TValue), true, onComplete, valueList);
+        }
+
+        public static void Show(string title, string description, bool showTitle, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
+        {
+            Show(title, description, default(TValue), showTitle, onComplete, valueList);
         }
 
         public static void Show(string title, string description, TValue defaultValue, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
+        {
+            Show(title, description, defaultValue, true, onComplete, valueList);
+        }
+        
+        public static void Show(string title, string description, TValue defaultValue, bool showTitle, Action<TValue> onComplete, IEnumerable<TValue> valueList = null)
         {
             if (onComplete == null) throw new ArgumentNullException(nameof(onComplete), "Callback cannot be null");
 
@@ -70,6 +99,7 @@ namespace Glitch9
                 window.Callback = onComplete;
                 window.Value = defaultValue;
                 window.ValueList = valueList != null ? new List<TValue>(valueList) : null;
+                window.ShowTitle = showTitle;
                 window.Initialize();
                 window.Show();
             }

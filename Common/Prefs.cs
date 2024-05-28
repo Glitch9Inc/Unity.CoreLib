@@ -1,7 +1,7 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Glitch9
@@ -28,8 +28,7 @@ namespace Glitch9
                 Save();
             }
         }
-
-
+        
         public Prefs(string prefsKey, bool useEncryption = false)
         {
             _prefsKey = prefsKey;
@@ -168,7 +167,7 @@ namespace Glitch9
                 return default;
             }
         }
-
+        
         private void HandleFailedDeserialization(Exception e)
         {
             string json = PlayerPrefs.GetString(_prefsKey, string.Empty);
@@ -185,7 +184,6 @@ namespace Glitch9
 
             PlayerPrefs.DeleteKey(_prefsKey);
         }
-
 
         public void Save()
         {
@@ -241,58 +239,11 @@ namespace Glitch9
 
             PlayerPrefs.Save();
         }
-
-        public string GetJsonString()
-        {
-            return GetString();
-        }
-
+  
         public void Clear()
         {
             Value = default;
             PlayerPrefs.DeleteKey(_prefsKey);
-        }
-
-        private string GetString(string defaultValue = "")
-        {
-            string value;
-            if (_useEncryption) value = EncryptedPrefs.Get(_prefsKey, defaultValue);
-            else value = PlayerPrefs.GetString(_prefsKey, defaultValue);
-            return value;
-        }
-
-        private void SetString(string value)
-        {
-            if (_useEncryption) EncryptedPrefs.Set(_prefsKey, value);
-            else PlayerPrefs.SetString(_prefsKey, value);
-        }
-
-        private int GetInt(int defaultValue = 0)
-        {
-            int value;
-            if (_useEncryption) value = EncryptedPrefs.Get(_prefsKey, defaultValue);
-            else value = PlayerPrefs.GetInt(_prefsKey, defaultValue);
-            return value;
-        }
-
-        private void SetInt(int value)
-        {
-            if (_useEncryption) EncryptedPrefs.Set(_prefsKey, value);
-            else PlayerPrefs.SetInt(_prefsKey, value);
-        }
-
-        private float GetFloat(float defaultValue = 0)
-        {
-            float value;
-            if (_useEncryption) value = EncryptedPrefs.Get(_prefsKey, defaultValue);
-            else value = PlayerPrefs.GetFloat(_prefsKey, defaultValue);
-            return value;
-        }
-
-        private void SetFloat(float value)
-        {
-            if (_useEncryption) EncryptedPrefs.Set(_prefsKey, value);
-            else PlayerPrefs.SetFloat(_prefsKey, value);
         }
     }
 }

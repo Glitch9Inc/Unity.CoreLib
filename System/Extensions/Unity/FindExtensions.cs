@@ -161,7 +161,7 @@ namespace Glitch9
 
         public static T GetOrAddComponentInChildren<T>(this GameObject gameObject, string nameToSearch) where T : Component
         {
-            if (nameToSearch.IsNullOrEmpty()) return null;
+            if (nameToSearch.LogIfNullOrEmpty()) return null;
 
             // Try to find a child with the specified name
             Transform childTransform = gameObject.transform.Find(nameToSearch);

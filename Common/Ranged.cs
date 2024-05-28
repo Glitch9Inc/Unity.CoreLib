@@ -1,6 +1,6 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Glitch9
 {
@@ -40,8 +40,8 @@ namespace Glitch9
 
         // equal check
         public static bool operator ==(Ranged<T> ranged1, Ranged<T> ranged2)
-            => ReferenceEquals(ranged1, null) && ReferenceEquals(ranged2, null)
-               || !ReferenceEquals(ranged1, null) && ranged1.Equals(ranged2);
+            => ranged1 is null && ranged2 is null
+               || ranged1 is not null && ranged1.Equals(ranged2);
 
         public static bool operator !=(Ranged<T> ranged1, Ranged<T> ranged2)
             => !(ranged1 == ranged2);
@@ -58,7 +58,7 @@ namespace Glitch9
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             return obj is Ranged<T> other && Equals(other);
         }

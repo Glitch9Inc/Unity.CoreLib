@@ -18,6 +18,28 @@ namespace Glitch9.ExEditor
             return rect;
         }
 
+        public static Rect[] SplitRectVertically(this Rect rect, int count, float space = 0)
+        {
+            Rect[] rects = new Rect[count];
+            float height = rect.height / count;
+            for (int i = 0; i < count; i++)
+            {
+                rects[i] = new Rect(rect.x, rect.y + height * i + space * i, rect.width, height - space);
+            }
+            return rects;
+        }
+
+        public static Rect[] SplitRectHorizontally(this Rect rect, int count, float space = 0)
+        {
+            Rect[] rects = new Rect[count];
+            float width = rect.width / count;
+            for (int i = 0; i < count; i++)
+            {
+                rects[i] = new Rect(rect.x + width * i + space * i, rect.y, width - space, rect.height);
+            }
+            return rects;
+        }
+
         public static Rect GetLabelRect(this Rect rowRect, float labelWidth = -1)
         {
             if (Math.Abs(labelWidth - (-1)) < ExGUI.TOLERANCE) labelWidth = EditorGUIUtility.labelWidth;
