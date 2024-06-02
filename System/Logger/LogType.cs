@@ -14,7 +14,8 @@ namespace Glitch9
         NativeVerbose = 1 << 6,
         NativeWarning = 1 << 7,
         NativeError = 1 << 8,
-        NativeCritical = 1 << 9
+        NativeCritical = 1 << 9,
+        Debug = 1 << 10,
     }
 
     //[Flags]

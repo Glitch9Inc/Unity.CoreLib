@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
-// ReSharper disable All
+using System.Collections.Concurrent;
 
+// ReSharper disable All
 namespace UnityEngine
 {
     /// <summary>
@@ -9,15 +9,15 @@ namespace UnityEngine
     /// </summary>
     public readonly struct ExColor
     {
-        private static readonly Dictionary<string, Color> _colorCache = new Dictionary<string, Color>();
-        private static Color GetColor(string colorName, Func<Color> createColorFunc)
+        private static readonly ConcurrentDictionary<string, Color> _colorCache = new();
+        private static Color GetColor(string colorName, Func<Color> colorCreator)
         {
             if (_colorCache.TryGetValue(colorName, out Color cachedColor))
             {
                 return cachedColor;
             }
 
-            var newColor = createColorFunc();
+            Color newColor = colorCreator();
             _colorCache[colorName] = newColor;
             return newColor;
         }

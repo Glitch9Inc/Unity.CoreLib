@@ -95,6 +95,30 @@ namespace Glitch9
             ContinueWithLogger(msg, LogType.Critical, false, null, null, tag);
         }
 
+        /// <summary>
+        /// Temporary log for debugging purposes
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="showCallerInfo"></param>
+        /// <param name="callerMemberName"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Debug(string msg, bool showCallerInfo = false,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
+        {
+            ContinueWithLogger(msg, LogType.Debug, showCallerInfo, callerMemberName, callerFilePath);
+        }
+
+        /// <summary>
+        /// Temporary log for debugging purposes
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="msg"></param>
+        public static void Debug(string tag, string msg)
+        {
+            ContinueWithLogger(msg, LogType.Debug, false, null, null, tag);
+        }
+
         public static void Native(string msg)
         {
             ContinueWithLogger(msg, LogType.NativeInfo, false, null, null, NATIVE_PLUGIN_TAG);

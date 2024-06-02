@@ -14,7 +14,7 @@ namespace Glitch9
     {
         // cache the enum names
         private static readonly ConcurrentDictionary<Type, Dictionary<Enum, string>> _enumDisplayNames = new();
-
+        
         public static string GetName(this Enum value)
         {
             Type type = value.GetType();

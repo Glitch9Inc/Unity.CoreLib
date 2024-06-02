@@ -157,14 +157,14 @@ namespace Glitch9
 #endif
     }
 
-    public static class IssueExtensions
+    public static class IssueConverter
     {
         public static Issue Convert(this Exception e)
         {
             return e switch
             {
                 IssueException restEx => restEx.Issue,
-                HttpRequestException _ => Issue.NetworkError,
+                HttpRequestException httpEx => Issue.NetworkError,
                 WebException webEx => ConvertWebException(webEx),
                 TimeoutException _ => Issue.RequestTimeout,
                 InvalidOperationException _ => Issue.InvalidOperation,

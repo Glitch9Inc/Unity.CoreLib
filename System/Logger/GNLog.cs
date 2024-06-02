@@ -88,9 +88,13 @@ namespace Glitch9
                     sb.Append("]</color> ");
                 }
 
-                if (IsColored) sb.Append($"<color={GetColorHex(logType)}>");
+                bool isColored = IsColored;
+
+                if (isColored) sb.Append($"<color={GetColorHex(logType)}>");
+                
                 sb.Append(msg);
-                if (IsColored) sb.Append("</color>");
+                
+                if (isColored) sb.Append("</color>");
 
                 string log = sb.ToString();
 
@@ -102,17 +106,18 @@ namespace Glitch9
                     case LogType.Verbose:
                     case LogType.NativeInfo:
                     case LogType.NativeVerbose:
-                        Debug.Log(log);
+                    case LogType.Debug:
+                        UnityEngine.Debug.Log(log);
                         break;
                     case LogType.Warning:
                     case LogType.NativeWarning:
-                        Debug.LogWarning(log);
+                        UnityEngine.Debug.LogWarning(log);
                         break;
                     case LogType.Error:
                     case LogType.NativeError:
                     case LogType.Critical:
                     case LogType.NativeCritical:
-                        Debug.LogError(log);
+                        UnityEngine.Debug.LogError(log);
                         break;
                 }
 

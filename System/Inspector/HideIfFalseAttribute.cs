@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Glitch9.ExEditor
+namespace Glitch9.ExtendedEditor
 {
     public class HideIfFalseAttribute : PropertyAttribute
     {
