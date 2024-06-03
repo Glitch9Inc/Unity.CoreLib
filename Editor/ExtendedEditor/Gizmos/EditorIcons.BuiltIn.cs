@@ -58,6 +58,8 @@ namespace Glitch9.ExtendedEditor
         public static Texture ToolBarPlus2x => GetBuiltInIcon("Toolbar Plus@2x");
         public static Texture ToolBarMinus => GetBuiltInIcon("Toolbar Minus");
         public static Texture ToolBarMinus2x => GetBuiltInIcon("Toolbar Minus@2x");
+        public static Texture Menu => GetBuiltInIcon("_Menu");
+        public static Texture Menu2x => GetBuiltInIcon("_Menu@2x");
 
         /// <summary>
         /// Icon looks like branching

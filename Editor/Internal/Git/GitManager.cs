@@ -51,12 +51,15 @@ namespace Glitch9.Internal.Git
         private readonly string _gitUrl; // should look like https://github.com/amaiichigopurin/CodeqoShared.git
         private readonly string _repoName;
 
+        private readonly Action _onRepaint;
+
+
         private GitVersion _localVersion;
         private GitVersion _remoteVersion;
         public GitVersion LocalVersion => _localVersion;
         public GitVersion RemoteVersion => _remoteVersion;
 
-        public GitManager(string repoName, string gitUrl, string gitBranch, string localDir)
+        public GitManager(string repoName, string gitUrl, string gitBranch, string localDir, Action onRepaint)
         {
             if (string.IsNullOrEmpty(repoName))
             {
@@ -82,6 +85,7 @@ namespace Glitch9.Internal.Git
             _gitUrl = gitUrl;
             _gitBranch = gitBranch;
             _repoName = repoName;
+            _onRepaint = onRepaint;
         }
 
         public async Task InitializeAsync()
@@ -92,8 +96,9 @@ namespace Glitch9.Internal.Git
             {
                 await InitGitRepositoryAsync();
                 await PullVersionTagAsync();
-                await ValidateRemoteOrigin();
+                //await ValidateRemoteOrigin();
                 await ValidateBranch();
+                _onRepaint?.Invoke();
             }
             catch (Exception e)
             {

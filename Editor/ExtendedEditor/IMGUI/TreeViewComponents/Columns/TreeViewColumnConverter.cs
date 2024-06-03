@@ -8,6 +8,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         public static MultiColumnHeaderState.Column[] Convert(float currentViewWidth, List<TreeViewColumnData> columnDataList)
         {
             if (columnDataList == null) return null;
+            columnDataList.Sort((a, b) => a.Index.CompareTo(b.Index));
 
             int columnCount = columnDataList.Count;
             float[] columnWidths = new float[columnCount];
@@ -63,6 +64,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     width = columnWidths[i],
                     autoResize = columnData.AutoResize,
                     canSort = columnData.CanSort,
+                    allowToggleVisibility = columnData.AllowToggleVisibility
                 });
             }
 

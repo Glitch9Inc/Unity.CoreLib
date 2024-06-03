@@ -273,7 +273,7 @@ namespace Glitch9.ExtendedEditor
         }
 
 
-        public static ReorderableList CreateReorderableList<T>(T[] array, Func<Rect, int, T, T> customElementDrawer, GUIContent label = null, int rectHeightMultiplier = 1)
+        public static ReorderableList CreateReorderableList<T>(T[] array, Func<Rect, int, T, T> customElementDrawer, GUIContent label = null, float rectHeightMultiplier = 1)
         {
             label ??= new GUIContent("List");
 
@@ -330,6 +330,149 @@ namespace Glitch9.ExtendedEditor
 
             return reorderableList;
         }
+
+        public static ReorderableList CreateReorderableList<T>(T[] array, Func<Rect, int, T, T> customElementDrawer, GUIContent label, Func<int, float> heightMultiplierPerIndex)
+        {
+            label ??= new GUIContent("List");
+
+            ReorderableList reorderableList = new(array, typeof(T), true, true, true, true);
+
+            // Draw Header
+            reorderableList.drawHeaderCallback = (Rect rect) =>
+            {
+                EditorGUI.LabelField(rect, label);
+            };
+
+            const float PADDING_HORIZONTAL = 7;
+            const float PADDING_VERTICAL = 4;
+            const float SPACE = 3;
+            const float Y_OFFSET = 2;
+
+            reorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                T element = array[index];
+
+                rect.y += Y_OFFSET;
+
+                Rect boxRect = rect;
+                boxRect.height -= SPACE;
+
+                // Draw a help box behind the custom element drawer
+                GUI.Box(boxRect, GUIContent.none, EditorStyles.helpBox);
+
+                // Adjust rect for the custom element to be drawn inside the help box
+                Rect contentRect = new(boxRect.x + PADDING_HORIZONTAL,
+                    boxRect.y + PADDING_VERTICAL,
+                    boxRect.width - PADDING_HORIZONTAL * 2,
+                    boxRect.height - PADDING_VERTICAL * 2 - SPACE);
+
+                array[index] = customElementDrawer(contentRect, index, element);
+            };
+
+            // Configure element height per index
+            reorderableList.elementHeightCallback = (int index) =>
+            {
+                float rectHeightMultiplier = heightMultiplierPerIndex?.Invoke(index) ?? 1f;
+                return EditorGUIUtility.singleLineHeight * rectHeightMultiplier + (PADDING_VERTICAL * 2 + SPACE);
+            };
+
+            reorderableList.onAddCallback = (ReorderableList rl) =>
+            {
+                rl.list.Add(default(T));
+            };
+
+            reorderableList.onRemoveCallback = (ReorderableList rl) =>
+            {
+                if (EditorUtility.DisplayDialog("Warning", "Are you sure you want to delete this element?", "Yes", "No"))
+                {
+                    ReorderableList.defaultBehaviours.DoRemoveButton(rl);
+                }
+            };
+
+            return reorderableList;
+        }
+
+
+
+        public static ReorderableList CreateReorderableDictionary(Dictionary<string, string> dictionary, GUIContent label = null, float rectHeightMultiplier = 1)
+        {
+            label ??= new GUIContent("Dictionary");
+
+            // Convert the dictionary to a List of KeyValuePair
+            List<KeyValuePair<string, string>> list = new(dictionary);
+
+            ReorderableList reorderableList = new(list, typeof(KeyValuePair<string, string>), true, true, true, true);
+
+            // Draw Header
+            reorderableList.drawHeaderCallback = (Rect rect) =>
+            {
+                EditorGUI.LabelField(rect, label);
+            };
+
+            const float PADDING_HORIZONTAL = 7;
+            const float PADDING_VERTICAL = 4;
+            const float SPACE = 3;
+            const float Y_OFFSET = 2;
+
+            // Element drawing
+            reorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                KeyValuePair<string, string> entry = list[index];
+
+                rect.y += Y_OFFSET;
+
+                Rect boxRect = rect;
+                boxRect.height -= SPACE;
+
+                // Draw a help box behind the element fields
+                GUI.Box(boxRect, GUIContent.none, EditorStyles.helpBox);
+
+                // Adjust rect for the key-value pair to be drawn inside the help box
+                Rect contentRect = new(boxRect.x + PADDING_HORIZONTAL,
+                    boxRect.y + PADDING_VERTICAL,
+                    boxRect.width - PADDING_HORIZONTAL * 2,
+                    boxRect.height - PADDING_VERTICAL * 2 - SPACE);
+
+                string key = EditorGUI.TextField(new Rect(contentRect.x, contentRect.y, contentRect.width / 2 - 2, contentRect.height), entry.Key);
+                string value = EditorGUI.TextField(new Rect(contentRect.x + contentRect.width / 2 + 2, contentRect.y, contentRect.width / 2 - 2, contentRect.height), entry.Value);
+
+                if (!key.Equals(entry.Key) || !value.Equals(entry.Value)) // Check if modified
+                {
+                    list[index] = new KeyValuePair<string, string>(key, value);
+                    dictionary[entry.Key] = value; // Update dictionary
+                    if (!key.Equals(entry.Key))
+                    {
+                        dictionary.Remove(entry.Key); // Remove old entry
+                        dictionary.Add(key, value); // Add new entry
+                    }
+                }
+            };
+
+            // Handle element heights
+            float sumAllSpaces = PADDING_VERTICAL * 2 + SPACE;
+            reorderableList.elementHeightCallback = (int index) => EditorGUIUtility.singleLineHeight * rectHeightMultiplier + sumAllSpaces;
+
+            // Add and remove callbacks
+            reorderableList.onAddCallback = (ReorderableList rl) =>
+            {
+                rl.list.Add(new KeyValuePair<string, string>("newKey", "newValue"));
+                dictionary.Add("newKey", "newValue");
+            };
+
+            reorderableList.onRemoveCallback = (ReorderableList rl) =>
+            {
+                KeyValuePair<string, string> entry = list[rl.index];
+                if (EditorUtility.DisplayDialog("Warning", "Are you sure you want to delete this element?", "Yes", "No"))
+                {
+                    dictionary.Remove(entry.Key);
+                    ReorderableList.defaultBehaviours.DoRemoveButton(rl);
+                }
+            };
+
+            return reorderableList;
+        }
+
+
 
         public static void DragAndDropArea(Rect dropArea, Action<string> onDrop)
         {

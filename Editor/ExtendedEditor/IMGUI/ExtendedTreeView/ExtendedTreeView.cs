@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
+using System.Linq;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using TreeView = UnityEditor.IMGUI.Controls.TreeView;
@@ -8,36 +8,52 @@ using TreeView = UnityEditor.IMGUI.Controls.TreeView;
 
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public abstract partial class TreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewChildWindow, TData, TFilter, TEventHandler>
-        where TSelf : TreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewChildWindow, TData, TFilter, TEventHandler>
-        where TTreeView : TreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewChildWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
-        where TTreeViewItem : ExtendedTreeViewItem<TData, TFilter>
-        where TTreeViewChildWindow : TreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewChildWindow, TData, TFilter, TEventHandler>.TreeViewChildWindow
-        where TData : ITreeViewData<TData, TFilter>
-        where TFilter : ITreeViewFilter<TFilter, TData>
-        where TEventHandler : ITreeViewEventHandler<TTreeViewItem, TData, TFilter>
+    public abstract partial class ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
+        where TSelf : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
+        where TTreeView : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
+        where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
+        where TTreeViewEditWindow : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
+        where TData : class, ITreeViewData<TData, TFilter>
+        where TFilter : class, ITreeViewFilter<TFilter, TData>
+        where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
         internal static class Strings
         {
             internal const string UNKNOWN_TIME = "Unknown";
+
+            // Styles
+            internal const string STYLE_TREEVIEW_ITEM = "treeviewitem";
+            internal const string STYLE_TREEVIEW_GROUP = "treeviewgroup";
         }
 
         public abstract class ExtendedTreeView : TreeView
         {
-            private const string STYLE_TREEVIEW_ITEM = "treeviewitem";
-            private const string STYLE_TREEVIEW_GROUP = "treeviewgroup";
+            public bool RequiresRefresh { get; set; }
 
             private readonly TSelf _parentWindow;
             private readonly TEventHandler _eventHandler;
 
             private List<TreeViewItem> _cachedTreeViewItems;
+            private List<TreeViewItem> _rows;
 
             protected ExtendedTreeView(TSelf parentWindow, TEventHandler eventHandler, TreeViewState treeViewState, MultiColumnHeader multiColumnHeader) : base(treeViewState, multiColumnHeader)
             {
                 _parentWindow = parentWindow;
-                _eventHandler = eventHandler;
+                _eventHandler = PrepareEventHandler(eventHandler);
                 multiColumnHeader.sortingChanged += OnSortingChanged;
                 RefreshData();
+            }
+
+            private TEventHandler PrepareEventHandler(TEventHandler eventHandler)
+            {
+                if (eventHandler == null) return Activator.CreateInstance<TEventHandler>();
+
+                eventHandler.DeleteItem?.AddListener((item, deleted) =>
+                {
+                    if (deleted) _parentWindow.RemoveItem(item);
+                });
+
+                return eventHandler;
             }
 
             protected override TreeViewItem BuildRoot()
@@ -56,6 +72,48 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 return root;
             }
 
+            protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
+            {
+                if (root.children == null) return new List<TreeViewItem>();
+                if (_rows != null && !RequiresRefresh) return _rows;
+
+                //Debug.Log("Rebuilding tree view rows...");
+                _rows = new();
+
+                foreach (TreeViewItem treeViewItem in _cachedTreeViewItems)
+                {
+                    if (_parentWindow.Toolbar.HasSearchField)
+                    {
+                        //Debug.Log("Search string: " + _parentWindow.Toolbar.SearchString);
+                        if (treeViewItem is TTreeViewItem genericItem)
+                        {
+                            if (genericItem.Data == null) continue;
+                            if (!genericItem.Data.Search(_parentWindow.Toolbar.SearchString)) continue;
+                        }
+                    }
+
+                    _rows.Add(treeViewItem);
+                }
+
+                if (multiColumnHeader.sortedColumnIndex == -1) return _rows;
+                int columnIndex = multiColumnHeader.sortedColumnIndex;
+                bool ascending = multiColumnHeader.IsSortedAscending(columnIndex);
+
+                int Comparison(TreeViewItem x, TreeViewItem y)
+                {
+                    TTreeViewItem itemX = x as TTreeViewItem;
+                    TTreeViewItem itemY = y as TTreeViewItem;
+                    if (itemX == null || itemY == null) return 0;
+
+                    return itemX.CompareTo(itemY, columnIndex, ascending);
+                }
+
+                _rows.ToList().Sort(Comparison);
+                RequiresRefresh = false;
+
+                return _rows;
+            }
+
             protected override void RowGUI(RowGUIArgs args)
             {
                 TreeViewItem tableItem = args.item;
@@ -63,7 +121,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (Event.current.type == EventType.Repaint)
                 {
                     bool isNotGroupRow = tableItem is TTreeViewItem;
-                    GUIStyle backgroundStyle = isNotGroupRow ? EGUI.skin.GetStyle(STYLE_TREEVIEW_ITEM) : EGUI.skin.GetStyle(STYLE_TREEVIEW_GROUP);
+                    GUIStyle backgroundStyle = isNotGroupRow ? EGUI.skin.GetStyle(Strings.STYLE_TREEVIEW_ITEM) : EGUI.skin.GetStyle(Strings.STYLE_TREEVIEW_GROUP);
                     backgroundStyle.Draw(args.rowRect, false, false, false, false);
                 }
 
@@ -95,42 +153,33 @@ namespace Glitch9.ExtendedEditor.IMGUI
             /// <param name="item"></param>
             protected virtual void OnRightClickedItem(TTreeViewItem item)
             {
-                //Debug.Log($"Right clicked item: {item.Data}");
-                if (_eventHandler == null || _eventHandler.EmptyActions) return;
-
-                // Draw context menu
-
-                GenericMenu menu = new();
-
-                if (_eventHandler.CopyItem != null)
+                if (_eventHandler == null)
                 {
-                    menu.AddItem(new GUIContent("Copy"), false, () => _eventHandler.CopyItem(item));
+                    Debug.LogError("Event handler is null.");
+                    return;
                 }
-
-                if (_eventHandler.PasteItem != null)
-                {
-                    menu.AddItem(new GUIContent("Paste"), false, () => _eventHandler.PasteItem(item, (success) => { if (success) RefreshData(); }));
-                }
-
-                if (_eventHandler.DeleteItem != null)
-                {
-                    menu.AddItem(new GUIContent("Delete"), false, () => _eventHandler.DeleteItem(item, (success) => { if (success) RefreshData(); }));
-                }
-
-                menu.ShowAsContext();
+                _eventHandler.ShowRightClickMenu(item, OnDataUpdated);
             }
 
-            private void ShowChildWindow(TTreeViewItem item)
+            private void OnDataUpdated(bool success)
+            {
+                if (success)
+                {
+                    RefreshData();
+                }
+            }
+
+            public void ShowEditWindow(TTreeViewItem item)
             {
                 if (item == null || item.Data == null) return;
                 string windowTitle = item.Data.Id == null ? "Details" : $"Details: {item.Data.Id}";
 
                 try
                 {
-                    TTreeViewChildWindow window = GetWindow<TTreeViewChildWindow>(true, windowTitle, true);
+                    TTreeViewEditWindow window = GetWindow<TTreeViewEditWindow>(false, windowTitle, true);
                     window.minSize = new Vector2(400, 400);
                     window.maxSize = new Vector2(800, 800);
-                    window.Data = item.Data;
+                    window.SetData(item, _parentWindow, _eventHandler);
                 }
                 catch (Exception e)
                 {
@@ -144,7 +193,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             /// <param name="item"></param>
             protected virtual void OnDoubleClickedItem(TTreeViewItem item)
             {
-                ShowChildWindow(item);
+                ShowEditWindow(item);
             }
 
             protected void DrawString(Rect cellRect, string text, GUIStyle style = null)
@@ -156,7 +205,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             protected void DrawUnixTime(Rect cellRect, UnixTime? unixTime, GUIStyle style = null)
             {
-                string timeString = unixTime == null ? Strings.UNKNOWN_TIME : unixTime.Value.ToString();
+                string timeString = unixTime == null ? Strings.UNKNOWN_TIME : unixTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
                 DrawString(cellRect, timeString, style);
             }
 
@@ -170,9 +219,10 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (UpdateCachedItems()) CustomReload();
             }
 
-            private void CustomReload()
+            public void CustomReload()
             {
-                Debug.Log("Reloading TreeView...");
+                //Debug.Log("Reloading TreeView...");
+                RequiresRefresh = true;
                 Reload();
             }
 
@@ -222,6 +272,22 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 {
                     OnDoubleClickedItem(treeViewItem);
                 }
+            }
+
+            public void RemoveItem(TTreeViewItem item)
+            {
+                if (item == null) return;
+
+                // find the same item by comparing id
+                TreeViewItem foundItem = _cachedTreeViewItems.Find(x => x.id == item.id);
+
+                if (foundItem != null)
+                {
+                    _cachedTreeViewItems.Remove(foundItem);
+                    RefreshData();
+                }
+
+                //Debug.LogWarning($"Item {item.displayName} not found in cached items.");
             }
         }
     }

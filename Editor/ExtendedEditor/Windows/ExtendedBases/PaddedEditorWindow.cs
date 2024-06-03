@@ -8,32 +8,32 @@ namespace Glitch9.ExtendedEditor
     /// </summary>
     public abstract class PaddedEditorWindow : EditorWindow
     {
-        const int PADDING_LEFT = 12;
-        const int PADDING_TOP = 10;
-        const int PADDING_RIGHT = 12;
+        const int PADDING_LEFT = 8;
+        const int PADDING_TOP = 6;
+        const int PADDING_RIGHT = 8;
         const int PADDING_BOTTOM = 10;
 
         private void OnGUI()
         {
-            // Top padding
-            GUILayout.Space(PADDING_TOP);
+            GUILayout.Space(PADDING_TOP); // Top padding
 
-            // Start horizontal group for left padding
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(PADDING_LEFT);
+            GUILayout.BeginHorizontal(); // Start horizontal group for left padding
+            {
+                GUILayout.Space(PADDING_LEFT);
 
-            GUILayout.BeginVertical();
-            
-            // Your GUI content goes here
-            OnGUIUpdate();
-
-            GUILayout.EndVertical();
-            // End horizontal group for right padding
-            GUILayout.Space(PADDING_RIGHT);
-            GUILayout.EndHorizontal();
-
-            // Bottom padding
-            GUILayout.Space(PADDING_BOTTOM);
+                GUILayout.BeginVertical();
+                {
+                    // Your GUI content goes here
+                    OnGUIUpdate();
+                }
+                GUILayout.EndVertical();
+                
+                
+                GUILayout.Space(PADDING_RIGHT);
+            }
+            GUILayout.EndHorizontal(); // End horizontal group for right padding
+           
+            GUILayout.Space(PADDING_BOTTOM);  // Bottom padding
         }
 
         protected abstract void OnGUIUpdate();

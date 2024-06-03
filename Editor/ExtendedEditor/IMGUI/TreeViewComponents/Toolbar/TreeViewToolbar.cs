@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -9,22 +10,32 @@ namespace Glitch9.ExtendedEditor.IMGUI
     public class TreeViewToolbar
     {
         private const float k_ButtonWidth = 90f;
+        private const float k_SearchFieldMaxWidth = 300f;
+        private const float k_SearchFieldY = 2f;
+
+
         public string SearchString { get; private set; }
         public bool HasSearchField { get; private set; }
-        
-        private SearchField _searchField;
-    
-        private readonly Dictionary<string, TreeViewToolbarItem> _menuItems;
 
-        public TreeViewToolbar(IEnumerable<TreeViewToolbarItem> toolbarItems)
+        private SearchField _searchField;
+
+        private readonly Dictionary<string, TreeViewToolbarItem> _menuItems;
+        private readonly Action _onSearchStringUpdated;
+
+        public TreeViewToolbar(IEnumerable<TreeViewToolbarItem> toolbarItems, Action onSearchStringUpdated)
         {
             _menuItems = new Dictionary<string, TreeViewToolbarItem>();
+            _onSearchStringUpdated = onSearchStringUpdated;
 
             foreach (TreeViewToolbarItem item in toolbarItems)
             {
                 if (item.Menu == TreeViewToolbarMenu.Custom)
                 {
                     _menuItems.Add(item.CustomMenuName, item);
+                }
+                else if (item.Menu == TreeViewToolbarMenu.SearchField)
+                {
+                    HasSearchField = true;
                 }
                 else
                 {
@@ -39,7 +50,14 @@ namespace Glitch9.ExtendedEditor.IMGUI
             return new Rect(k_ButtonWidth * buttonIndex, 0, 100, 20);
         }
 
-        internal void OnGUI()
+        private Rect GetSearchFieldRect(Rect position)
+        {
+            float leftOverViewWidth = position.width - k_ButtonWidth * _menuItems.Count;
+            float searchFieldWidth = Mathf.Min(leftOverViewWidth, k_SearchFieldMaxWidth);
+            return new Rect(position.width - searchFieldWidth, k_SearchFieldY, searchFieldWidth, 24);
+        }
+
+        internal void OnGUI(Rect position)
         {
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
             {
@@ -52,16 +70,17 @@ namespace Glitch9.ExtendedEditor.IMGUI
                         continue;
                     }
 
-                    if (kvp.Value.Menu == TreeViewToolbarMenu.SearchField)
-                    {
-                        DrawSearchField(GetMenuButtonRect(i));
-                        continue;
-                    }
-
                     if (DrawMenuButton(kvp.Key))
                     {
                         kvp.Value.Action(GetMenuButtonRect(i));
                     }
+                }
+
+                GUILayout.FlexibleSpace();
+
+                if (HasSearchField)
+                {
+                    DrawSearchField(GetSearchFieldRect(position));
                 }
             }
             GUILayout.EndHorizontal();
@@ -74,16 +93,16 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         private void DrawSearchField(Rect rect)
         {
-            InitializeSearchField();
-            SearchString = _searchField.OnToolbarGUI(rect, SearchString);
-        }
-
-        private void InitializeSearchField()
-        {
-            if (_searchField == null)
+            _searchField ??= new();
+            string searchString = _searchField.OnToolbarGUI(rect, SearchString);
+            
+            if (searchString != SearchString)
             {
-                _searchField = new();
-                HasSearchField = true;
+                SearchString = searchString;
+                if (!string.IsNullOrWhiteSpace(searchString))
+                {
+                    _onSearchStringUpdated?.Invoke();
+                }
             }
         }
     }

@@ -38,5 +38,6 @@ namespace Glitch9.ExtendedEditor.IMGUI
         public TextAlignment HeaderTextAlignment { get; set; }
         public bool AutoResize { get; set; }
         public bool CanSort { get; set; }
+        public bool AllowToggleVisibility { get; set; }
     }
 }

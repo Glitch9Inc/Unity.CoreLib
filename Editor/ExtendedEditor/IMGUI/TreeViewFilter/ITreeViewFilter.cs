@@ -1,8 +1,8 @@
 namespace Glitch9.ExtendedEditor.IMGUI
 {
     public interface ITreeViewFilter<TSelf, in TData>
-        where TSelf : ITreeViewFilter<TSelf, TData>
-        where TData : ITreeViewData<TData, TSelf>
+        where TSelf : class, ITreeViewFilter<TSelf, TData>
+        where TData : class, ITreeViewData<TData, TSelf>
     {
         bool SetFilter(TData data);
     }

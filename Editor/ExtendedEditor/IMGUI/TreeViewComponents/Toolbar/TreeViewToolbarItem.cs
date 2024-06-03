@@ -12,7 +12,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         public string CustomMenuName { get; set; }
         public Action<Rect> Action { get; set; }
 
-        public TreeViewToolbarItem(TreeViewToolbarMenu menu, Action<Rect> action)
+        public TreeViewToolbarItem(TreeViewToolbarMenu menu, Action<Rect> action = null)
         {
             Menu = menu;
             Action = action;

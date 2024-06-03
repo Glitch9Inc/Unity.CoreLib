@@ -18,7 +18,7 @@ namespace Glitch9.ExtendedEditor
             return rect;
         }
 
-        public static Rect[] SplitRectVertically(this Rect rect, int count, float space = 0)
+        public static Rect[] SplitVertically(this Rect rect, int count, float space = 0)
         {
             Rect[] rects = new Rect[count];
             float height = rect.height / count;
@@ -29,7 +29,7 @@ namespace Glitch9.ExtendedEditor
             return rects;
         }
 
-        public static Rect[] SplitRectHorizontally(this Rect rect, int count, float space = 0)
+        public static Rect[] SplitHorizontally(this Rect rect, int count, float space = 0)
         {
             Rect[] rects = new Rect[count];
             float width = rect.width / count;
@@ -37,6 +37,20 @@ namespace Glitch9.ExtendedEditor
             {
                 rects[i] = new Rect(rect.x + width * i + space * i, rect.y, width - space, rect.height);
             }
+            return rects;
+        }
+
+        public static Rect[] SplitHorizontally(this Rect rect, float space, params float[] weights)
+        {
+            Rect[] rects = new Rect[weights.Length];
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                float width = rect.width * weights[i];
+                float x = i == 0 ? rect.x : rects[i - 1].x + rects[i - 1].width + space;
+                rects[i] = new Rect(x, rect.y, width, rect.height);
+            }
+            
             return rects;
         }
 

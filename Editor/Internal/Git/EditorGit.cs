@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Glitch9.Internal.Git
 {
-    internal class EditorGit
+    public class EditorGit
     {
         internal bool IsInitialized { get; set; } = false;
 
@@ -71,7 +71,7 @@ namespace Glitch9.Internal.Git
             _branchName = gitBranch;
             _onRepaint = onRepaint;
 
-            _git = new GitManager(_repoName, gitUrl, gitBranch, localDir);
+            _git = new GitManager(_repoName, gitUrl, gitBranch, localDir, onRepaint);
 
             _git.OnGitOutput += (output) =>
             {
@@ -248,7 +248,7 @@ namespace Glitch9.Internal.Git
 
                 if (GUILayout.Button("Master => Main"))
                 {
-                    if (EGUI.Ask("Are you sure you want to continue?"))
+                    if (EGUI.Confirmation("Are you sure you want to continue?"))
                     {
                         EnterGitCommand("branch -m master main");
                     }
@@ -264,7 +264,7 @@ namespace Glitch9.Internal.Git
             {
                 if (GUILayout.Button("Normalize Line Endings"))
                 {
-                    if (EGUI.Ask("Are you sure you want to continue?"))
+                    if (EGUI.Confirmation("Are you sure you want to continue?"))
                     {
                         NormalizeLineEndings();
                     }
