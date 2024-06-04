@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace Glitch9.ExtendedEditor.IMGUI
@@ -51,6 +52,26 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             GUI.Label(priceRect, $"${displayValue}");
             GUI.Label(perRect, $"per {per}");
+        }
+
+        public static void LeftSubtitle(string text)
+        {
+            EditorGUILayout.LabelField(text, TreeViewStyles.ChildWindowSubtitleLeft);
+        }
+
+        public static void RightSubtitle(string text)
+        {
+            EditorGUILayout.LabelField(text, TreeViewStyles.ChildWindowSubtitleRight);
+        }
+
+        public static void Subtitle(string left, string right)
+        {
+            GUILayout.BeginHorizontal();
+            {
+                LeftSubtitle(left);
+                RightSubtitle(right);
+            }
+            GUILayout.EndHorizontal();
         }
     }
 }

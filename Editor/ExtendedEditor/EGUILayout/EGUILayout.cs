@@ -753,6 +753,23 @@ namespace Glitch9.ExtendedEditor
 
             return (TEnum)Enum.Parse(typeof(TEnum), names[index]);
         }
+
+        #region Non-Editable Field
+
+        public static void NonEditableField(string label, string value)
+        {
+            NonEditableField(new GUIContent(label), value);
+        }
+
+        public static void NonEditableField(GUIContent label, string value)
+        {
+            GUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight));
+            EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth), GUILayout.Height(EditorGUIUtility.singleLineHeight));
+            EditorGUILayout.SelectableLabel(value, ExtendedEditorStyles.disabledTextField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+            GUILayout.EndHorizontal();
+        }
+
+        #endregion
     }
 }
 

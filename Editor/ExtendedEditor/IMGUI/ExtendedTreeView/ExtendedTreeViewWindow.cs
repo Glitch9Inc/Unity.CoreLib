@@ -15,6 +15,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TFilter : class, ITreeViewFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
+        private const int MAX_INIT_COUNT = 3;
+        
         protected MultiColumnHeader MultiColumnHeader;
         protected TTreeView TreeView;
         protected TreeViewState TreeViewState;
@@ -25,7 +27,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         public TreeViewMenu Menu { get; private set; }
 
         private bool _isInitialized = false;
-
+        private int _initCount = 0;
 
         protected static TTreeViewWindow InitializeWindow(string name = null)
         {
@@ -44,8 +46,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         private void Initialize()
         {
-            if (_isInitialized) return;
+            if (_isInitialized || _initCount >= MAX_INIT_COUNT) return;
             _isInitialized = true;
+            _initCount++;
             TreeView = CreateThreeView();
             Menu = new TreeViewMenu(CreateTopToolbar(), TreeView.OnSearchStringChanged);
         }
@@ -66,8 +69,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
             }
             catch (Exception e)
             {
+                _isInitialized = false;
                 EditorGUILayout.HelpBox(e.Message, MessageType.Error);
-
+                
                 if (GUILayout.Button("Show Error"))
                 {
                     Debug.LogError(e);
@@ -75,7 +79,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                 if (GUILayout.Button("Try Again"))
                 {
-                    _isInitialized = false;
+                    _initCount = 0;
                 }
             }
         }

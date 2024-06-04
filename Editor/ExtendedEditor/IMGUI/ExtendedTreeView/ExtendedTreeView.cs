@@ -69,6 +69,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             public void OnSortingChanged(MultiColumnHeader multiColumnHeaderParam)
             {
+                Debug.Log("Sorting changed: " + multiColumnHeaderParam.sortedColumnIndex);
                 UpdateTreeView();
             }
 
@@ -76,7 +77,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 UpdateTreeView();
             }
-            
+
             public void ResetFilter()
             {
                 _filter = null;
@@ -129,7 +130,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (root.children == null) return new List<TreeViewItem>();
                 if (_rows != null && !RequiresRefresh) return _rows;
 
-                //Debug.Log("Rebuilding tree view rows...");
+                Debug.Log("Rebuilding tree view rows...");
                 _rows = new();
 
                 foreach (TreeViewItem treeViewItem in _cachedItems)
@@ -147,18 +148,29 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     _rows.Add(treeViewItem);
                 }
 
-                if (multiColumnHeader.sortedColumnIndex == -1) return _rows;
+                if (multiColumnHeader.sortedColumnIndex == -1)
+                {
+                    _treeViewWindow.Repaint();
+                    return _rows;
+                }
+
+                Debug.Log("Resorting tree view rows...");
                 int columnIndex = multiColumnHeader.sortedColumnIndex;
                 bool ascending = multiColumnHeader.IsSortedAscending(columnIndex);
 
                 _rows.ToList().Sort(Comparison);
                 RequiresRefresh = false;
 
+                _treeViewWindow.Repaint();
                 return _rows;
 
                 int Comparison(TreeViewItem x, TreeViewItem y)
                 {
-                    if (x is not TTreeViewItem itemX || y is not TTreeViewItem itemY) return 0;
+                    if (x is not TTreeViewItem itemX || y is not TTreeViewItem itemY)
+                    {
+                        Debug.LogWarning("Comparison failed: " + x + " - " + y);
+                        return 0;
+                    }
                     return itemX.CompareTo(itemY, columnIndex, ascending);
                 }
             }
@@ -237,7 +249,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 ShowEditWindow(item);
             }
-            
+
             public void UpdateTreeView(bool filterUpdated = false)
             {
                 //Debug.Log("Reloading TreeView...");
@@ -277,7 +289,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 List<TreeViewItem> BuildCachedItems()
                 {
                     Debug.Log("Building tree view cached items...");
-                    
+
                     List<TreeViewItem> items = new();
 
                     for (int i = 0; i < SourceData.Count; i++)

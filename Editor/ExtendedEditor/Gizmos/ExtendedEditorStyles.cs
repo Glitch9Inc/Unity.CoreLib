@@ -171,6 +171,31 @@ namespace Glitch9.ExtendedEditor
             }
         }
 
+        public static GUIStyle disabledTextField
+        {
+            get
+            {
+                string key = "disabledTextField";
+                if (!_cache.TryGetValue(key, out GUIStyle style))
+                {
+                    style = new GUIStyle()
+                    {
+                        border = new RectOffset(2, 2, 2, 2),
+                        margin = new RectOffset(2, 2, 2, 2),
+                        padding = new RectOffset(3, 3, 3, 3),
+                        normal =
+                        {
+                            background = EditorGUITextures.TextField(GUIColor.Gray),
+                            textColor = ExColor.charcoal,
+                        },
+                        fontSize = 12,
+                        fontStyle = FontStyle.Normal,
+                    };
+                    _cache.Add(key, style);
+                }
+                return style;
+            }
+        }
 
         private static GUIStyle Border(GUIBorder direction, RectOffset padding)
         {

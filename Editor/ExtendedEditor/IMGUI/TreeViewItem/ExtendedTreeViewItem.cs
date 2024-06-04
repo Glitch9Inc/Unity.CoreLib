@@ -3,8 +3,8 @@ using UnityEditor.IMGUI.Controls;
 
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public abstract class ExtendedTreeViewItem<TSelf, TData, TFilter> : TreeViewItem
-        where TSelf : ExtendedTreeViewItem<TSelf, TData, TFilter>
+    public abstract class ExtendedTreeViewItem<TTreeViewItem, TData, TFilter> : TreeViewItem
+        where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
         where TData : class, ITreeViewData<TData>
         where TFilter : class, ITreeViewFilter<TFilter, TData>
     {
@@ -21,30 +21,30 @@ namespace Glitch9.ExtendedEditor.IMGUI
             return filter.IsFiltered(Data);
         }
         
-        public abstract int CompareTo(TSelf anotherItem, int columnIndex, bool ascending);
+        public abstract int CompareTo(TTreeViewItem anotherItem, int columnIndex, bool ascending);
         public abstract bool Search(string searchString);
 
-        protected int CompareByString(bool ascending, TSelf anotherItem, Func<TData, string> selector)
+        protected int CompareByString(bool ascending, TTreeViewItem anotherItem, Func<TData, string> selector)
         {
             return ascending ? string.CompareOrdinal(selector(Data), selector(anotherItem.Data)) : string.CompareOrdinal(selector(anotherItem.Data), selector(Data));
         }
 
-        protected int CompareByInt(bool ascending, TSelf anotherItem, Func<TData, int> selector)
+        protected int CompareByInt(bool ascending, TTreeViewItem anotherItem, Func<TData, int> selector)
         {
             return ascending ? selector(Data).CompareTo(selector(anotherItem.Data)) : selector(anotherItem.Data).CompareTo(selector(Data));
         }
 
-        protected int CompareByFloat(bool ascending, TSelf anotherItem, Func<TData, float> selector)
+        protected int CompareByFloat(bool ascending, TTreeViewItem anotherItem, Func<TData, float> selector)
         {
             return ascending ? selector(Data).CompareTo(selector(anotherItem.Data)) : selector(anotherItem.Data).CompareTo(selector(Data));
         }
 
-        protected int CompareByBool(bool ascending, TSelf anotherItem, Func<TData, bool> selector)
+        protected int CompareByBool(bool ascending, TTreeViewItem anotherItem, Func<TData, bool> selector)
         {
             return ascending ? selector(Data).CompareTo(selector(anotherItem.Data)) : selector(anotherItem.Data).CompareTo(selector(Data));
         }
 
-        protected int CompareByDateTime(bool ascending, TSelf anotherItem, Func<TData, DateTime?> selector)
+        protected int CompareByDateTime(bool ascending, TTreeViewItem anotherItem, Func<TData, DateTime?> selector)
         {
             DateTime? firstDate = selector(Data);
             DateTime? secondDate = selector(anotherItem.Data);
@@ -61,7 +61,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             return ascending ? firstDate.Value.CompareTo(secondDate.Value) : secondDate.Value.CompareTo(firstDate.Value);
         }
 
-        protected int CompareByUnixTime(bool ascending, TSelf anotherItem, Func<TData, UnixTime?> selector)
+        protected int CompareByUnixTime(bool ascending, TTreeViewItem anotherItem, Func<TData, UnixTime?> selector)
         {
             UnixTime? firstTime = selector(Data);
             UnixTime? secondTime = selector(anotherItem.Data);
