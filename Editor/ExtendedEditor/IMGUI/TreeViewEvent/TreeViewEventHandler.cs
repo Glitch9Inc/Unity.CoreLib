@@ -28,43 +28,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
             internal const string PASTE_ITEM = "Paste";
         }
 
-        // Actions
-        public TreeViewEvent CopyItem
-        {
-            get
-            {
-                _copyItem ??= new TreeViewEvent(MenuNames.COPY_ITEM, ConfirmationMessages.COPY_ITEM);
-                return _copyItem;
-            }
-        }
+        public TreeViewEvent CopyItem => _copyItem ??= new TreeViewEvent(MenuNames.COPY_ITEM, ConfirmationMessages.COPY_ITEM);
+        public TreeViewEvent PasteItem => _pasteItem ??= new TreeViewEvent(MenuNames.PASTE_ITEM, ConfirmationMessages.PASTE_ITEM);
+        public TreeViewEvent SaveItem => _saveItem ??= new TreeViewEvent(MenuNames.SAVE_ITEM, ConfirmationMessages.SAVE_ITEM);
+        public TreeViewEvent DeleteItem => _deleteItem ??= new TreeViewEvent(MenuNames.DELETE_ITEM, ConfirmationMessages.DELETE_ITEM);
 
-        public TreeViewEvent PasteItem
-        {
-            get
-            {
-                _pasteItem ??= new TreeViewEvent(MenuNames.PASTE_ITEM, ConfirmationMessages.PASTE_ITEM);
-                return _pasteItem;
-            }
-        }
-
-        public TreeViewEvent SaveItem
-        {
-            get
-            {
-                _saveItem ??= new TreeViewEvent(MenuNames.SAVE_ITEM, ConfirmationMessages.SAVE_ITEM);
-                return _saveItem;
-            }
-        }
-
-        public TreeViewEvent DeleteItem
-        {
-            get
-            {
-                _deleteItem ??= new TreeViewEvent(MenuNames.DELETE_ITEM, ConfirmationMessages.DELETE_ITEM);
-                return _deleteItem;
-            }
-        }
-        
         private TreeViewEvent _copyItem;
         private TreeViewEvent _pasteItem;
         private TreeViewEvent _saveItem;
@@ -75,25 +43,10 @@ namespace Glitch9.ExtendedEditor.IMGUI
         {
             GenericMenu menu = new();
 
-            if (CopyItem != null && CopyItem.ShowInRightClickMenu)
-            {
-                menu.AddItem(new GUIContent(CopyItem.Name), false, () => CopyItem.Execute(item, refreshTreeView));
-            }
-
-            if (PasteItem != null && PasteItem.ShowInRightClickMenu)
-            {
-                menu.AddItem(new GUIContent(PasteItem.Name), false, () => PasteItem.Execute(item, refreshTreeView));
-            }
-
-            if (SaveItem != null && SaveItem.ShowInRightClickMenu)
-            {
-                menu.AddItem(new GUIContent(SaveItem.Name), false, () => SaveItem.Execute(item, refreshTreeView));
-            }
-
-            if (DeleteItem != null && DeleteItem.ShowInRightClickMenu)
-            {
-                menu.AddItem(new GUIContent(DeleteItem.Name), false, () => DeleteItem.Execute(item, refreshTreeView));
-            }
+            ShowRightClickMenuInternal(ref menu, item, refreshTreeView, CopyItem);
+            ShowRightClickMenuInternal(ref menu, item, refreshTreeView, PasteItem);
+            ShowRightClickMenuInternal(ref menu, item, refreshTreeView, SaveItem);
+            ShowRightClickMenuInternal(ref menu, item, refreshTreeView, DeleteItem);
 
             menu.ShowAsContext();
         }
@@ -102,48 +55,39 @@ namespace Glitch9.ExtendedEditor.IMGUI
         {
             GenericMenu menu = new();
 
-            if (CopyItem != null && CopyItem.ShowInEditWindowMenu)
-            {
-                menu.AddItem(new GUIContent(CopyItem.Name), false, () => CopyItem.Execute(item, (success) =>
-                {
-                    refreshWindow(Result.Success());
-                }));
-            }
+            ShowEditWindowMenuInternal(ref menu, item, refreshWindow, CopyItem);
+            ShowEditWindowMenuInternal(ref menu, item, refreshWindow, PasteItem);
 
-            if (PasteItem != null && PasteItem.ShowInEditWindowMenu)
-            {
-                menu.AddItem(new GUIContent(PasteItem.Name), false, () => PasteItem.Execute(item, (success) =>
-                {
-                    refreshWindow(Result.Success());
-                }));
-            }
+            if (revertChange != null) menu.AddItem(new GUIContent(MenuNames.REVERT_CHANGES), isDirty, () => revertChange());
 
-            if (revertChange != null)
-            {
-                menu.AddItem(new GUIContent(MenuNames.REVERT_CHANGES), isDirty, () => revertChange());
-            }
-
-            if (SaveItem != null && SaveItem.ShowInEditWindowMenu)
-            {
-                menu.AddItem(new GUIContent(SaveItem.Name), isDirty, () => SaveItem.Execute(item, (success) =>
-                {
-                    refreshWindow(Result.Saved());
-                }));
-            }
-
-            if (DeleteItem != null && DeleteItem.ShowInEditWindowMenu)
-            {
-                menu.AddItem(new GUIContent(DeleteItem.Name), false, () => DeleteItem.Execute(item, (success) =>
-                {
-                    refreshWindow(Result.Success());
-                }));
-            }
+            ShowEditWindowMenuInternal(ref menu, item, refreshWindow, SaveItem, Result.Saved());
+            ShowEditWindowMenuInternal(ref menu, item, refreshWindow, DeleteItem);
 
             menu.ShowAsContext();
         }
 
+        private void ShowRightClickMenuInternal(ref GenericMenu menu, TTreeViewItem item, Action<bool> refreshWindow, TreeViewEvent treeViewEvent)
+        {
+            if (!treeViewEvent.IsEmpty && treeViewEvent.ShowInRightClickMenu)
+            {
+                menu.AddItem(new GUIContent(treeViewEvent.Name), treeViewEvent.IsVisible(item), () => treeViewEvent.Execute(item, refreshWindow));
+            }
+        }
+
+        private void ShowEditWindowMenuInternal(ref GenericMenu menu, TTreeViewItem item, Action<IResult> refreshWindow, TreeViewEvent treeViewEvent, IResult customResult = null)
+        {
+            if (!treeViewEvent.IsEmpty && treeViewEvent.ShowInEditWindowMenu)
+            {
+                menu.AddItem(new GUIContent(treeViewEvent.Name), treeViewEvent.IsVisible(item), () => treeViewEvent.Execute(item, (success) =>
+                {
+                    refreshWindow(customResult ?? Result.Success());
+                }));
+            }
+        }
+
         public class TreeViewEvent
         {
+            public bool IsEmpty => _onAction == null;
             public bool ShowInRightClickMenu { get; set; } = true;
             public bool ShowInEditWindowMenu { get; set; } = true;
             public bool ShowConfirmationMessage { get; set; } = false;
@@ -153,11 +97,22 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             private Action<TTreeViewItem, Action<bool>> _onAction;
             private Action<TTreeViewItem, bool> _onSuccess;
+            private Func<TTreeViewItem, bool> _isVisible;
 
             internal TreeViewEvent(string name, string confirmationMessage)
             {
                 Name = name;
                 _confirmationMessage = confirmationMessage;
+            }
+
+            public bool IsVisible(TTreeViewItem item)
+            {
+                return _isVisible == null || _isVisible(item);
+            }
+
+            public void AddVisibilityCheck(Func<TTreeViewItem, bool> isVisible)
+            {
+                _isVisible += isVisible;
             }
 
             public void AddListener(Action<TTreeViewItem, Action<bool>> action)

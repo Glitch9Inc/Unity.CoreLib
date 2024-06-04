@@ -15,8 +15,13 @@ namespace Glitch9.ExtendedEditor.IMGUI
             Data = data;
         }
 
+        public bool IsFiltered(TFilter filter)
+        {
+            Validate.Argument.NotNull(filter);
+            return filter.IsFiltered(Data);
+        }
+        
         public abstract int CompareTo(TSelf anotherItem, int columnIndex, bool ascending);
-        public abstract bool SetFilter(TFilter filter);
         public abstract bool Search(string searchString);
 
         protected int CompareByString(bool ascending, TSelf anotherItem, Func<TData, string> selector)

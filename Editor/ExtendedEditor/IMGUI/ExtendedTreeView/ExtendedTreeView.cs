@@ -8,19 +8,17 @@ using TreeView = UnityEditor.IMGUI.Controls.TreeView;
 
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public abstract partial class ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
-        where TSelf : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
-        where TTreeView : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
+    public abstract partial class ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
+        where TTreeViewWindow : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
+        where TTreeView : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
-        where TTreeViewEditWindow : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
+        where TTreeViewEditWindow : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
         where TData : class, ITreeViewData<TData>
         where TFilter : class, ITreeViewFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
         internal static class Strings
         {
-            internal const string UNKNOWN_TIME = "Unknown";
-
             // Styles
             internal const string STYLE_TREEVIEW_ITEM = "treeviewitem";
             internal const string STYLE_TREEVIEW_GROUP = "treeviewgroup";
@@ -36,7 +34,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             private TFilter _filter;
             private readonly EPrefs<TFilter> _filterSave;
-            private readonly TSelf _parentWindow;
+            private readonly TTreeViewWindow _treeViewWindow;
             private readonly TEventHandler _eventHandler;
 
             private List<TreeViewItem> _cachedItems;
@@ -44,20 +42,29 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
 
 
-            protected ExtendedTreeView(TSelf parentWindow, TEventHandler eventHandler, TreeViewState treeViewState, MultiColumnHeader multiColumnHeader) : base(treeViewState, multiColumnHeader)
+            protected ExtendedTreeView(TTreeViewWindow treeViewWindow, TEventHandler eventHandler, TreeViewState treeViewState, MultiColumnHeader multiColumnHeader) : base(treeViewState, multiColumnHeader)
             {
-                _parentWindow = parentWindow;
-                _eventHandler = PrepareEventHandler(eventHandler);
-                multiColumnHeader.sortingChanged += OnSortingChanged;
+                try
+                {
+                    _treeViewWindow = treeViewWindow;
 
-                // ReSharper disable once VirtualMemberCallInConstructor
-                SourceData = GetAllDataFromSource().ToList();
+                    string filterPrefsKey = $"{GetType().Name}.Filter";
+                    _filterSave = new EPrefs<TFilter>(filterPrefsKey, Activator.CreateInstance<TFilter>());
+                    _filter = _filterSave.Value;
 
-                string filterPrefsKey = $"{GetType().Name}.Filter";
-                _filterSave = new EPrefs<TFilter>(filterPrefsKey, Activator.CreateInstance<TFilter>());
-                _filter = _filterSave.Value;
+                    // ReSharper disable once VirtualMemberCallInConstructor
+                    SourceData = GetAllDataFromSource().ToList();
 
-                UpdateTreeView(true);
+                    _eventHandler = PrepareEventHandler(eventHandler);
+
+                    UpdateTreeView(true);
+
+                    multiColumnHeader.sortingChanged += OnSortingChanged;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
             }
 
             public void OnSortingChanged(MultiColumnHeader multiColumnHeaderParam)
@@ -127,13 +134,13 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                 foreach (TreeViewItem treeViewItem in _cachedItems)
                 {
-                    if (_parentWindow.Menu.HasSearchField)
+                    if (_treeViewWindow.Menu != null && _treeViewWindow.Menu.HasSearchField)
                     {
                         //Debug.Log("Search string: " + _parentWindow.Toolbar.SearchString);
                         if (treeViewItem is TTreeViewItem genericItem)
                         {
                             if (genericItem.Data == null) continue;
-                            if (!genericItem.Search(_parentWindow.Menu.SearchString)) continue;
+                            if (!genericItem.Search(_treeViewWindow.Menu.SearchString)) continue;
                         }
                     }
 
@@ -169,14 +176,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                 for (int i = 0; i < args.GetNumVisibleColumns(); ++i)
                 {
-                    try
-                    {
-                        CellGUI(args.GetCellRect(i), tableItem, i, ref args);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError(e);
-                    }
+                    CellGUI(args.GetCellRect(i), tableItem, i, ref args);
                 }
             }
 
@@ -237,21 +237,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 ShowEditWindow(item);
             }
-
-            protected void DrawString(Rect cellRect, string text, GUIStyle style = null)
-            {
-                if (text == null) return;
-                if (style == null) GUI.Label(cellRect, text);
-                else GUI.Label(cellRect, text, style);
-            }
-
-            protected void DrawUnixTime(Rect cellRect, UnixTime? unixTime, GUIStyle style = null)
-            {
-                string timeString = unixTime == null ? Strings.UNKNOWN_TIME : unixTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
-                DrawString(cellRect, timeString, style);
-            }
-
-        
+            
             public void UpdateTreeView(bool filterUpdated = false)
             {
                 //Debug.Log("Reloading TreeView...");
@@ -290,6 +276,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                 List<TreeViewItem> BuildCachedItems()
                 {
+                    Debug.Log("Building tree view cached items...");
+                    
                     List<TreeViewItem> items = new();
 
                     for (int i = 0; i < SourceData.Count; i++)
@@ -303,8 +291,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                         if (_filter != null)
                         {
-                            bool visible = newItem.SetFilter(_filter);
-                            if (!visible) continue;
+                            bool filtered = newItem.IsFiltered(_filter);
+                            if (filtered)
+                            {
+                                Debug.Log($"Item {newItem.Data.Id} is not visible.");
+                                continue;
+                            }
                         }
 
                         items.Add(newItem);
@@ -336,7 +328,6 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     OnDoubleClickedItem(treeViewItem);
                 }
             }
-
 
             protected void SetData(List<TData> data)
             {

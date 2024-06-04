@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public abstract partial class ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler> : EditorWindow
-        where TSelf : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
-        where TTreeView : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
+    public abstract partial class ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler> : EditorWindow
+        where TTreeViewWindow : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>
+        where TTreeView : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
-        where TTreeViewEditWindow : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
+        where TTreeViewEditWindow : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
         where TData : class, ITreeViewData<TData>
         where TFilter : class, ITreeViewFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
@@ -24,23 +24,29 @@ namespace Glitch9.ExtendedEditor.IMGUI
         /// </summary>
         public TreeViewMenu Menu { get; private set; }
 
+        private bool _isInitialized = false;
 
-        protected static TSelf Initialize(string name = null)
+
+        protected static TTreeViewWindow InitializeWindow(string name = null)
         {
-            name ??= typeof(TSelf).Name;
-            TSelf window = (TSelf)GetWindow(typeof(TSelf), false, name);
+            name ??= typeof(TTreeViewWindow).Name;
+            TTreeViewWindow window = (TTreeViewWindow)GetWindow(typeof(TTreeViewWindow), false, name);
             window.Show();
             window.autoRepaintOnSceneChange = true;
             return window;
         }
 
 
+
         protected abstract List<TreeViewColumnData> CreateColumns();
         protected abstract IEnumerable<TreeViewMenuItem> CreateTopToolbar();
         protected abstract TEventHandler CreateEventHandler();
 
-        protected virtual void OnEnable()
+        private void Initialize()
         {
+            if (_isInitialized) return;
+            _isInitialized = true;
+            TreeView = CreateThreeView();
             Menu = new TreeViewMenu(CreateTopToolbar(), TreeView.OnSearchStringChanged);
         }
 
@@ -51,17 +57,40 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         protected virtual void OnGUI()
         {
+            try
+            {
+                Initialize();
+                DrawMenu();
+                DrawTreeView();
+                DrawBottomBar();
+            }
+            catch (Exception e)
+            {
+                EditorGUILayout.HelpBox(e.Message, MessageType.Error);
+
+                if (GUILayout.Button("Show Error"))
+                {
+                    Debug.LogError(e);
+                }
+
+                if (GUILayout.Button("Try Again"))
+                {
+                    _isInitialized = false;
+                }
+            }
+        }
+
+        private void DrawMenu()
+        {
+            if (Menu == null) throw new NullReferenceException("Tree View Menu is null");
             Menu.OnGUI(position);
-            DrawTreeView();
-            DrawBottomBar();
         }
 
         private void DrawTreeView()
         {
-            TreeView ??= CreateThreeView();
-
+            if (TreeView == null) throw new NullReferenceException("Tree View is null");
             Rect reservedRect = GUILayoutUtility.GetRect(600f, 400f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            TreeView?.OnGUI(reservedRect);
+            TreeView.OnGUI(reservedRect);
         }
 
         private TTreeView CreateThreeView()
