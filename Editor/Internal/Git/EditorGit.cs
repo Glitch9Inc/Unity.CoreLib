@@ -22,6 +22,9 @@ namespace Glitch9.Internal.Git
         private string commitMessage;
         private EPrefs<string> _commitMessage;
 
+        private bool saveCommitMessage;
+        private EPrefs<bool> _saveCommitMessage;
+
         private string _commandLine;
         private int _gitOutputUpdated = 0;
         private bool _isInitializing = false;
@@ -34,6 +37,7 @@ namespace Glitch9.Internal.Git
             { GitOutputStatus.Hint, Color.magenta },
             { GitOutputStatus.Error, ExColor.orange },
             { GitOutputStatus.Fatal, Color.red },
+            { GitOutputStatus.Completed, ExColor.teal },
         };
 
         private static class Strings
@@ -66,6 +70,10 @@ namespace Glitch9.Internal.Git
             _commitMessage = new EPrefs<string>(commitMessageKey, string.Empty);
             commitMessage = _commitMessage.Value;
 
+            string saveCommitMessageKey = $"{gitUrl}-{gitBranch}-saveCommitMessage";
+            _saveCommitMessage = new EPrefs<bool>(saveCommitMessageKey, false);
+            saveCommitMessage = _saveCommitMessage.Value;
+
             _gitOutputs = new List<GitOutput>();
             _gitUrl = gitUrl;
             _repoName = gitUrl.Substring(gitUrl.LastIndexOf('/') + 1);
@@ -92,7 +100,12 @@ namespace Glitch9.Internal.Git
 
         internal void OnDestroy()
         {
-            _commitMessage.Value = commitMessage;
+            if (saveCommitMessage)
+            {
+                _commitMessage.Value = commitMessage;
+            }
+          
+            _saveCommitMessage.Value = saveCommitMessage;
         }
 
         internal void DrawGit()
@@ -156,7 +169,14 @@ namespace Glitch9.Internal.Git
         {
             GUILayout.BeginVertical(EGUI.box);
             {
-                GUILayout.Label("Commit Message");
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Commit Message");
+                    GUILayout.FlexibleSpace();
+                    saveCommitMessage = GUILayout.Toggle(saveCommitMessage, "Save");
+                }
+                GUILayout.EndHorizontal();
+       
                 commitMessage = EditorGUILayout.TextField(commitMessage);
             }
             GUILayout.EndVertical();
@@ -166,7 +186,6 @@ namespace Glitch9.Internal.Git
         {
             GUILayout.BeginHorizontal();
             {
-
                 if (GUILayout.Button("Git Status (status)"))
                 {
                     RunGitCommandsAsync("status");
@@ -391,7 +410,7 @@ namespace Glitch9.Internal.Git
         private async void Push(VersionIncrement versionType, bool force)
         {
             IResult iResult = await _git.PushAsync(commitMessage, versionType, force);
-            if (iResult.IsSuccess) commitMessage = "";
+            if (iResult.IsSuccess && !saveCommitMessage) commitMessage = "";
         }
     }
 }
