@@ -23,6 +23,11 @@ namespace Glitch9.Internal.Git
             _git.InitializeAsync(gitUrl.stringValue, gitBranch.stringValue, localDir.stringValue, Repaint);
         }
 
+        private void OnDestroy()
+        {
+            _git?.OnDestroy();;
+        }
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -47,7 +52,7 @@ namespace Glitch9.Internal.Git
             GUILayout.Space(10);
             EGUILayout.Title("Git Window");
 
-            if (!_git.IsInitialized)
+            if (_git == null || !_git.IsInitialized)
             {
                 GUILayout.BeginVertical(EGUI.Box(3, 7));
                 {

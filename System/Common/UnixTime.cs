@@ -43,6 +43,11 @@ namespace Glitch9
             _value = (long)(new DateTime(year, month, day, hour, minute, second) - UnixEpoch).TotalSeconds;
         }
 
+        public UnixTime(string dateAsString)
+        {
+            _value = (long)(DateTime.Parse(dateAsString) - UnixEpoch).TotalSeconds;
+        }
+
         public static explicit operator DateTime(UnixTime unixTime)
         {
             return UnixEpoch.AddSeconds(unixTime.Value);

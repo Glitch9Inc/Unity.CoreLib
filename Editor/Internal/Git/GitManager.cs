@@ -2,47 +2,20 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Debug = UnityEngine.Debug;
 
 namespace Glitch9.Internal.Git
 {
-    public enum GitOutputStatus
-    {
-        Info,
-        Hint,
-        Success,
-        Warning,
-        Error,
-        RealError,
-        Fatal,
-    }
-
-    public struct GitOutput
-    {
-        public string Value;
-        public GitOutputStatus Status;
-
-        public GitOutput(string value, GitOutputStatus status = 0)
-        {
-            this.Value = value;
-            this.Status = status;
-        }
-    }
-
     public class GitManager
     {
         #region Status Checks
+
         public bool PullAvailable => _remoteVersion > _localVersion && _remoteVersion.Build != 0 && _localVersion.Build != 0;
         public bool PushAvailable => _remoteVersion < _localVersion && _remoteVersion.Build != 0 && _localVersion.Build != 0;
+
         #endregion
 
-        //private const string RAW_GIT_URL = "https://raw.githubusercontent.com";
-        private const string GIT_HINT = "hint: ";
-        private const string GIT_WARNING = "warning: ";
-        private const string GIT_ERROR = "error: ";
-        private const string GIT_FATAL = "fatal: ";
 
         public event Action<GitOutput> OnGitOutput;
 
@@ -96,7 +69,6 @@ namespace Glitch9.Internal.Git
             {
                 await InitGitRepositoryAsync();
                 await PullVersionTagAsync();
-                //await ValidateRemoteOrigin();
                 await ValidateBranch();
                 _onRepaint?.Invoke();
             }
@@ -105,7 +77,7 @@ namespace Glitch9.Internal.Git
                 Debug.LogError(e);
             }
         }
-        
+
         private async Task InitGitRepositoryAsync()
         {
             string gitDirectory = Path.Combine(_localDir, ".git");
@@ -131,15 +103,17 @@ namespace Glitch9.Internal.Git
         public async Task PullVersionTagAsync()
         {
             Debug.Log("Getting version info...");
-            
+
             // Set the current branch to track the remote branch
             await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}");
-            
+
             // Fetch the tags from the remote repository
             await RunGitCommandAsync("fetch --tags");
 
             // Get the latest tag from the fetched tags
-            string latestTag = await RunGitCommandAsync("describe --tags --abbrev=0", true);
+            IResult iResult = await RunGitCommandAsync("describe --tags --abbrev=0");
+            if (iResult.IsFailure || iResult is not Result result) return;
+            string latestTag = result.Message.Trim();
 
             // Check if the latestTag is not null or empty after trimming
             if (!string.IsNullOrEmpty(latestTag))
@@ -154,24 +128,12 @@ namespace Glitch9.Internal.Git
             }
         }
 
-        private async Task ValidateRemoteOrigin()
-        {
-            string currentRemoteOrigin = await GetCurrentRemoteOrigin();
-            if (string.IsNullOrEmpty(currentRemoteOrigin)) return;
-            currentRemoteOrigin = currentRemoteOrigin.Trim();
-            Debug.Log($"Current remote origin: {currentRemoteOrigin}");
-
-            if (currentRemoteOrigin != _gitUrl)
-            {
-                Debug.LogWarning($"Current remote origin ({currentRemoteOrigin}) does not match the expected remote origin ({_gitUrl}).");
-                Debug.Log("Attempting to set origin...");
-                await RunGitCommandAsync($"remote add origin {_gitUrl}");
-            }
-        }
-
         private async Task ValidateBranch()
         {
-            string currentBranch = await GetCurrentBranch();
+            IResult iResult = await RunGitCommandAsync("remote get-url origin");
+            if (iResult.IsFailure || iResult is not Result result) return;
+
+            string currentBranch = result.Message;
             if (string.IsNullOrEmpty(currentBranch)) return;
             currentBranch = currentBranch.Trim();
             Debug.Log($"Current branch: {currentBranch}");
@@ -184,16 +146,11 @@ namespace Glitch9.Internal.Git
             }
         }
 
-        public async Task PullAsync()
-        {
-            await RunGitCommandAsync("pull");
-        }
-
         public async Task PushAsync(VersionIncrement versionInc, bool force = false)
         {
             string pushCommand = $"push origin {_gitBranch}";
             if (force) pushCommand += " --force";
-            
+
             // Commit changes
             await RunGitCommandAsync("add .");
             await RunGitCommandAsync("commit -m \"" + _remoteVersion.CreateTagInfo() + "\"");
@@ -218,39 +175,10 @@ namespace Glitch9.Internal.Git
             _localVersion = _remoteVersion;
         }
 
-        public Task StatusAsync() => RunGitCommandAsync("status");
-        public Task ConfigureLocalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}");
-        public Task ConfigureGlobalCoreAutoCRLFAsync(bool value) => RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}");
-        public Task NormalizeLineEndingsAsync() => RunGitCommandAsync("add --renormalize .");
+        public async void ConfigureLocalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}");
+        public async void ConfigureGlobalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}");
 
-
-        public async Task SetUpstreamToOrigin()
-        {
-            await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}");
-        }
-
-        public async Task<string> PushVersionAsync()
-        {
-            return await RunGitCommandAsync("remote get-url origin", returnOutput: true);
-        }
-
-        public async Task<string> GetCurrentRemoteOrigin()
-        {
-            return await RunGitCommandAsync("remote get-url origin", returnOutput: true);
-        }
-
-        public async Task<string> GetCurrentBranch()
-        {
-            return await RunGitCommandAsync("rev-parse --abbrev-ref HEAD", returnOutput: true);
-        }
-
-        public async Task<string> FixIndexLock()
-        {
-            //return await RunGitCommandAsync("update-index --really-refresh");
-            return await RunGitCommandAsync("update-index --refresh");
-        }
-
-        public async Task<string> RunGitCommandAsync(string command, bool returnOutput = false)
+        public async Task<IResult> RunGitCommandAsync(string command)
         {
             Debug.Log($"Running Git command: {command}");
             OnGitOutput?.Invoke(new GitOutput(command));
@@ -281,7 +209,7 @@ namespace Glitch9.Internal.Git
                     if (args.Data != null)
                     {
                         outputBuilder.AppendLine(args.Data);
-                        HandleResult(args.Data, GitOutputStatus.Success);
+                        HandleResult(args.Data, GitOutputStatus.Success, false);
                     }
                 };
 
@@ -290,7 +218,7 @@ namespace Glitch9.Internal.Git
                     if (args.Data != null)
                     {
                         errorBuilder.AppendLine(args.Data);
-                        HandleResult(args.Data, GitOutputStatus.Error);
+                        HandleResult(args.Data, GitOutputStatus.Error, false);
                     }
                 };
 
@@ -303,77 +231,34 @@ namespace Glitch9.Internal.Git
                 if (process.ExitCode != 0)
                 {
                     string error = $"Git command Failed with exit code {process.ExitCode}";
-                    Debug.LogError(error);
-                    OnGitOutput?.Invoke(new GitOutput(error, GitOutputStatus.Error));
-                    return null;
+                    return HandleResult(error, GitOutputStatus.Error);
                 }
 
-                return returnOutput ? outputBuilder.ToString().Trim() : null;
+                string output = outputBuilder.ToString().Trim();
+                return HandleResult(output);
             }
             catch (Exception ex)
             {
                 string error = $"Git command Failed: {ex.Message}";
-                Debug.LogError(error);
-                OnGitOutput?.Invoke(new GitOutput(error, GitOutputStatus.Error));
-                return null;
+                return HandleResult(error, GitOutputStatus.Error);
             }
         }
 
-        private void HandleResult(string output, GitOutputStatus status)
+        private IResult HandleResult(string output, GitOutputStatus status = GitOutputStatus.Unset, bool triggerEventHandler = true)
         {
-            if (output.StartsWith(GIT_HINT))
+            if (status == GitOutputStatus.Unset)
             {
-                output = output.Replace(GIT_HINT, "");
-                status = GitOutputStatus.Hint;
-                Debug.Log(output);
-            }
-            else if (output.StartsWith(GIT_WARNING))
-            {
-                output = output.Replace(GIT_WARNING, "");
-                status = GitOutputStatus.Warning;
-                Debug.LogWarning(output);
-            }
-            else if (output.StartsWith(GIT_ERROR))
-            {
-                output = output.Replace(GIT_ERROR, "");
-                status = GitOutputStatus.RealError;
-                Debug.LogError(output);
-            }
-            else if (output.StartsWith(GIT_FATAL))
-            {
-                output = output.Replace(GIT_FATAL, "");
-                status = GitOutputStatus.Fatal;
-                Debug.LogError(output);
-            }
-            else
-            {
-                Debug.Log(output);
+                status = GitEditorUtils.ParseStatus(output);
             }
 
             OnGitOutput?.Invoke(new GitOutput(output, status));
-        }
-    }
 
-    
-    public static class TaskExtensions
-    {
-        public static async Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default)
-        {
-            TaskCompletionSource<object> tcs = new();
-
-            void ProcessExited(object sender, EventArgs e) => tcs.TrySetResult(null);
-
-            process.EnableRaisingEvents = true;
-            process.Exited += ProcessExited;
-
-            using (cancellationToken.Register(() =>
+            if (status == GitOutputStatus.Error || status == GitOutputStatus.Fatal)
             {
-                process.Exited -= ProcessExited;
-                tcs.TrySetCanceled();
-            }))
-            {
-                await tcs.Task;
+                return Result.Fail(output);
             }
+
+            return Result.Success(output);
         }
     }
 }

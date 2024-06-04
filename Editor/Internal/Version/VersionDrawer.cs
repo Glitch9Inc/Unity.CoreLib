@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Glitch9.Internal
 {
-    [CustomPropertyDrawer(typeof(Version))]
+    [CustomPropertyDrawer(typeof(Version), true)]
     public class VersionDrawer : PropertyDrawer
     {
         private SerializedProperty major;

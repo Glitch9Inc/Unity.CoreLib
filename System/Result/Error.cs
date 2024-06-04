@@ -11,7 +11,6 @@ namespace Glitch9
         public static implicit operator Error(string errorMessage) => new(errorMessage);
 
         [JsonIgnore] public Issue Issue { get; set; }
-        [JsonIgnore] public string Message { get; set; }
         [JsonIgnore] public string StackTrace { get; set; }
 
         public Error()

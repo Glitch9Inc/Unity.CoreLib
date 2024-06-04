@@ -4,14 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Glitch9.Internal.Git
 {
-    public enum VersionIncrement
-    {
-        Major,
-        Minor,
-        Patch
-    }
-
-    public struct GitVersion : IEquatable<GitVersion>, IComparable<GitVersion>
+    public class GitVersion : Version
     {
         /*
              Version.txt looks like below
@@ -19,15 +12,16 @@ namespace Glitch9.Internal.Git
              Build: 456
              Release: 2023-11-01
         */
+
         public static GitVersion CreateCurrentVersion(string projectName)
         {
-            string envPrefix = CreateEnvPrefix(projectName);
+            string envPrefix = CreateGithubEnvPrefix(projectName);
             string versionTag = Environment.GetEnvironmentVariable(envPrefix) ?? null;
             if (versionTag == null) return new GitVersion();
             return new GitVersion(projectName, versionTag);
         }
-        
-        public static string CreateEnvPrefix(string projectName)
+
+        public static string CreateGithubEnvPrefix(string projectName)
         {
             return string.Format(ENV_GITHUB_PROJECT_VERSION_PREFIX, projectName);
         }
@@ -37,14 +31,12 @@ namespace Glitch9.Internal.Git
         private const string VERSION_TAG_INFO_FORMAT = "Version {0}.{1}.{2} Build {3} Date {4}";
         private const string ENV_GITHUB_PROJECT_VERSION_PREFIX = "GITHUB_{0}";
 
-        public int Major { get; private set; }
-        public int Minor { get; private set; }
-        public int Patch { get; private set; }
-        public int Build { get; private set; }
-        public string ReleaseDate { get; private set; }
         public bool IsValid { get; private set; }
-
         private readonly string _projectName;
+
+        public GitVersion()
+        {
+        }
 
         public GitVersion(string projectName, string tag)
         {
@@ -55,7 +47,7 @@ namespace Glitch9.Internal.Git
 
             _projectName = projectName.ToUpper();
 
-            var match = Regex.Match(tag, VERSION_TAG_PATTERN);
+            Match match = Regex.Match(tag, VERSION_TAG_PATTERN);
             if (match.Success && match.Groups.Count == 6)
             {
                 IsValid = true;
@@ -63,9 +55,9 @@ namespace Glitch9.Internal.Git
                 Minor = int.Parse(match.Groups[2].Value);
                 Patch = int.Parse(match.Groups[3].Value);
                 Build = int.Parse(match.Groups[4].Value);
-                ReleaseDate = match.Groups[5].Value;
-                
-                string envPrefix = CreateEnvPrefix(_projectName);
+                ReleaseDate = new UnixTime(match.Groups[5].Value);
+
+                string envPrefix = CreateGithubEnvPrefix(_projectName);
                 Environment.SetEnvironmentVariable(envPrefix, tag);
             }
             else
@@ -73,13 +65,13 @@ namespace Glitch9.Internal.Git
                 throw new FormatException("The provided tag does not match the expected pattern.");
             }
         }
-        
+
         public string CreateTag()
         {
             string currentDate = DateTime.Now.ToString("yyyy-MM-dd");
             return CreateTag(currentDate);
         }
-        
+
         public string CreateTag(string dateString)
         {
             return string.Format(VERSION_TAG_FORMAT, Major, Minor, Patch, Build, dateString);
@@ -93,104 +85,13 @@ namespace Glitch9.Internal.Git
 
         public string CreateUpdatedTag(VersionIncrement increment)
         {
-            switch (increment)
-            {
-                case VersionIncrement.Major:
-                    Major++;
-                    Minor = 0;
-                    Patch = 0;
-                    break;
-                case VersionIncrement.Minor:
-                    Minor++;
-                    Patch = 0;
-                    break;
-                case VersionIncrement.Patch:
-                    Patch++;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(increment), "Unsupported version increment specified.");
-            }
+            Increase(increment);
 
-            int newBuildNumber = Version.CalcBuildNumber(Major, Minor, Patch);
-         
-            if (Build < newBuildNumber)
-            {
-                Build = newBuildNumber;
-            }
-            else
-            {
-                Build++;
-            }
-
-            string newTag = CreateTag();            
-            string envPrefix = CreateEnvPrefix(_projectName);
+            string newTag = CreateTag();
+            string envPrefix = CreateGithubEnvPrefix(_projectName);
             Environment.SetEnvironmentVariable(envPrefix, newTag);
 
             return newTag;
-        }
-
-        public int CompareTo(GitVersion other)
-        {
-            if (Build > other.Build)
-                return 1;
-            if (Build < other.Build)
-                return -1;
-            return 0;
-        }
-
-        public bool Equals(GitVersion other)
-        {
-            return Build == other.Build;
-        }
-
-        public static bool operator >(GitVersion version1, GitVersion version2)
-        {
-            return version1.CompareTo(version2) > 0;
-        }
-
-        public static bool operator <(GitVersion version1, GitVersion version2)
-        {
-            return version1.CompareTo(version2) < 0;
-        }
-
-        public static bool operator >=(GitVersion version1, GitVersion version2)
-        {
-            return version1.CompareTo(version2) >= 0;
-        }
-
-        public static bool operator <=(GitVersion version1, GitVersion version2)
-        {
-            return version1.CompareTo(version2) <= 0;
-        }
-
-        public static bool operator ==(GitVersion version1, GitVersion version2)
-        {
-            if (ReferenceEquals(version1, version2))
-                return true;
-            if (ReferenceEquals(version1, null))
-                return false;
-            if (ReferenceEquals(version2, null))
-                return false;
-            return version1.Equals(version2);
-        }
-
-        public static bool operator !=(GitVersion version1, GitVersion version2)
-        {
-            return !(version1 == version2);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
-            if (!(obj is GitVersion))
-                return false;
-            return Build == ((GitVersion)obj).Build;
-        }
-
-        public override int GetHashCode()
-        {
-            return Build.GetHashCode();
         }
     }
 }
