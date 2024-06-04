@@ -20,9 +20,10 @@ namespace Glitch9.ExtendedEditor.IMGUI
             Validate.Argument.NotNull(filter);
             return filter.IsFiltered(Data);
         }
-        
+
         public abstract int CompareTo(TTreeViewItem anotherItem, int columnIndex, bool ascending);
         public abstract bool Search(string searchString);
+
 
         protected int CompareByString(bool ascending, TTreeViewItem anotherItem, Func<TData, string> selector)
         {

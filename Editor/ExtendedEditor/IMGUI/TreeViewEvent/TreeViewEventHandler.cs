@@ -70,7 +70,16 @@ namespace Glitch9.ExtendedEditor.IMGUI
         {
             if (!treeViewEvent.IsEmpty && treeViewEvent.ShowInRightClickMenu)
             {
-                menu.AddItem(new GUIContent(treeViewEvent.Name), treeViewEvent.IsVisible(item), () => treeViewEvent.Execute(item, refreshWindow));
+                bool isVisible = treeViewEvent.IsVisible(item);
+
+                if (isVisible)
+                {
+                    menu.AddItem(new GUIContent(treeViewEvent.Name), false, () => treeViewEvent.Execute(item, refreshWindow));
+                }
+                else
+                {
+                    menu.AddDisabledItem(new GUIContent(treeViewEvent.Name));
+                }
             }
         }
 
@@ -78,10 +87,19 @@ namespace Glitch9.ExtendedEditor.IMGUI
         {
             if (!treeViewEvent.IsEmpty && treeViewEvent.ShowInEditWindowMenu)
             {
-                menu.AddItem(new GUIContent(treeViewEvent.Name), treeViewEvent.IsVisible(item), () => treeViewEvent.Execute(item, (success) =>
+                bool isVisible = treeViewEvent.IsVisible(item);
+
+                if (isVisible)
                 {
-                    refreshWindow(customResult ?? Result.Success());
-                }));
+                    menu.AddItem(new GUIContent(treeViewEvent.Name), false, () => treeViewEvent.Execute(item, (success) =>
+                    {
+                        refreshWindow(customResult ?? Result.Success());
+                    }));
+                }
+                else
+                {
+                    menu.AddDisabledItem(new GUIContent(treeViewEvent.Name));
+                }
             }
         }
 
@@ -107,7 +125,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             public bool IsVisible(TTreeViewItem item)
             {
-                return _isVisible == null || _isVisible(item);
+                bool isVisible = _isVisible == null || _isVisible(item);
+                //Debug.Log($"{Name} is visible: {isVisible}");
+                return isVisible;
             }
 
             public void AddVisibilityCheck(Func<TTreeViewItem, bool> isVisible)

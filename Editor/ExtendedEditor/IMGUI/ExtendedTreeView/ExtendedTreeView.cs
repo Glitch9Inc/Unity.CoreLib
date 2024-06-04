@@ -39,6 +39,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             private List<TreeViewItem> _cachedItems;
             private List<TreeViewItem> _rows;
+            
+            private TTreeViewEditWindow _editWindowInstance;
 
 
 
@@ -150,7 +152,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                 if (multiColumnHeader.sortedColumnIndex == -1)
                 {
-                    _treeViewWindow.Repaint();
+                    RequiresRefresh = false;
                     return _rows;
                 }
 
@@ -158,10 +160,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 int columnIndex = multiColumnHeader.sortedColumnIndex;
                 bool ascending = multiColumnHeader.IsSortedAscending(columnIndex);
 
-                _rows.ToList().Sort(Comparison);
+                _rows.Sort(Comparison);
+                
                 RequiresRefresh = false;
-
-                _treeViewWindow.Repaint();
                 return _rows;
 
                 int Comparison(TreeViewItem x, TreeViewItem y)
@@ -177,18 +178,18 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             protected override void RowGUI(RowGUIArgs args)
             {
-                TreeViewItem tableItem = args.item;
+                TreeViewItem treeViewItem = args.item;
 
                 if (Event.current.type == EventType.Repaint)
                 {
-                    bool isNotGroupRow = tableItem is TTreeViewItem;
+                    bool isNotGroupRow = treeViewItem is TTreeViewItem;
                     GUIStyle backgroundStyle = isNotGroupRow ? EGUI.skin.GetStyle(Strings.STYLE_TREEVIEW_ITEM) : EGUI.skin.GetStyle(Strings.STYLE_TREEVIEW_GROUP);
                     backgroundStyle.Draw(args.rowRect, false, false, false, false);
                 }
 
                 for (int i = 0; i < args.GetNumVisibleColumns(); ++i)
                 {
-                    CellGUI(args.GetCellRect(i), tableItem, i, ref args);
+                    CellGUI(args.GetCellRect(i), treeViewItem, i, ref args);
                 }
             }
 
@@ -228,12 +229,14 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (item == null || item.Data == null) return;
                 string windowTitle = item.Data.Id == null ? "Details" : $"Details: {item.Data.Id}";
 
+                if (_editWindowInstance != null) _editWindowInstance.Close();
+
                 try
                 {
-                    TTreeViewEditWindow window = GetWindow<TTreeViewEditWindow>(false, windowTitle, true);
-                    window.minSize = new Vector2(400, 400);
-                    window.maxSize = new Vector2(800, 800);
-                    window.SetData(item, this as TTreeView, _eventHandler);
+                    _editWindowInstance = GetWindow<TTreeViewEditWindow>(false, windowTitle, true);
+                    _editWindowInstance.minSize = new Vector2(400, 400);
+                    _editWindowInstance.maxSize = new Vector2(800, 800);
+                    _editWindowInstance.SetData(item, this as TTreeView, _eventHandler);
                 }
                 catch (Exception e)
                 {

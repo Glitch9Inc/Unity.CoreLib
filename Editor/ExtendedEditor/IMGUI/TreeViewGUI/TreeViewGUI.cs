@@ -24,7 +24,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
             DrawString(cellRect, timeString, style);
         }
 
-        public static bool DrawBool(Rect cellRect, bool value)
+        public static void DrawBool(Rect cellRect, bool value)
+        {
+            GUI.Label(cellRect, value ? "Yes" : "No");
+        }
+
+        public static bool DrawCheckbox(Rect cellRect, bool value)
         {
             Rect toggleRect = cellRect;
             toggleRect.width = 20f;

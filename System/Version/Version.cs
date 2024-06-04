@@ -64,7 +64,6 @@ namespace Glitch9
             set => releaseDate = value;
         }
 
-
         public Version()
         {
         }
