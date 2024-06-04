@@ -77,10 +77,12 @@ namespace Glitch9.Internal.Git
             return string.Format(VERSION_TAG_FORMAT, Major, Minor, Patch, Build, dateString);
         }
 
-        public string CreateTagInfo()
+        public string CreateTagInfo(string commitMessage = null)
         {
             string currentDate = DateTime.Now.ToString("yyyy-MM-dd");
-            return string.Format(VERSION_TAG_INFO_FORMAT, Major, Minor, Patch, Build, currentDate);
+            string cm = string.Format(VERSION_TAG_INFO_FORMAT, Major, Minor, Patch, Build, currentDate);
+            if (!string.IsNullOrEmpty(commitMessage)) cm += $": {commitMessage}";
+            return cm;
         }
 
         public string CreateUpdatedTag(VersionIncrement increment)

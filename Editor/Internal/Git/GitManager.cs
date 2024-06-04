@@ -146,14 +146,16 @@ namespace Glitch9.Internal.Git
             }
         }
 
-        public async Task PushAsync(VersionIncrement versionInc, bool force = false)
+        public async Task PushAsync(string commitMessage, VersionIncrement versionInc, bool force = false)
         {
             string pushCommand = $"push origin {_gitBranch}";
             if (force) pushCommand += " --force";
 
+            string cm = _remoteVersion.CreateTagInfo(commitMessage);
+
             // Commit changes
             await RunGitCommandAsync("add .", true);
-            await RunGitCommandAsync("commit -m \"" + _remoteVersion.CreateTagInfo() + "\"", true);
+            await RunGitCommandAsync("commit -m \"" + cm + "\"", true);
 
             // Push changes
             await RunGitCommandAsync(pushCommand, true);

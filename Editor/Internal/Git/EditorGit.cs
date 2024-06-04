@@ -385,12 +385,12 @@ namespace Glitch9.Internal.Git
 
         private async void Push(VersionIncrement versionType)
         {
-            await _git.PushAsync(versionType);
+            await _git.PushAsync(commitMessage, versionType);
         }
 
         private async void ForcePush(VersionIncrement versionType)
         {
-            await _git.PushAsync(versionType, true);
+            await _git.PushAsync(commitMessage, versionType, true);
         }
     }
 }
