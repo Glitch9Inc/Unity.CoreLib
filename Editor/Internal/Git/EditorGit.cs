@@ -181,6 +181,11 @@ namespace Glitch9.Internal.Git
                 {
                     RunGitCommandsAsync("update-index --refresh", "update-index --really-refresh");
                 }
+
+                if (GUILayout.Button("Open Repo"))
+                {
+                    Application.OpenURL(_gitUrl);
+                }
             }
             GUILayout.EndHorizontal();
         }
