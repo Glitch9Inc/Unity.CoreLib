@@ -2,7 +2,7 @@ namespace Glitch9.Internal.Git
 {
     public enum GitOutputStatus
     {
-        Unset,
+        Unknown,
         Info,
         Hint,
         Success,

@@ -83,7 +83,7 @@ namespace Glitch9.Internal.Git
         private void OnGitOutput(GitOutput output)
         {
             if (_gitOutputs.Contains(output)) return;
-            
+
             _gitOutputs.Add(output);
             _gitOutputUpdated++;
             GoToBottom();
@@ -283,7 +283,7 @@ namespace Glitch9.Internal.Git
 
             DrawTrueOrFalseButton("core.autocrlf", _git.ConfigureLocalCoreAutoCRLFAsync);
             DrawTrueOrFalseButton("core.autocrlf (global)", _git.ConfigureGlobalCoreAutoCRLFAsync);
-            
+
             GUILayout.BeginHorizontal();
             {
                 if (GUILayout.Button("Normalize Line Endings"))
@@ -358,7 +358,7 @@ namespace Glitch9.Internal.Git
                 _gitOutputs.Add(new GitOutput("Empty Command"));
                 return;
             }
-            await _git.RunGitCommandAsync(_commandLine);
+            await _git.RunGitCommandAsync(_commandLine, true);
             _commandLine = "";
         }
 
@@ -378,7 +378,7 @@ namespace Glitch9.Internal.Git
                     continue;
                 }
 
-                IResult iResult = await _git.RunGitCommandAsync(command);
+                IResult iResult = await _git.RunGitCommandAsync(command, true);
                 if (iResult.IsSuccess) return;
             }
         }

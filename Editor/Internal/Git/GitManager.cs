@@ -89,7 +89,7 @@ namespace Glitch9.Internal.Git
 
             try
             {
-                await RunGitCommandAsync("init");
+                await RunGitCommandAsync("init", false);
                 Debug.Log(Directory.Exists(gitDirectory) ? "Git repository initialized." : "Failed to initialize Git repository.");
             }
             catch (Exception ex)
@@ -105,13 +105,13 @@ namespace Glitch9.Internal.Git
             Debug.Log("Getting version info...");
 
             // Set the current branch to track the remote branch
-            await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}");
+            await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}", false);
 
             // Fetch the tags from the remote repository
-            await RunGitCommandAsync("fetch --tags");
+            await RunGitCommandAsync("fetch --tags", false);
 
             // Get the latest tag from the fetched tags
-            IResult iResult = await RunGitCommandAsync("describe --tags --abbrev=0");
+            IResult iResult = await RunGitCommandAsync("describe --tags --abbrev=0", false);
             if (iResult.IsFailure || iResult is not Result result) return;
             string latestTag = result.Message.Trim();
 
@@ -130,7 +130,7 @@ namespace Glitch9.Internal.Git
 
         private async Task ValidateBranch()
         {
-            IResult iResult = await RunGitCommandAsync("remote get-url origin");
+            IResult iResult = await RunGitCommandAsync("remote get-url origin", false);
             if (iResult.IsFailure || iResult is not Result result) return;
 
             string currentBranch = result.Message;
@@ -142,7 +142,7 @@ namespace Glitch9.Internal.Git
             {
                 Debug.LogWarning($"Current branch ({currentBranch}) does not match the expected branch ({_gitBranch}).");
                 Debug.Log("Attempting to checkout branch...");
-                await RunGitCommandAsync($"checkout {_gitBranch}");
+                await RunGitCommandAsync($"checkout {_gitBranch}", false);
             }
         }
 
@@ -152,11 +152,11 @@ namespace Glitch9.Internal.Git
             if (force) pushCommand += " --force";
 
             // Commit changes
-            await RunGitCommandAsync("add .");
-            await RunGitCommandAsync("commit -m \"" + _remoteVersion.CreateTagInfo() + "\"");
+            await RunGitCommandAsync("add .", true);
+            await RunGitCommandAsync("commit -m \"" + _remoteVersion.CreateTagInfo() + "\"", true);
 
             // Push changes
-            await RunGitCommandAsync(pushCommand);
+            await RunGitCommandAsync(pushCommand, true);
             await PushVersionTagAsync(versionInc);
             _localVersion = _remoteVersion;
         }
@@ -170,15 +170,15 @@ namespace Glitch9.Internal.Git
         {
             string tag = _remoteVersion.CreateUpdatedTag(versionInc);
             string tagInfo = _remoteVersion.CreateTagInfo();
-            await RunGitCommandAsync($"tag -a {tag} -m \"{tagInfo}\"");
-            await RunGitCommandAsync("push origin --tags");
+            await RunGitCommandAsync($"tag -a {tag} -m \"{tagInfo}\"", false);
+            await RunGitCommandAsync("push origin --tags", false);
             _localVersion = _remoteVersion;
         }
 
-        public async void ConfigureLocalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}");
-        public async void ConfigureGlobalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}");
+        public async void ConfigureLocalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}", true);
+        public async void ConfigureGlobalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}", true);
 
-        public async Task<IResult> RunGitCommandAsync(string command)
+        public async Task<IResult> RunGitCommandAsync(string command, bool logSuccessMessage)
         {
             Debug.Log($"Running Git command: {command}");
             OnGitOutput?.Invoke(new GitOutput(command));
@@ -209,7 +209,7 @@ namespace Glitch9.Internal.Git
                     if (args.Data != null)
                     {
                         outputBuilder.AppendLine(args.Data);
-                        HandleResult(args.Data, GitOutputStatus.Success, false);
+                        HandleResult(command, args.Data, GitOutputStatus.Success, false);
                     }
                 };
 
@@ -218,7 +218,7 @@ namespace Glitch9.Internal.Git
                     if (args.Data != null)
                     {
                         errorBuilder.AppendLine(args.Data);
-                        HandleResult(args.Data, GitOutputStatus.Error, false);
+                        HandleResult(command, args.Data, GitOutputStatus.Error, false);
                     }
                 };
 
@@ -231,31 +231,40 @@ namespace Glitch9.Internal.Git
                 if (process.ExitCode != 0)
                 {
                     string error = $"Git command Failed with exit code {process.ExitCode}";
-                    return HandleResult(error, GitOutputStatus.Error);
+                    return HandleResult(command, error, GitOutputStatus.Error);
                 }
 
                 string output = outputBuilder.ToString().Trim();
-                return HandleResult(output);
+                return HandleResult(command, output, GitOutputStatus.Unknown, true, logSuccessMessage);
             }
             catch (Exception ex)
             {
                 string error = $"Git command Failed: {ex.Message}";
-                return HandleResult(error, GitOutputStatus.Error);
+                return HandleResult(command, error, GitOutputStatus.Error);
             }
         }
 
-        private IResult HandleResult(string output, GitOutputStatus status = GitOutputStatus.Unset, bool triggerEventHandler = true)
+        private IResult HandleResult(string command, string output, GitOutputStatus status = GitOutputStatus.Unknown, bool triggerEventHandler = true, bool logSuccessMessage = false)
         {
-            if (status == GitOutputStatus.Unset)
+            if (status == GitOutputStatus.Unknown)
             {
                 status = GitEditorUtils.ParseStatus(output);
             }
 
-            OnGitOutput?.Invoke(new GitOutput(output, status));
+            if (triggerEventHandler)
+            {
+                OnGitOutput?.Invoke(new GitOutput(output, status));
+            }
 
             if (status == GitOutputStatus.Error || status == GitOutputStatus.Fatal)
             {
                 return Result.Fail(output);
+            }
+
+            if (status == GitOutputStatus.Success && logSuccessMessage)
+            {
+                string successMessage = $"Git command \"{command}\" executed successfully.";
+                OnGitOutput?.Invoke(new GitOutput(successMessage, GitOutputStatus.Success));
             }
 
             return Result.Success(output);
