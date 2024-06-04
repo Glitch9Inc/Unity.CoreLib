@@ -67,30 +67,37 @@ namespace Glitch9.Internal.Git
 
             try
             {
-                await InitGitRepositoryAsync();
-                await PullVersionTagAsync();
+                IResult iResult = await InitGitRepositoryAsync();
+                if (iResult.IsFailure) return;
+                iResult = await PullVersionTagAsync();
+                if (iResult.IsFailure) return;
                 await ValidateBranch();
-                _onRepaint?.Invoke();
             }
             catch (Exception e)
             {
                 Debug.LogError(e);
             }
+            finally
+            {
+                _onRepaint?.Invoke();
+            }
         }
 
-        private async Task InitGitRepositoryAsync()
+        private async Task<IResult> InitGitRepositoryAsync()
         {
             string gitDirectory = Path.Combine(_localDir, ".git");
             if (Directory.Exists(gitDirectory))
             {
                 Debug.Log("Git repository already initialized.");
-                return;
+                return Result.Success();
             }
 
             try
             {
-                await RunGitCommandAsync("init", false);
-                Debug.Log(Directory.Exists(gitDirectory) ? "Git repository initialized." : "Failed to initialize Git repository.");
+                IResult iResult = await RunGitCommandAsync("init", false);
+                if (iResult.IsFailure) return iResult;
+                if (Directory.Exists(gitDirectory)) return Result.Success();
+                return Result.Fail("Failed to initialize Git repository.");
             }
             catch (Exception ex)
             {
@@ -98,21 +105,25 @@ namespace Glitch9.Internal.Git
                 Debug.LogError(error);
                 OnGitOutput?.Invoke(new GitOutput(error, GitOutputStatus.Error));
             }
+
+            return Result.Fail("Failed to initialize Git repository.");
         }
 
-        public async Task PullVersionTagAsync()
+        public async Task<IResult> PullVersionTagAsync()
         {
             Debug.Log("Getting version info...");
 
             // Set the current branch to track the remote branch
-            await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}", false);
+            IResult iResult = await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}", false);
+            if (iResult.IsFailure) return iResult;
 
             // Fetch the tags from the remote repository
-            await RunGitCommandAsync("fetch --tags", false);
+            iResult = await RunGitCommandAsync("fetch --tags", false);
+            if (iResult.IsFailure) return iResult; ;
 
             // Get the latest tag from the fetched tags
-            IResult iResult = await RunGitCommandAsync("describe --tags --abbrev=0", false);
-            if (iResult.IsFailure || iResult is not Result result) return;
+            iResult = await RunGitCommandAsync("describe --tags --abbrev=0", false);
+            if (iResult.IsFailure || iResult is not Result result) return iResult; ;
             string latestTag = result.Message.Trim();
 
             // Check if the latestTag is not null or empty after trimming
@@ -126,15 +137,17 @@ namespace Glitch9.Internal.Git
                 Debug.LogWarning("No valid version tag found.");
                 _remoteVersion = new GitVersion();
             }
+
+            return Result.Success();
         }
 
-        private async Task ValidateBranch()
+        private async Task<IResult> ValidateBranch()
         {
             IResult iResult = await RunGitCommandAsync("remote get-url origin", false);
-            if (iResult.IsFailure || iResult is not Result result) return;
+            if (iResult.IsFailure || iResult is not Result result) return iResult;
 
             string currentBranch = result.Message;
-            if (string.IsNullOrEmpty(currentBranch)) return;
+            if (string.IsNullOrEmpty(currentBranch)) return Result.Fail("Failed to get current branch.");
             currentBranch = currentBranch.Trim();
             Debug.Log($"Current branch: {currentBranch}");
 
@@ -142,11 +155,13 @@ namespace Glitch9.Internal.Git
             {
                 Debug.LogWarning($"Current branch ({currentBranch}) does not match the expected branch ({_gitBranch}).");
                 Debug.Log("Attempting to checkout branch...");
-                await RunGitCommandAsync($"checkout {_gitBranch}", false);
+                return await RunGitCommandAsync($"checkout {_gitBranch}", false);
             }
+
+            return Result.Success();
         }
 
-        public async Task PushAsync(string commitMessage, VersionIncrement versionInc, bool force = false)
+        public async Task<IResult> PushAsync(string commitMessage, VersionIncrement versionInc, bool force = false)
         {
             string pushCommand = $"push origin {_gitBranch}";
             if (force) pushCommand += " --force";
@@ -154,13 +169,21 @@ namespace Glitch9.Internal.Git
             string cm = _remoteVersion.CreateTagInfo(commitMessage);
 
             // Commit changes
-            await RunGitCommandAsync("add .", true);
-            await RunGitCommandAsync("commit -m \"" + cm + "\"", true);
+            IResult iResult = await RunGitCommandAsync("add .", true);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await RunGitCommandAsync("commit -m \"" + cm + "\"", true);
+            if (iResult.IsFailure) return iResult;
 
             // Push changes
-            await RunGitCommandAsync(pushCommand, true);
-            await PushVersionTagAsync(versionInc);
+            iResult = await RunGitCommandAsync(pushCommand, true);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await PushVersionTagAsync(versionInc);
+            if (iResult.IsFailure) return iResult;
+            
             _localVersion = _remoteVersion;
+            return Result.Success();
         }
 
         /// <summary>
@@ -168,13 +191,19 @@ namespace Glitch9.Internal.Git
         /// git push origin--tags
         /// </summary>
         /// <returns></returns>
-        public async Task PushVersionTagAsync(VersionIncrement versionInc = VersionIncrement.Patch)
+        public async Task<IResult> PushVersionTagAsync(VersionIncrement versionInc = VersionIncrement.Patch)
         {
             string tag = _remoteVersion.CreateUpdatedTag(versionInc);
             string tagInfo = _remoteVersion.CreateTagInfo();
-            await RunGitCommandAsync($"tag -a {tag} -m \"{tagInfo}\"", false);
-            await RunGitCommandAsync("push origin --tags", false);
+            
+            IResult iResult = await RunGitCommandAsync($"tag -a {tag} -m \"{tagInfo}\"", false);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await RunGitCommandAsync("push origin --tags", false);
+            if (iResult.IsFailure) return iResult;
+            
             _localVersion = _remoteVersion;
+            return Result.Success();
         }
 
         public async void ConfigureLocalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}", true);

@@ -195,12 +195,12 @@ namespace Glitch9.Internal.Git
             {
                 if (GUILayout.Button("Upload (commit and push)"))
                 {
-                    GitEditorUtils.ShowGitVersionSelector(Push);
+                    GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, true));
                 }
 
                 if (GUILayout.Button("Force Upload (commit and push -f)"))
                 {
-                    GitEditorUtils.ShowGitVersionSelector(ForcePush);
+                    GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, false));
                 }
             }
             GUILayout.EndHorizontal();
@@ -383,14 +383,10 @@ namespace Glitch9.Internal.Git
             }
         }
 
-        private async void Push(VersionIncrement versionType)
+        private async void Push(VersionIncrement versionType, bool force)
         {
-            await _git.PushAsync(commitMessage, versionType);
-        }
-
-        private async void ForcePush(VersionIncrement versionType)
-        {
-            await _git.PushAsync(commitMessage, versionType, true);
+            IResult iResult = await _git.PushAsync(commitMessage, versionType, force);
+            if (iResult.IsSuccess) commitMessage = "";
         }
     }
 }
