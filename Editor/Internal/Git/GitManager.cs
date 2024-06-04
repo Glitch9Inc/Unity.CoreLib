@@ -295,7 +295,7 @@ namespace Glitch9.Internal.Git
             if (status == GitOutputStatus.Success && logSuccessMessage)
             {
                 string successMessage = $"Git command \"{command}\" executed successfully.";
-                OnGitOutput?.Invoke(new GitOutput(successMessage, GitOutputStatus.Success));
+                OnGitOutput?.Invoke(new GitOutput(successMessage, GitOutputStatus.Completed));
             }
 
             return Result.Success(output);

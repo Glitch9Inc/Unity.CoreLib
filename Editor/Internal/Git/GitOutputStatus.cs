@@ -9,5 +9,10 @@ namespace Glitch9.Internal.Git
         Warning,
         Error,
         Fatal,
+
+        /// <summary>
+        /// Custom status for when the git command is successfully completed
+        /// </summary>
+        Completed,
     }
 }
