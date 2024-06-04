@@ -1,6 +1,6 @@
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public enum TreeViewToolbarMenu
+    public enum TreeViewMenuType
     {
         Unset,
         File,

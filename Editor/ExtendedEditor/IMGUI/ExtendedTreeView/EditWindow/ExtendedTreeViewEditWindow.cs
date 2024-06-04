@@ -8,7 +8,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TTreeView : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
         where TTreeViewEditWindow : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
-        where TData : class, ITreeViewData<TData, TFilter>
+        where TData : class, ITreeViewData<TData>
         where TFilter : class, ITreeViewFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
@@ -25,7 +25,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             private const string FALLBACK_TITLE = "Unknown Item";
             protected const float MIN_TEXT_FIELD_HEIGHT = 20;
             public TTreeViewItem Item { get; set; }
-            public TSelf ParentWindow { get; set; }
+            public TTreeView TreeView { get; set; }
             public TEventHandler EventHandler { get; set; }
 
             public TData Data => Item?.Data;
@@ -37,10 +37,10 @@ namespace Glitch9.ExtendedEditor.IMGUI
             private bool _isInitialized = false;
             private Vector2 _scrollPosition;
 
-            public void SetData(TTreeViewItem item, TSelf parentWindow, TEventHandler eventHandler)
+            public void SetData(TTreeViewItem item, TTreeView treeView, TEventHandler eventHandler)
             {
                 Item = item;
-                ParentWindow = parentWindow;
+                TreeView = treeView;
                 EventHandler = eventHandler;
                 Initialize();
             }
@@ -93,15 +93,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 ModifiedData = Data;
             }
 
-            private void RepaintWindow(EditWindowMenuActionResult result)
+            private void RepaintWindow(IResult result)
             {
                 if (result.IsSuccess)
                 {
                     Repaint();
-                    if (result.IsSaved)
-                    {
-                        ParentWindow.UpdateData(Item.Data);
-                    }
+                    if (result.IsSaved) TreeView.UpdateData(Item.Data);
                 }
             }
 

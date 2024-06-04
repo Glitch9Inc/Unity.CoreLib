@@ -6,21 +6,21 @@ namespace Glitch9.ExtendedEditor.IMGUI
     /// <summary>
     /// Represents a toolbar item for a tree view.
     /// </summary>
-    public class TreeViewToolbarItem
+    public class TreeViewMenuItem
     {
-        public TreeViewToolbarMenu Menu { get; set; }
+        public TreeViewMenuType MenuType { get; set; }
         public string CustomMenuName { get; set; }
         public Action<Rect> Action { get; set; }
 
-        public TreeViewToolbarItem(TreeViewToolbarMenu menu, Action<Rect> action = null)
+        public TreeViewMenuItem(TreeViewMenuType menuType, Action<Rect> action = null)
         {
-            Menu = menu;
+            MenuType = menuType;
             Action = action;
         }
 
-        public TreeViewToolbarItem(string customMenuName, Action<Rect> action)
+        public TreeViewMenuItem(string customMenuName, Action<Rect> action)
         {
-            Menu = TreeViewToolbarMenu.Custom;
+            MenuType = TreeViewMenuType.Custom;
             CustomMenuName = customMenuName;
             Action = action;
         }

@@ -5,7 +5,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 {
     public abstract class ExtendedTreeViewItem<TSelf, TData, TFilter> : TreeViewItem
         where TSelf : ExtendedTreeViewItem<TSelf, TData, TFilter>
-        where TData : class, ITreeViewData<TData, TFilter>
+        where TData : class, ITreeViewData<TData>
         where TFilter : class, ITreeViewFilter<TFilter, TData>
     {
         public TData Data { get; private set; }
@@ -16,6 +16,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
         }
 
         public abstract int CompareTo(TSelf anotherItem, int columnIndex, bool ascending);
+        public abstract bool SetFilter(TFilter filter);
+        public abstract bool Search(string searchString);
 
         protected int CompareByString(bool ascending, TSelf anotherItem, Func<TData, string> selector)
         {

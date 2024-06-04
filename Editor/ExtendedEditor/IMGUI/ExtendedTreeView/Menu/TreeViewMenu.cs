@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public class TreeViewToolbar
+    public class TreeViewMenu
     {
         private const float k_ButtonWidth = 90f;
         private const float k_SearchFieldMaxWidth = 300f;
@@ -19,27 +19,27 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         private SearchField _searchField;
 
-        private readonly Dictionary<string, TreeViewToolbarItem> _menuItems;
+        private readonly Dictionary<string, TreeViewMenuItem> _menuItems;
         private readonly Action _onSearchStringUpdated;
 
-        public TreeViewToolbar(IEnumerable<TreeViewToolbarItem> toolbarItems, Action onSearchStringUpdated)
+        public TreeViewMenu(IEnumerable<TreeViewMenuItem> toolbarItems, Action onSearchStringUpdated)
         {
-            _menuItems = new Dictionary<string, TreeViewToolbarItem>();
+            _menuItems = new Dictionary<string, TreeViewMenuItem>();
             _onSearchStringUpdated = onSearchStringUpdated;
 
-            foreach (TreeViewToolbarItem item in toolbarItems)
+            foreach (TreeViewMenuItem item in toolbarItems)
             {
-                if (item.Menu == TreeViewToolbarMenu.Custom)
+                if (item.MenuType == TreeViewMenuType.Custom)
                 {
                     _menuItems.Add(item.CustomMenuName, item);
                 }
-                else if (item.Menu == TreeViewToolbarMenu.SearchField)
+                else if (item.MenuType == TreeViewMenuType.SearchField)
                 {
                     HasSearchField = true;
                 }
                 else
                 {
-                    _menuItems.Add(item.Menu.ToString(), item);
+                    _menuItems.Add(item.MenuType.ToString(), item);
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 for (int i = 0; i < _menuItems.Count; i++)
                 {
-                    KeyValuePair<string, TreeViewToolbarItem> kvp = _menuItems.ElementAt(i);
+                    KeyValuePair<string, TreeViewMenuItem> kvp = _menuItems.ElementAt(i);
 
                     if (kvp.Value.Equals(null))
                     {

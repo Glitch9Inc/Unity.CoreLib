@@ -5,5 +5,8 @@ namespace Glitch9
         bool IsSuccess { get; }
         bool IsFailure => !IsSuccess;
         string FailReason { get; }
+
+        // Extra Properties
+        bool IsSaved { get; }
     }
 }

@@ -13,7 +13,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TTreeView : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
         where TTreeViewEditWindow : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
-        where TData : class, ITreeViewData<TData, TFilter>
+        where TData : class, ITreeViewData<TData>
         where TFilter : class, ITreeViewFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
@@ -28,20 +28,65 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         public abstract class ExtendedTreeView : TreeView
         {
+            public List<TData> SourceData { get; private set; }
             public bool RequiresRefresh { get; set; }
+            public int ShowingCount => _rows.Count;
+            public int TotalCount => SourceData.Count;
 
+
+            private TFilter _filter;
+            private readonly EPrefs<TFilter> _filterSave;
             private readonly TSelf _parentWindow;
             private readonly TEventHandler _eventHandler;
 
-            private List<TreeViewItem> _cachedTreeViewItems;
+            private List<TreeViewItem> _cachedItems;
             private List<TreeViewItem> _rows;
+
+
 
             protected ExtendedTreeView(TSelf parentWindow, TEventHandler eventHandler, TreeViewState treeViewState, MultiColumnHeader multiColumnHeader) : base(treeViewState, multiColumnHeader)
             {
                 _parentWindow = parentWindow;
                 _eventHandler = PrepareEventHandler(eventHandler);
                 multiColumnHeader.sortingChanged += OnSortingChanged;
-                RefreshData();
+
+                // ReSharper disable once VirtualMemberCallInConstructor
+                SourceData = GetAllDataFromSource().ToList();
+
+                string filterPrefsKey = $"{GetType().Name}.Filter";
+                _filterSave = new EPrefs<TFilter>(filterPrefsKey, Activator.CreateInstance<TFilter>());
+                _filter = _filterSave.Value;
+
+                UpdateTreeView(true);
+            }
+
+            public void OnSortingChanged(MultiColumnHeader multiColumnHeaderParam)
+            {
+                UpdateTreeView();
+            }
+
+            public void OnSearchStringChanged()
+            {
+                UpdateTreeView();
+            }
+            
+            public void ResetFilter()
+            {
+                _filter = null;
+            }
+
+            /// <summary>
+            /// Override this method to get data from a source.
+            /// </summary>
+            /// <returns></returns>
+            protected abstract IEnumerable<TData> GetAllDataFromSource();
+
+            public void OnDestroy()
+            {
+                if (_filterSave != null)
+                {
+                    _filterSave.Value = _filter;
+                }
             }
 
             private TEventHandler PrepareEventHandler(TEventHandler eventHandler)
@@ -50,7 +95,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                 eventHandler.DeleteItem?.AddListener((item, deleted) =>
                 {
-                    if (deleted) _parentWindow.RemoveItem(item);
+                    if (deleted) RemoveItem(item);
                 });
 
                 return eventHandler;
@@ -60,15 +105,15 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 TreeViewItem root = new() { id = 0, depth = -1, displayName = "Root" };
 
-                if (_cachedTreeViewItems != null)
+                if (_cachedItems != null)
                 {
-                    SetupParentsAndChildrenFromDepths(root, _cachedTreeViewItems);
+                    SetupParentsAndChildrenFromDepths(root, _cachedItems);
                     return root;
                 }
 
-                UpdateCachedItems();
-                if (_cachedTreeViewItems == null) return root;
-                SetupParentsAndChildrenFromDepths(root, _cachedTreeViewItems);
+                UpdateTreeView();
+                if (_cachedItems == null) return root;
+                SetupParentsAndChildrenFromDepths(root, _cachedItems);
                 return root;
             }
 
@@ -80,15 +125,15 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 //Debug.Log("Rebuilding tree view rows...");
                 _rows = new();
 
-                foreach (TreeViewItem treeViewItem in _cachedTreeViewItems)
+                foreach (TreeViewItem treeViewItem in _cachedItems)
                 {
-                    if (_parentWindow.Toolbar.HasSearchField)
+                    if (_parentWindow.Menu.HasSearchField)
                     {
                         //Debug.Log("Search string: " + _parentWindow.Toolbar.SearchString);
                         if (treeViewItem is TTreeViewItem genericItem)
                         {
                             if (genericItem.Data == null) continue;
-                            if (!genericItem.Data.Search(_parentWindow.Toolbar.SearchString)) continue;
+                            if (!genericItem.Search(_parentWindow.Menu.SearchString)) continue;
                         }
                     }
 
@@ -99,19 +144,16 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 int columnIndex = multiColumnHeader.sortedColumnIndex;
                 bool ascending = multiColumnHeader.IsSortedAscending(columnIndex);
 
-                int Comparison(TreeViewItem x, TreeViewItem y)
-                {
-                    TTreeViewItem itemX = x as TTreeViewItem;
-                    TTreeViewItem itemY = y as TTreeViewItem;
-                    if (itemX == null || itemY == null) return 0;
-
-                    return itemX.CompareTo(itemY, columnIndex, ascending);
-                }
-
                 _rows.ToList().Sort(Comparison);
                 RequiresRefresh = false;
 
                 return _rows;
+
+                int Comparison(TreeViewItem x, TreeViewItem y)
+                {
+                    if (x is not TTreeViewItem itemX || y is not TTreeViewItem itemY) return 0;
+                    return itemX.CompareTo(itemY, columnIndex, ascending);
+                }
             }
 
             protected override void RowGUI(RowGUIArgs args)
@@ -165,7 +207,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 if (success)
                 {
-                    RefreshData();
+                    UpdateTreeView();
                 }
             }
 
@@ -179,7 +221,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     TTreeViewEditWindow window = GetWindow<TTreeViewEditWindow>(false, windowTitle, true);
                     window.minSize = new Vector2(400, 400);
                     window.maxSize = new Vector2(800, 800);
-                    window.SetData(item, _parentWindow, _eventHandler);
+                    window.SetData(item, this as TTreeView, _eventHandler);
                 }
                 catch (Exception e)
                 {
@@ -209,48 +251,69 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 DrawString(cellRect, timeString, style);
             }
 
-            public void OnSortingChanged(MultiColumnHeader multiColumnHeaderParam)
-            {
-                if (UpdateCachedItems()) CustomReload();
-            }
-
-            public void RefreshData()
-            {
-                if (UpdateCachedItems()) CustomReload();
-            }
-
-            public void CustomReload()
+        
+            public void UpdateTreeView(bool filterUpdated = false)
             {
                 //Debug.Log("Reloading TreeView...");
+
+                if (filterUpdated)
+                {
+                    if (UpdateFilter())
+                    {
+                        RequiresRefresh = true;
+                        Reload();
+                    }
+
+                    return;
+                }
+
                 RequiresRefresh = true;
                 Reload();
-            }
 
-            private bool UpdateCachedItems()
-            {
-                if (_parentWindow.FilteredData == null)
+                return;
+
+                bool UpdateFilter()
                 {
-                    GNLog.Error("Filtered Data is null");
-                    return false;
-                }
+                    if (SourceData == null) return false;
 
-                _cachedTreeViewItems = new();
-
-                for (int i = 0; i < _parentWindow.FilteredData.Count; i++)
-                {
-                    int id = i + 1000;
-                    TData data = _parentWindow.FilteredData[i];
-                    TTreeViewItem newItem = Activator.CreateInstance(typeof(TTreeViewItem), id, 0, null, data) as TTreeViewItem;
-                    if (newItem == null)
+                    try
                     {
-                        GNLog.Error($"Failed to create new {typeof(TTreeViewItem).Name} instance.");
+                        _cachedItems = BuildCachedItems();
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"Error updating cached items: {e.Message}");
                         return false;
                     }
-                    _cachedTreeViewItems.Add(newItem);
                 }
 
-                return true;
+                List<TreeViewItem> BuildCachedItems()
+                {
+                    List<TreeViewItem> items = new();
+
+                    for (int i = 0; i < SourceData.Count; i++)
+                    {
+                        int id = i + 1000;
+                        TData data = SourceData[i];
+                        if (Activator.CreateInstance(typeof(TTreeViewItem), id, 0, null, data) is not TTreeViewItem newItem)
+                        {
+                            throw new Exception($"Failed to create new {typeof(TTreeViewItem).Name} instance.");
+                        }
+
+                        if (_filter != null)
+                        {
+                            bool visible = newItem.SetFilter(_filter);
+                            if (!visible) continue;
+                        }
+
+                        items.Add(newItem);
+                    }
+
+                    return items;
+                }
             }
+
 
             protected override void ContextClickedItem(int id)
             {
@@ -274,21 +337,55 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 }
             }
 
+
+            protected void SetData(List<TData> data)
+            {
+                if (data == null) return;
+                Debug.Log($"Setting data set of {data.Count} to TreeView.");
+                SourceData = data;
+                UpdateTreeView();
+            }
+
+            public void UpdateData(TData data)
+            {
+                if (data == null) return;
+                Debug.Log($"Updating data {data.Id} in TreeView.");
+                TData existingData = SourceData.FirstOrDefault(d => d.Id == data.Id);
+                if (existingData == null)
+                {
+                    Debug.LogError($"Data with id {data.Id} not found in TreeView.");
+                    return;
+                }
+
+                // replace the existing data with the new data
+                int index = SourceData.IndexOf(existingData);
+                SourceData[index] = data;
+
+                UpdateTreeView();
+            }
+
             public void RemoveItem(TTreeViewItem item)
             {
                 if (item == null) return;
 
                 // find the same item by comparing id
-                TreeViewItem foundItem = _cachedTreeViewItems.Find(x => x.id == item.id);
+                TreeViewItem foundItem = _cachedItems.Find(x => x.id == item.id);
 
                 if (foundItem != null)
                 {
-                    _cachedTreeViewItems.Remove(foundItem);
-                    RefreshData();
+                    _cachedItems.Remove(foundItem);
                 }
+
+                if (item.Data != null)
+                {
+                    SourceData.Remove(item.Data);
+                }
+
+                UpdateTreeView();
 
                 //Debug.LogWarning($"Item {item.displayName} not found in cached items.");
             }
+
         }
     }
 }

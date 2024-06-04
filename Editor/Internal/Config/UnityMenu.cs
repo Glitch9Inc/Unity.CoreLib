@@ -9,6 +9,9 @@ namespace Glitch9.Internal
         private const string NAME_DOCUMENTATION = "Documentation";
         private const string NAME_SUPPORT = "Support";
 
+        private const int STARTING_PRIORITY = -5000;
+        private const int SPACE_BETWEEN_TOOLS = 10;
+        
         public static class Utils
         {
             private const string PATH = ROOT_TOOL_PATH + "Utils/";
@@ -20,6 +23,7 @@ namespace Glitch9.Internal
         // AI Development Kit
         public static class OpenAI
         {
+            internal const int PRIORITY = STARTING_PRIORITY;
             private const string NAME = "OpenAI";
             private const string TOOL_PATH = ROOT_TOOL_PATH + NAME + "/";
 
@@ -42,7 +46,7 @@ namespace Glitch9.Internal
             public const string PATH_DOCUMENTATION = TOOL_PATH + NAME_DOCUMENTATION;
             public const string PATH_SUPPORT = TOOL_PATH + NAME_SUPPORT;
 
-            public const int PRIORITY_COMPLETION = -5000;
+            public const int PRIORITY_COMPLETION = PRIORITY;
             public const int PRIORITY_CHAT_GPT = -4999;
             public const int PRIORITY_DALLE = -4998;
             public const int PRIORITY_SPEECH = -4997;
@@ -63,6 +67,7 @@ namespace Glitch9.Internal
         // Smart Localization
         public static class SmartLocalization
         {
+            internal const int PRIORITY = OpenAI.PRIORITY - SPACE_BETWEEN_TOOLS;
             private const string NAME = "Smart Localization";
             private const string TOOL_PATH = ROOT_TOOL_PATH + NAME + "/";
 
@@ -77,13 +82,13 @@ namespace Glitch9.Internal
             public const string PATH_DOCUMENTATION = TOOL_PATH + NAME_DOCUMENTATION;
             public const string PATH_SUPPORT = TOOL_PATH + NAME_SUPPORT;
 
-            public const int PRIORITY_EDITOR = -4500;
-            public const int PRIORITY_TABLE_MANAGER = -4499;
-            public const int PRIORITY_SUFFIX_MANAGER = -4498;
+            public const int PRIORITY_EDITOR = PRIORITY;
+            public const int PRIORITY_TABLE_MANAGER = PRIORITY_EDITOR - 1;
+            public const int PRIORITY_SUFFIX_MANAGER = PRIORITY_TABLE_MANAGER - 1;
 
-            public const int PRIORITY_SETTINGS = -4400;
-            public const int PRIORITY_DOCUMENTATION = -4399;
-            public const int PRIORITY_SUPPORT = -4398;
+            public const int PRIORITY_SETTINGS = PRIORITY_SUFFIX_MANAGER - SPACE_BETWEEN_TOOLS;
+            public const int PRIORITY_DOCUMENTATION = PRIORITY_SETTINGS - 1;
+            public const int PRIORITY_SUPPORT = PRIORITY_DOCUMENTATION - 1;
 
             public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/docs/unity-toolkits/smart-localization";
             public const string URL_SUPPORT = "https://github.com/Glitch9Inc/Smart-Localization/issues";
@@ -93,8 +98,8 @@ namespace Glitch9.Internal
         // Commit-Gen (Only has 1 tool)
         public static class CommitGen
         {
+            public const int PRIORITY = SmartLocalization.PRIORITY - SPACE_BETWEEN_TOOLS;
             public const string TOOL_PATH = ROOT_TOOL_PATH + "Commit Message Generator";
-            public const int PRIORITY = -4000;
         }
     }
 }

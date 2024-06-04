@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -12,21 +11,18 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TTreeView : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
         where TTreeViewEditWindow : ExtendedTreeViewWindow<TSelf, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
-        where TData : class, ITreeViewData<TData, TFilter>
+        where TData : class, ITreeViewData<TData>
         where TFilter : class, ITreeViewFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
-
         protected MultiColumnHeader MultiColumnHeader;
         protected TTreeView TreeView;
         protected TreeViewState TreeViewState;
 
-        public List<TData> AllData { get; private set; }
-        public List<TData> FilteredData { get; private set; } = new();
-        public TreeViewToolbar Toolbar { get; private set; }
-        public TFilter Filter { get; set; }
-
-        private EPrefs<TFilter> _filterSave;
+        /// <summary>
+        /// Often accessed from ExtendedTreeView
+        /// </summary>
+        public TreeViewMenu Menu { get; private set; }
 
 
         protected static TSelf Initialize(string name = null)
@@ -40,97 +36,24 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
 
         protected abstract List<TreeViewColumnData> CreateColumns();
-        protected abstract IEnumerable<TreeViewToolbarItem> CreateTopToolbar();
-        protected abstract IEnumerable<TData> GetAllDataFromSource();
+        protected abstract IEnumerable<TreeViewMenuItem> CreateTopToolbar();
         protected abstract TEventHandler CreateEventHandler();
 
         protected virtual void OnEnable()
         {
-            AllData = GetAllDataFromSource().ToList();
-            Toolbar = new TreeViewToolbar(CreateTopToolbar(), OnSearchStringUpdated);
-
-            string filterPrefsKey = $"{GetType().Name}.Filter";
-            _filterSave = new EPrefs<TFilter>(filterPrefsKey, Activator.CreateInstance<TFilter>());
-
-            RefreshData();
-        }
-
-        private void OnSearchStringUpdated()
-        {
-            TreeView.CustomReload();
+            Menu = new TreeViewMenu(CreateTopToolbar(), TreeView.OnSearchStringChanged);
         }
 
         protected virtual void OnDestroy()
         {
-            if (_filterSave != null)
-            {
-                _filterSave.Value = Filter;
-            }
+            TreeView.OnDestroy();
         }
 
         protected virtual void OnGUI()
         {
-            Toolbar.OnGUI(position);
+            Menu.OnGUI(position);
             DrawTreeView();
             DrawBottomBar();
-        }
-
-        internal void RefreshData()
-        {
-            if (AllData == null) return;
-
-            if (Filter == null)
-            {
-                FilteredData = AllData.ToList();
-                return;
-            }
-
-            FilteredData.Clear();
-
-            foreach (TData data in AllData)
-            {
-                bool visible = data.SetFilter(Filter);
-
-                if (visible)
-                {
-                    FilteredData.Add(data);
-                }
-            }
-
-            TreeView?.RefreshData();
-        }
-
-        protected void SetData(List<TData> data)
-        {
-            if (data == null) return;
-            Debug.Log($"Setting data set of {data.Count} to TreeView.");
-            AllData = data;
-            RefreshData();
-        }
-
-        public void UpdateData(TData data)
-        {
-            if (data == null) return;
-            Debug.Log($"Updating data {data.Id} in TreeView.");
-            TData existingData = AllData.FirstOrDefault(d => d.Id == data.Id);
-            if (existingData == null)
-            {
-                Debug.LogError($"Data with id {data.Id} not found in TreeView.");
-                return;
-            }
-
-            // replace the existing data with the new data
-            int index = AllData.IndexOf(existingData);
-            AllData[index] = data;
-
-            // update the filtered data
-            if (FilteredData.Contains(existingData))
-            {
-                int filteredIndex = FilteredData.IndexOf(existingData);
-                FilteredData[filteredIndex] = data;
-            }
-
-            RefreshData();
         }
 
         private void DrawTreeView()
@@ -161,17 +84,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
             return Activator.CreateInstance(typeof(TTreeView), this, CreateEventHandler(), TreeViewState, MultiColumnHeader) as TTreeView;
         }
 
-        public void RemoveItem(TTreeViewItem item)
+        protected bool NullCheckItem(TTreeViewItem item)
         {
-            if (item == null) return;
-
-            if (item.Data != null)
-            {
-                AllData.Remove(item.Data);
-                FilteredData.Remove(item.Data);
-            }
-
-            TreeView?.RemoveItem(item);
+            if (item == null) return false;
+            if (item.Data == null) return false;
+            if (string.IsNullOrEmpty(item.Data.Id)) return false;
+            return true;
         }
     }
 }
