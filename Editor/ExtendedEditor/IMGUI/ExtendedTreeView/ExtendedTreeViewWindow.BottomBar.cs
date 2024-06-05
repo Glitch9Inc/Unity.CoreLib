@@ -12,28 +12,13 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TFilter : class, ITreeViewFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
-        private const float BOTTOM_BAR_BTN_WIDTH = 100;
+        protected const float BOTTOM_BAR_BTN_WIDTH = 100;
 
-        private GUIStyle BottomBarStyle
-        {
-            get
-            {
-                if (_bottomBarStyle == null)
-                {
-                    _bottomBarStyle = ExtendedEditorStyles.Border(GUIBorder.Bottom);
-                    _bottomBarStyle.fixedHeight = 34;
-                }
-
-                return _bottomBarStyle;
-            }
-        }
-        private GUIStyle _bottomBarStyle;
-
-        public void DrawBottomBar()
+        protected virtual void DrawBottomBar()
         {
             if (TreeView == null) return;
             
-            GUILayout.BeginHorizontal(BottomBarStyle);
+            GUILayout.BeginHorizontal(TreeViewStyles.BottomBarStyle);
             {
                 GUILayout.Label($"Showing {TreeView.ShowingCount} of {TreeView.TotalCount} items.");
                 GUILayout.FlexibleSpace();

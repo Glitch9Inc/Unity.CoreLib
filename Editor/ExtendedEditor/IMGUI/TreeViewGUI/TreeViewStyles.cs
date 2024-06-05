@@ -4,6 +4,21 @@ namespace Glitch9.ExtendedEditor.IMGUI
 {
     public class TreeViewStyles
     {
+        private static GUIStyle _bottomBarStyle;
+        public static GUIStyle BottomBarStyle
+        {
+            get
+            {
+                if (_bottomBarStyle == null)
+                {
+                    _bottomBarStyle = ExtendedEditorStyles.Border(GUIBorder.Bottom);
+                    _bottomBarStyle.fixedHeight = 34;
+                }
+
+                return _bottomBarStyle;
+            }
+        }
+        
         private static GUIStyle _childWindowTitle;
         public static GUIStyle ChildWindowTitle
         {
@@ -64,7 +79,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 {
                     _editWindowBody = new GUIStyle()
                     {
-                        padding = new RectOffset(5, 5, 10, 5) 
+                        padding = new RectOffset(5, 5, 10, 5)
                     };
                 }
                 return _editWindowBody;

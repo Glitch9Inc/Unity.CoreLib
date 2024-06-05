@@ -38,8 +38,6 @@ namespace Glitch9.ExtendedEditor.IMGUI
             return window;
         }
 
-
-
         protected abstract List<TreeViewColumnData> CreateColumns();
         protected abstract IEnumerable<TreeViewMenuItem> CreateTopToolbar();
         protected abstract TEventHandler CreateEventHandler();

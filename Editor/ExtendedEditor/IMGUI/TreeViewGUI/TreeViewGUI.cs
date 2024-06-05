@@ -11,25 +11,34 @@ namespace Glitch9.ExtendedEditor.IMGUI
             internal const string UNIX_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
         }
 
-        public static void DrawString(Rect cellRect, string text, GUIStyle style = null)
+        public static void StringCell(Rect cellRect, string text, GUIStyle style)
         {
-            if (text == null) return;
+            StringCell(cellRect, text, null, style);
+        }
+        
+        public static void StringCell(Rect cellRect, string text, string defaultText = null, GUIStyle style = null)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                if (defaultText != null) text = defaultText;
+                else return;
+            }
             if (style == null) GUI.Label(cellRect, text);
             else GUI.Label(cellRect, text, style);
         }
 
-        public static void DrawUnixTime(Rect cellRect, UnixTime? unixTime, GUIStyle style = null)
+        public static void UnixTimeCell(Rect cellRect, UnixTime? unixTime, GUIStyle style = null)
         {
             string timeString = unixTime == null ? Strings.UNKNOWN_TIME : unixTime.Value.ToString(Strings.UNIX_TIME_FORMAT);
-            DrawString(cellRect, timeString, style);
+            StringCell(cellRect, timeString, style);
         }
 
-        public static void DrawBool(Rect cellRect, bool value)
+        public static void BoolCell(Rect cellRect, bool value)
         {
             GUI.Label(cellRect, value ? "Yes" : "No");
         }
 
-        public static bool DrawCheckbox(Rect cellRect, bool value)
+        public static bool CheckboxCell(Rect cellRect, bool value)
         {
             Rect toggleRect = cellRect;
             toggleRect.width = 20f;
@@ -44,7 +53,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             return value;
         }
 
-        public static void DrawPrice(Rect cellRect, float displayValue, string per)
+        public static void PriceCell(Rect cellRect, float displayValue, string per)
         {
             if (displayValue == 0) return;
 

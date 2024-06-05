@@ -5,5 +5,9 @@ namespace Glitch9
         void Info(string message);
         void Warning(string message);
         void Error(string message);
+
+        void Info(string tag, string message);
+        void Warning(string tag, string message);
+        void Error(string tag, string message);
     }
 }

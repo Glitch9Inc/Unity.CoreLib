@@ -26,13 +26,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         public abstract class ExtendedTreeView : TreeView
         {
+            public TFilter Filter { get; private set; }
             public List<TData> SourceData { get; private set; }
             public bool RequiresRefresh { get; set; }
             public int ShowingCount => _rows.Count;
             public int TotalCount => SourceData.Count;
 
-
-            private TFilter _filter;
             private readonly EPrefs<TFilter> _filterSave;
             private readonly TTreeViewWindow _treeViewWindow;
             private readonly TEventHandler _eventHandler;
@@ -52,7 +51,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                     string filterPrefsKey = $"{GetType().Name}.Filter";
                     _filterSave = new EPrefs<TFilter>(filterPrefsKey, Activator.CreateInstance<TFilter>());
-                    _filter = _filterSave.Value;
+                    Filter = _filterSave.Value;
 
                     // ReSharper disable once VirtualMemberCallInConstructor
                     SourceData = GetAllDataFromSource().ToList();
@@ -82,7 +81,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             public void ResetFilter()
             {
-                _filter = null;
+                Filter = null;
             }
 
             /// <summary>
@@ -95,7 +94,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 if (_filterSave != null)
                 {
-                    _filterSave.Value = _filter;
+                    _filterSave.Value = Filter;
                 }
             }
 
@@ -153,6 +152,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (multiColumnHeader.sortedColumnIndex == -1)
                 {
                     RequiresRefresh = false;
+                    OnTreeViewUpdated();
                     return _rows;
                 }
 
@@ -163,6 +163,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 _rows.Sort(Comparison);
                 
                 RequiresRefresh = false;
+                OnTreeViewUpdated();
                 return _rows;
 
                 int Comparison(TreeViewItem x, TreeViewItem y)
@@ -304,9 +305,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
                             throw new Exception($"Failed to create new {typeof(TTreeViewItem).Name} instance.");
                         }
 
-                        if (_filter != null)
+                        if (Filter != null)
                         {
-                            bool filtered = newItem.IsFiltered(_filter);
+                            bool filtered = newItem.IsFiltered(Filter);
                             if (filtered)
                             {
                                 Debug.Log($"Item {newItem.Data.Id} is not visible.");
@@ -319,6 +320,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                     return items;
                 }
+            }
+
+            protected virtual void OnTreeViewUpdated()
+            {
+                // Do nothing
             }
 
 

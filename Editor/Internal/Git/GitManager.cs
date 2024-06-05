@@ -126,6 +126,8 @@ namespace Glitch9.Internal.Git
             if (iResult.IsFailure || iResult is not Result result) return iResult; ;
             string latestTag = result.Message.Trim();
 
+            _remoteVersion ??= new GitVersion();
+
             // Check if the latestTag is not null or empty after trimming
             if (!string.IsNullOrEmpty(latestTag))
             {
@@ -166,6 +168,7 @@ namespace Glitch9.Internal.Git
             string pushCommand = $"push origin {_gitBranch}";
             if (force) pushCommand += " --force";
 
+            _remoteVersion ??= new GitVersion();
             string cm = _remoteVersion.CreateTagInfo(commitMessage);
 
             // Commit changes
@@ -193,6 +196,8 @@ namespace Glitch9.Internal.Git
         /// <returns></returns>
         public async Task<IResult> PushVersionTagAsync(VersionIncrement versionInc = VersionIncrement.Patch)
         {
+            _remoteVersion ??= new GitVersion();
+            
             string tag = _remoteVersion.CreateUpdatedTag(versionInc);
             string tagInfo = _remoteVersion.CreateTagInfo();
             

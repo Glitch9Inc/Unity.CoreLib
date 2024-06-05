@@ -1,6 +1,6 @@
 using System;
 
-namespace Glitch9.ExtendedEditor.IMGUI
+namespace Glitch9
 {
     public interface ITreeViewData<TSelf> : IEquatable<TSelf>
         where TSelf : class, ITreeViewData<TSelf>

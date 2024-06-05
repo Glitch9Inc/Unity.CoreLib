@@ -10,13 +10,18 @@ namespace Glitch9.Internal
     {
         private const string FILE_NAME_FORMAT = "{0}_{1}.unitypackage"; // 0 is the package name, 1 is the version number
         private const string ASSET_PATHS_HELP = "Asset Paths must start with 'Assets/' and can contain wildcards (*).";
+        private static readonly string[] _forbiddenWords = new string[]
+        {
+            "Sirenix",
+            "HttpUtility",
+        };
 
         private PackageExporter _target;
         private SerializedProperty packageName;
         private SerializedProperty buildPath;
         private SerializedProperty version;
-        private SerializedProperty assetPaths;
-       
+        private SerializedProperty libraries;
+
 
         private void OnEnable()
         {
@@ -24,7 +29,7 @@ namespace Glitch9.Internal
             packageName = serializedObject.FindProperty(nameof(packageName));
             buildPath = serializedObject.FindProperty(nameof(buildPath));
             version = serializedObject.FindProperty(nameof(version));
-            assetPaths = serializedObject.FindProperty(nameof(assetPaths));
+            libraries = serializedObject.FindProperty(nameof(libraries));
         }
 
         public override void OnInspectorGUI()
@@ -45,40 +50,43 @@ namespace Glitch9.Internal
             GUILayout.EndHorizontal();
 
             EditorGUILayout.PropertyField(version);
-            EditorGUILayout.PropertyField(assetPaths, true);
+            EditorGUILayout.PropertyField(libraries, true);
             EditorGUILayout.HelpBox(ASSET_PATHS_HELP, MessageType.Info);
 
             EditorGUILayout.Space();
 
             if (GUILayout.Button("Export Package", GUILayout.Height(30)))
             {
-                Export();
+                ExportPackage();
             }
 
             if (GUILayout.Button("Export Package (Version +)", GUILayout.Height(30)))
             {
                 _target.IncreasePatchVersion();
-                Export();
+                ExportPackage();
             }
 
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void Export()
+        private void ExportPackage()
         {
             List<string> list = new();
 
-            for (int i = 0; i < this.assetPaths.arraySize; i++)
+            for (int i = 0; i < this.libraries.arraySize; i++)
             {
-                list.Add(this.assetPaths.GetArrayElementAtIndex(i).stringValue);
+                int enumIndex = libraries.GetArrayElementAtIndex(i).enumValueIndex;
+                string path = LibraryPaths.GetPath((Glitch9Library)enumIndex);
+                if (string.IsNullOrEmpty(path)) continue;
+                list.Add(path);
             }
 
-            int newBuildNum = ExportPackage(packageName.stringValue, _target.Version.Build, buildPath.stringValue, list);
+            int newBuildNum = BuildPackage(packageName.stringValue, _target.Version.Build, buildPath.stringValue, list);
             if (newBuildNum != -1) _target.SetBuildNumber(newBuildNum);
         }
 
 
-        private static int ExportPackage(string packageName, int versionNumber, string buildPath, List<string> assetPaths)
+        private static int BuildPackage(string packageName, int versionNumber, string buildPath, List<string> assetPaths)
         {
             if (string.IsNullOrEmpty(packageName))
             {
@@ -103,8 +111,13 @@ namespace Glitch9.Internal
             List<string> assetList = new();
             foreach (string path in allAssetPaths)
             {
-                if (Contains(path, assetPaths))
+                if (IsSamePath(path, assetPaths))
                 {
+                    if (ValidateDirectory(path))
+                    {
+                        Debug.LogError($"Cannot export script: {path}");
+                        return -1;
+                    }
                     assetList.Add(path);
                 }
             }
@@ -147,11 +160,39 @@ namespace Glitch9.Internal
             return versionNumber;
         }
 
-        private static bool Contains(string path, List<string> assetPaths)
+
+        private static bool ValidateDirectory(string scriptPath)
+        {
+            // check if the script has "Sirenix" in it
+            scriptPath = scriptPath.Replace("Assets/", "");
+            string dir = Path.Combine(Application.dataPath, scriptPath);
+
+            // get all script files from the directory
+            string[] files = Directory.GetFiles(dir, "*.cs", SearchOption.AllDirectories);
+
+            foreach (string file in files)
+            {
+                if (file.Contains(nameof(PackageExporterEditor))) continue;
+                string scriptText = File.ReadAllText(file);
+
+                foreach (string forbiddenWord in _forbiddenWords)
+                {
+                    if (scriptText.Contains(forbiddenWord))
+                    {
+                        Debug.LogError($"<color=blue>{file}</color> contains forbidden word: {forbiddenWord}. Cannot export.");
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsSamePath(string path, List<string> assetPaths)
         {
             foreach (string assetPath in assetPaths)
             {
-                if (path.StartsWith(assetPath))
+                if (path.Trim() == assetPath.Trim())
                 {
                     return true;
                 }

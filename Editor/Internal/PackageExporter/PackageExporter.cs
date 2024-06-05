@@ -8,7 +8,7 @@ namespace Glitch9.Internal
         [SerializeField] private string packageName;
         [SerializeField] private string buildPath;
         [SerializeField] private Version version;
-        [SerializeField] private string[] assetPaths;
+        [SerializeField] private Glitch9Library[] libraries;
 
         public Version Version => version;
         public string PackageName => packageName;

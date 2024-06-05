@@ -128,6 +128,8 @@ namespace Glitch9.Internal.Git
 
         private void DrawVersionInfo()
         {
+            if (_git == null || _git.LocalVersion == null || _git.RemoteVersion == null) return;
+
             GUILayout.BeginVertical(EGUI.box);
             {
                 GUILayout.Label($"Local: {_git.LocalVersion.CreateTagInfo()}");

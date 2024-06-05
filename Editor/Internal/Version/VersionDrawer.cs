@@ -98,13 +98,20 @@ namespace Glitch9.Internal
             // Row 1
             GUILayout.BeginHorizontal();
             {
-                EditorGUI.LabelField(labelRect, label);
-                EditorGUI.PropertyField(majorRect, major, GUIContent.none);
-                DrawVersionIncreaseButton(majorBtnRect, major);
-                EditorGUI.PropertyField(minorRect, minor, GUIContent.none);
-                DrawVersionIncreaseButton(minorBtnRect, minor);
-                EditorGUI.PropertyField(patchRect, patch, GUIContent.none);
-                DrawVersionIncreaseButton(patchBtnRect, patch);
+                EditorGUI.BeginChangeCheck();
+                {
+                    EditorGUI.LabelField(labelRect, label);
+                    EditorGUI.PropertyField(majorRect, major, GUIContent.none);
+                    DrawVersionIncreaseButton(majorBtnRect, major);
+                    EditorGUI.PropertyField(minorRect, minor, GUIContent.none);
+                    DrawVersionIncreaseButton(minorBtnRect, minor);
+                    EditorGUI.PropertyField(patchRect, patch, GUIContent.none);
+                    DrawVersionIncreaseButton(patchBtnRect, patch);
+                }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    build.intValue = Version.CalcBuildNumber(major.intValue, minor.intValue, patch.intValue);
+                }
             }
             GUILayout.EndHorizontal();
 
