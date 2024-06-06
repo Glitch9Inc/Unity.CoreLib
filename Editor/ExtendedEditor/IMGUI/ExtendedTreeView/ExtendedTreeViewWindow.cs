@@ -11,8 +11,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TTreeView : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
         where TTreeViewEditWindow : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
-        where TData : class, ITreeViewData<TData>
-        where TFilter : class, ITreeViewFilter<TFilter, TData>
+        where TData : class, IData<TData>
+        where TFilter : class, IFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
         private const int MAX_INIT_COUNT = 3;

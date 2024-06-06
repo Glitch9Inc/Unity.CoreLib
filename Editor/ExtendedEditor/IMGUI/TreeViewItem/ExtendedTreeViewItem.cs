@@ -5,13 +5,15 @@ namespace Glitch9.ExtendedEditor.IMGUI
 {
     public abstract class ExtendedTreeViewItem<TTreeViewItem, TData, TFilter> : TreeViewItem
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
-        where TData : class, ITreeViewData<TData>
-        where TFilter : class, ITreeViewFilter<TFilter, TData>
+        where TData : class, IData<TData>
+        where TFilter : class, IFilter<TFilter, TData>
     {
         public TData Data { get; private set; }
 
         protected ExtendedTreeViewItem(int id, int depth, string displayName, TData data) : base(id, depth, displayName)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
             Data = data;
         }
 

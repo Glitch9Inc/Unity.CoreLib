@@ -20,7 +20,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
         {
             if (string.IsNullOrEmpty(text))
             {
-                if (defaultText != null) text = defaultText;
+                if (defaultText != null)
+                {
+                    //EGUI.Label(cellRect, text, ExColor.charcoal);
+                    text = defaultText;
+                }
                 else return;
             }
             if (style == null) GUI.Label(cellRect, text);

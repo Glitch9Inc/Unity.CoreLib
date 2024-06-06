@@ -7,8 +7,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
     public abstract class TreeViewEventHandler<TTreeViewItem, TData, TFilter>
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
-        where TData : class, ITreeViewData<TData>
-        where TFilter : class, ITreeViewFilter<TFilter, TData>
+        where TData : class, IData<TData>
+        where TFilter : class, IFilter<TFilter, TData>
     {
         private static class ConfirmationMessages
         {

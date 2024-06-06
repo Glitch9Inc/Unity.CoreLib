@@ -9,9 +9,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
 {
     public class TreeViewMenu
     {
-        private const float k_ButtonWidth = 90f;
+        private const float k_ButtonWidth = 96f;
         private const float k_SearchFieldMaxWidth = 300f;
         private const float k_SearchFieldY = 2f;
+        private const float k_DropdownMenuWidth = 120f;
+        private const float k_DropdownMenuHeight = 20f;
 
 
         public string SearchString { get; private set; }
@@ -47,7 +49,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         private Rect GetMenuButtonRect(int buttonIndex)
         {
             // y is always 20 because the toolbar height is 20
-            return new Rect(k_ButtonWidth * buttonIndex, 0, 100, 20);
+            return new Rect(k_ButtonWidth * buttonIndex, 0, k_DropdownMenuWidth, k_DropdownMenuHeight);
         }
 
         private Rect GetSearchFieldRect(Rect position)

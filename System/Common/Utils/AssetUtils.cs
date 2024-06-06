@@ -1,0 +1,131 @@
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+
+namespace Glitch9
+{
+    public static class AssetUtils
+    {
+        private static T CreateAsset<T>(string name, T obj) where T : ScriptableObject
+        {
+            string path = $"Assets/{name}.asset";
+            string dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir) && dir != null) Directory.CreateDirectory(dir);
+            AssetDatabase.CreateAsset(obj, path);
+            EditorUtility.SetDirty(obj);
+            return obj;
+        }
+
+        public static T LoadAsset<T>(bool create = true) where T : ScriptableObject
+        {
+            string name = typeof(T).Name;
+            string[] guids = AssetDatabase.FindAssets($"t:{name}");
+            if (guids.Length == 0)
+            {
+                if (!create) return null;
+                Debug.LogWarning($"{name} does not exist in the project. Creating a new one...");
+                return CreateAsset(name, ScriptableObject.CreateInstance<T>());
+            }
+            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            return AssetDatabase.LoadAssetAtPath<T>(path);
+        }
+
+        public static Texture2D LoadTexture(string assetName, ref Dictionary<string, Texture2D> cache)
+        {
+            if (cache.TryGetValue(assetName, out Texture2D icon)) return icon;
+            string[] guids = AssetDatabase.FindAssets($"{assetName} t:texture2D", null);
+            if (guids.Length == 0) return null;
+            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            if (path == null) return null;
+            Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            cache.Add(assetName, tex);
+            return tex;
+        }
+
+        public static void PingScriptFile(Type type)
+        {
+            // Find all MonoScript objects in the project
+            string[] guids = AssetDatabase.FindAssets("t:MonoScript");
+            Debug.Log($"Found {guids.Length} MonoScripts in the project.");
+
+            foreach (string guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                MonoScript script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
+
+                if (script != null && script.GetClass() == type)
+                {
+                    Debug.Log($"Found {type.Name} script at {assetPath}");
+                    // Ping the script in the Unity Editor
+                    EditorGUIUtility.PingObject(script);
+                    Selection.activeObject = script;
+                    break;
+                }
+            }
+        }
+
+        public static void AssureDirectory(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+                AssetDatabase.Refresh();
+            }
+        }
+
+        public static TScriptableObject CreateScriptableObject<TScriptableObject>(string fileNameWithoutExt, string targetPath) where TScriptableObject : ScriptableObject
+        {
+            TScriptableObject res = Resources.Load(fileNameWithoutExt) as TScriptableObject;
+            if (res != null)
+            {
+                Debug.LogError($"{typeof(TScriptableObject).Name} already exists. {res.name}");
+                return res;
+            }
+
+            if (!Directory.Exists(targetPath)) Directory.CreateDirectory(targetPath);
+            // check if the file already exists, if it does, it means the file is broken somehow.
+            // create a backup by changing the filename to {filename}_{bk}.asset
+
+            string filePath = $"{targetPath}/{fileNameWithoutExt}.asset";
+            if (File.Exists(filePath))
+            {
+                string backupPath = $"{targetPath}/{fileNameWithoutExt}_bk.asset";
+                File.Move(filePath, backupPath);
+                Debug.LogError($"{typeof(TScriptableObject).Name} already exists, but there were issues loading the file. Backup created at {backupPath} and new file will be created.");
+            }
+
+
+            TScriptableObject obj = ScriptableObject.CreateInstance<TScriptableObject>();
+            AssetDatabase.CreateAsset(obj, filePath);
+            EditorUtility.SetDirty(obj);
+            return obj;
+        }
+
+        public static TScriptableObject CreateResourcesAsset<TScriptableObject>(string objectName = null) where TScriptableObject : ScriptableObject
+        {
+            if (string.IsNullOrEmpty(objectName)) objectName = typeof(TScriptableObject).Name;
+            TScriptableObject asset = ScriptableObject.CreateInstance<TScriptableObject>();
+            AssetDatabase.CreateAsset(asset, $"Assets/Resources/{objectName}.asset");
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            return asset;
+        }
+
+        public static T LoadResourceAsset<T>(bool create = false) where T : ScriptableObject
+        {
+            string name = typeof(T).Name;
+            string path = $"Assets/Resources/{name}.asset";
+            T asset = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (asset == null && create)
+            {
+                Debug.LogWarning($"{name} does not exist in the project. Creating a new one...");
+                return CreateResourcesAsset<T>();
+            }
+            return asset;
+        }
+    }
+}
+#endif

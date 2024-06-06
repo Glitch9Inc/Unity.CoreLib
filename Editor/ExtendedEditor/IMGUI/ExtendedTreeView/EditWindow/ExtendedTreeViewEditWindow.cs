@@ -8,8 +8,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TTreeView : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
         where TTreeViewEditWindow : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
-        where TData : class, ITreeViewData<TData>
-        where TFilter : class, ITreeViewFilter<TFilter, TData>
+        where TData : class, IData<TData>
+        where TFilter : class, IFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
         /// <summary>
@@ -49,7 +49,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 if (_isInitialized) return;
                 _isInitialized = true;
-                _title = !string.IsNullOrEmpty(Data.Title) ? Data.Title : FALLBACK_TITLE;
+                _title = !string.IsNullOrEmpty(Data.Name) ? Data.Name : FALLBACK_TITLE;
                 ModifiedData = Data;
             }
 

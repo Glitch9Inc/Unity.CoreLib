@@ -13,8 +13,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TTreeView : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeView
         where TTreeViewItem : ExtendedTreeViewItem<TTreeViewItem, TData, TFilter>
         where TTreeViewEditWindow : ExtendedTreeViewWindow<TTreeViewWindow, TTreeView, TTreeViewItem, TTreeViewEditWindow, TData, TFilter, TEventHandler>.ExtendedTreeViewEditWindow
-        where TData : class, ITreeViewData<TData>
-        where TFilter : class, ITreeViewFilter<TFilter, TData>
+        where TData : class, IData<TData>
+        where TFilter : class, IFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
         internal static class Strings
@@ -29,8 +29,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
             public TFilter Filter { get; private set; }
             public List<TData> SourceData { get; private set; }
             public bool RequiresRefresh { get; set; }
-            public int ShowingCount => _rows.Count;
-            public int TotalCount => SourceData.Count;
+            public int ShowingCount => _rows?.Count ?? 0;
+            public int TotalCount => SourceData?.Count ?? 0;
 
             private readonly EPrefs<TFilter> _filterSave;
             private readonly TTreeViewWindow _treeViewWindow;
@@ -285,7 +285,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError($"Error updating cached items: {e.Message}");
+                        Debug.LogError($"Error updating cached items: {e.Message}: {e.StackTrace}");
                         return false;
                     }
                 }
@@ -300,7 +300,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     {
                         int id = i + 1000;
                         TData data = SourceData[i];
-                        if (Activator.CreateInstance(typeof(TTreeViewItem), id, 0, null, data) is not TTreeViewItem newItem)
+                        if (data == null) continue;
+
+                        if (Activator.CreateInstance(typeof(TTreeViewItem), id, 0, data.Name, data) is not TTreeViewItem newItem)
                         {
                             throw new Exception($"Failed to create new {typeof(TTreeViewItem).Name} instance.");
                         }
@@ -310,7 +312,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                             bool filtered = newItem.IsFiltered(Filter);
                             if (filtered)
                             {
-                                Debug.Log($"Item {newItem.Data.Id} is not visible.");
+                                //Debug.Log($"Item {newItem.Data.Id} is not visible.");
                                 continue;
                             }
                         }

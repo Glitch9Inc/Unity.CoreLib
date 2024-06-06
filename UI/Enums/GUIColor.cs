@@ -1,4 +1,4 @@
-namespace Glitch9
+namespace Glitch9.UI
 {
     public enum GUIColor
     {

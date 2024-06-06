@@ -23,32 +23,17 @@ namespace Glitch9.ExtendedEditor
 
         private readonly GUIStyle _providerStyle;
         protected SerializedObject SettingsSerializedObject;
-        public override void OnGUI(string searchContext)
-        {
-            GUILayout.BeginVertical(_providerStyle);
-            {
-                InitializeSettings();
-                
-                SettingsSerializedObject.Update();  // Update the serialized object
-
-                DrawSettings();
-                
-                SettingsSerializedObject.ApplyModifiedProperties();
-            }
-            GUILayout.EndVertical();
-        }
-        protected abstract void DrawSettings();
 
         private void InitializeSettings()
         {
             if (SettingsSerializedObject == null)
             {
-                string className = typeof(TSettings).Name;
-                TSettings settingsInstance = Resources.Load<TSettings>(className);
+                string objectName = typeof(TSettings).Name;
+                TSettings settingsInstance = Resources.Load<TSettings>(objectName);
 
                 if (settingsInstance == null)
                 {
-                    EditorGUILayout.HelpBox($"Failed to load {className} asset. Please make sure the asset exists in the Resources folder.", MessageType.Error);
+                    EditorGUILayout.HelpBox($"Failed to load {objectName} (Scriptable Object). Please make sure the asset exists in the Resources folder.", MessageType.Error);
                     return;
                 }
 
@@ -56,14 +41,35 @@ namespace Glitch9.ExtendedEditor
 
                 if (settingsEditor == null)
                 {
-                    EditorGUILayout.HelpBox("Failed to create editor for LocalizationSettings. Please report this issue.", MessageType.Error);
+                    EditorGUILayout.HelpBox($"Failed to create editor for {objectName}. Please report this issue.", MessageType.Error);
                     return;
                 }
 
                 SettingsSerializedObject = settingsEditor.serializedObject;
             }
-
-            if (SettingsSerializedObject == null) return;
         }
+
+        public override void OnGUI(string searchContext)
+        {
+            //if (SettingsSerializedObject == null)
+            //{
+            //    EGUILayout.ScriptableObjectNotInResourcesFolder<TSettings>();
+            //    return;
+            //}
+            
+            GUILayout.BeginVertical(_providerStyle);
+            {
+                InitializeSettings();
+
+                SettingsSerializedObject.Update();  // Update the serialized object
+
+                DrawSettings();
+
+                SettingsSerializedObject.ApplyModifiedProperties();
+            }
+            GUILayout.EndVertical();
+        }
+        
+        protected abstract void DrawSettings();
     }
 }
