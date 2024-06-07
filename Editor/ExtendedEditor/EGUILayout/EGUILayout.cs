@@ -63,69 +63,69 @@ namespace Glitch9.ExtendedEditor
 
         #region BoxedLabel
         public static void BoxedLabel(GUIContent label, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter), options);
         public static void BoxedLabel(GUIContent label, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, color), options);
         public static void BoxedLabel(GUIContent label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
         public static void BoxedLabel(GUIContent label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(alignment, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, color), options);
         public static void BoxedLabel(GUIContent label, TextAnchor alignment = TextAnchor.MiddleCenter, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(alignment, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, color), options);
 
         public static void BoxedLabel(string label, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter), options);
         public static void BoxedLabel(string label, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, color), options);
         public static void BoxedLabel(string label, int fontSize, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter, fontSize), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize), options);
         public static void BoxedLabel(string label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
         public static void BoxedLabel(string label, int fontSize, TextAnchor alignment, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(alignment, fontSize, GUIColor.None), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, GUIColor.None), options);
         public static void BoxedLabel(string label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(alignment, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, color), options);
         public static void BoxedLabel(string label, TextAnchor alignment = TextAnchor.MiddleCenter, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Box(alignment, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, color), options);
         #endregion
 
         #region TableBox
         public static void TableBox(string label, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.TableBox(fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.TableBox(fontSize, color), options);
         public static void TableBox(string label, int fontSize = 12, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.TableBox(fontSize, GUIColor.None), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.TableBox(fontSize, GUIColor.None), options);
         #endregion
 
         #region Label
         public static void Label(GUIContent label, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft), options);
         public static void Label(GUIContent label, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft, 12, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft, 12, color), options);
         public static void Label(GUIContent label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft, fontSize, color), options);
         public static void Label(GUIContent label, int fontSize, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft, fontSize), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft, fontSize), options);
         public static void Label(GUIContent label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(alignment, 12, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(alignment, 12, color), options);
         public static void Label(GUIContent label, TextAnchor alignment = TextAnchor.UpperLeft, int fontSize = 12, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(alignment, fontSize, GUIColor.None), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(alignment, fontSize, GUIColor.None), options);
         public static void Label(GUIContent label, TextAnchor alignment = TextAnchor.UpperLeft, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(alignment, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(alignment, fontSize, color), options);
 
         public static void Label(string label, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft), options);
         public static void Label(string label, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft, 12, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft, 12, color), options);
         public static void Label(string label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft, fontSize, color), options);
         public static void Label(string label, int fontSize, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(TextAnchor.UpperLeft, fontSize), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft, fontSize), options);
         public static void Label(string label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(alignment, 12, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(alignment, 12, color), options);
         public static void Label(string label, TextAnchor alignment = TextAnchor.UpperLeft, int fontSize = 12, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(alignment, fontSize, GUIColor.None), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(alignment, fontSize, GUIColor.None), options);
         public static void Label(string label, TextAnchor alignment = TextAnchor.UpperLeft, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, ExtendedEditorStyles.Label(alignment, fontSize, color), options);
+            => EditorGUILayout.LabelField(label, EGUIStyles.Label(alignment, fontSize, color), options);
         #endregion
 
         #region InfoLabel
@@ -347,9 +347,9 @@ namespace Glitch9.ExtendedEditor
         public static bool Button(GUIContent content, GUIColor color, bool isSelected, params GUILayoutOption[] options)
             => Button(content, 12, color, isSelected, options);
         public static bool Button(GUIContent content, int fontSize, GUIColor color = GUIColor.None, bool isSelected = false, params GUILayoutOption[] options)
-            => GUILayout.Button(content, ExtendedEditorStyles.Button(TextAnchor.MiddleCenter, fontSize, color, isSelected), options);
+            => GUILayout.Button(content, EGUIStyles.Button(TextAnchor.MiddleCenter, fontSize, color, isSelected), options);
         public static bool Button(GUIContent content, TextAnchor alignment = TextAnchor.MiddleCenter, int fontSize = 12, params GUILayoutOption[] options)
-            => GUILayout.Button(content, ExtendedEditorStyles.Button(alignment, fontSize, GUIColor.None, false), options);
+            => GUILayout.Button(content, EGUIStyles.Button(alignment, fontSize, GUIColor.None, false), options);
         public static bool Button(string label, params GUILayoutOption[] options)
             => Button(label, 12, GUIColor.None, false, options);
         public static bool Button(string label, GUIColor color, params GUILayoutOption[] options)
@@ -359,7 +359,7 @@ namespace Glitch9.ExtendedEditor
         public static bool Button(string label, GUIColor color, bool isSelected, params GUILayoutOption[] options)
             => Button(label, 12, color, isSelected, options);
         public static bool Button(string label, int fontSize = 12, GUIColor color = GUIColor.None, bool isSelected = false, params GUILayoutOption[] options)
-            => GUILayout.Button(label, ExtendedEditorStyles.Button(TextAnchor.MiddleCenter, fontSize, color, isSelected), options);
+            => GUILayout.Button(label, EGUIStyles.Button(TextAnchor.MiddleCenter, fontSize, color, isSelected), options);
         public static bool Button(Texture2D label, params GUILayoutOption[] options)
             => Button(label, GUIColor.None, false, options);
         public static bool Button(Texture2D label, GUIColor color, params GUILayoutOption[] options)
@@ -367,7 +367,7 @@ namespace Glitch9.ExtendedEditor
         public static bool Button(Texture2D label, bool isSelected, params GUILayoutOption[] options)
             => Button(label, GUIColor.None, isSelected, options);
         public static bool Button(Texture2D label, GUIColor color = GUIColor.None, bool isSelected = false, params GUILayoutOption[] options)
-            => GUILayout.Button(label, ExtendedEditorStyles.Button(TextAnchor.MiddleCenter, 12, color, isSelected), options);
+            => GUILayout.Button(label, EGUIStyles.Button(TextAnchor.MiddleCenter, 12, color, isSelected), options);
 
         #endregion
 
@@ -766,7 +766,7 @@ namespace Glitch9.ExtendedEditor
         {
             GUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight));
             EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth), GUILayout.Height(EditorGUIUtility.singleLineHeight));
-            EditorGUILayout.SelectableLabel(value, ExtendedEditorStyles.disabledTextField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+            EditorGUILayout.SelectableLabel(value, EGUIStyles.disabledTextField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
             GUILayout.EndHorizontal();
         }
 

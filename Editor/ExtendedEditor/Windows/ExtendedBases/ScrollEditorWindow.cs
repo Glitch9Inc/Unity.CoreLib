@@ -17,8 +17,8 @@ namespace Glitch9.ExtendedEditor
         {
             base.OnEnable();
             InitializeScrollEditorWindow();
-            _topBorderStyle = ExtendedEditorStyles.Border(GUIBorder.Top);
-            _bottomBorderStyle = ExtendedEditorStyles.Border(GUIBorder.Bottom);
+            _topBorderStyle = EGUIStyles.Border(GUIBorder.Top);
+            _bottomBorderStyle = EGUIStyles.Border(GUIBorder.Bottom);
         }
 
         protected void InitializeScrollEditorWindow()
@@ -106,7 +106,7 @@ namespace Glitch9.ExtendedEditor
                 OnGUITop();
                 GUILayout.FlexibleSpace();
                 DrawWindowLabelButtons();
-                if (GUILayout.Button(EditorIcons.Settings, ExtendedEditorStyles.miniButton))
+                if (GUILayout.Button(EditorIcons.Settings, EGUIStyles.miniButton))
                 {
                     OpenSettingsWindow();
                 }

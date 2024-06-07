@@ -34,7 +34,7 @@ namespace Glitch9.ExtendedEditor
             EGUIUtility.DrawHorizontalLine(1);
             GUILayout.Space(space);
             bool b = EditorPrefs.GetBool(label, true);
-            b = EditorGUILayout.Foldout(b, label, ExtendedEditorStyles.foldout);
+            b = EditorGUILayout.Foldout(b, label, EGUIStyles.foldout);
             EditorPrefs.SetBool(label, b);
 
             if (b)
@@ -61,7 +61,7 @@ namespace Glitch9.ExtendedEditor
         public static void Title(string label)
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField(label, ExtendedEditorStyles.title);
+            EditorGUILayout.LabelField(label, EGUIStyles.title);
             EGUIUtility.DrawTitleLine();
         }
 

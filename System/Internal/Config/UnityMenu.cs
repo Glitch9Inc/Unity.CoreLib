@@ -17,6 +17,8 @@ namespace Glitch9.Internal
         private const int ADD_SEPARATOR = 15;
         private const int NEXT_ROW = 1;
 
+        public const string URL_SUPPORT_REPO = "https://github.com/Glitch9Inc/Glitch9-Support";
+
         public static class Utils
         {
             private const string PATH = ROOT_TOOL_PATH + "Tools/";
@@ -68,20 +70,25 @@ namespace Glitch9.Internal
             public const string NAME_CHAT_GPT = "Editor ChatGPT";
             public const string NAME_DALLE = "Editor DALL·E";
             public const string NAME_SPEECH = "Editor Speech";
+            
             public const string NAME_LOG_MANAGER = "Log Manager";
             public const string NAME_AI_MODEL_MANAGER = "AI Model Manager";
             public const string NAME_ASSISTANT_MANAGER = "Assistant Manager";
+            
 
             public const string PATH_COMPLETION = TOOLS_PATH + NAME_COMPLETION;
             public const string PATH_CHAT_GPT = TOOLS_PATH + NAME_CHAT_GPT;
             public const string PATH_DALLE = TOOLS_PATH + NAME_DALLE;
             public const string PATH_SPEECH = TOOLS_PATH + NAME_SPEECH;
+            
             public const string PATH_LOG_MANAGER = TOOLS_PATH + NAME_LOG_MANAGER;
             public const string PATH_AI_MODEL_MANAGER = TOOLS_PATH + NAME_AI_MODEL_MANAGER;
             public const string PATH_ASSISTANT_MANAGER = TOOLS_PATH + NAME_ASSISTANT_MANAGER;
+            
             public const string PATH_SETTINGS = TOOLS_PATH + NAME_PREFERENCES;
             public const string PATH_DOCUMENTATION = TOOLS_PATH + NAME_DOCUMENTATION;
             public const string PATH_SUPPORT = TOOLS_PATH + NAME_REPORT_ISSUES;
+            
 
             public const int PRIORITY_COMPLETION = STARTING_TOOLS_MENU_PRIORITY;
             public const int PRIORITY_CHAT_GPT = PRIORITY_COMPLETION + NEXT_ROW;
@@ -107,19 +114,20 @@ namespace Glitch9.Internal
             private const string NAME = "Smart Localization";
             private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
 
-            public const string NAME_EDITOR = "Smart Localization";
-            public const string NAME_TABLE_MANAGER = "Localization Table Manager";
-            public const string NAME_SUFFIX_MANAGER = "Suffix Manager";
+            public const string NAME_LOCALIZATION_MANAGER = "Localization Manager";
+            public const string NAME_TABLE_MANAGER = "Localization Tables";
+            public const string NAME_SUFFIX_MANAGER = "Localization Suffixes";
 
-            public const string PATH_EDITOR = TOOLS_PATH + NAME_EDITOR;
+            public const string PATH_LOCALIZATION_MANAGER = TOOLS_PATH + NAME_LOCALIZATION_MANAGER;
             public const string PATH_TABLE_MANAGER = TOOLS_PATH + NAME_TABLE_MANAGER;
             public const string PATH_SUFFIX_MANAGER = TOOLS_PATH + NAME_SUFFIX_MANAGER;
+            
             public const string PATH_SETTINGS = TOOLS_PATH + NAME_PREFERENCES;
             public const string PATH_DOCUMENTATION = TOOLS_PATH + NAME_DOCUMENTATION;
             public const string PATH_SUPPORT = TOOLS_PATH + NAME_REPORT_ISSUES;
 
-            public const int PRIORITY_EDITOR = STARTING_TOOLS_MENU_PRIORITY;
-            public const int PRIORITY_TABLE_MANAGER = PRIORITY_EDITOR + NEXT_ROW;
+            public const int PRIORITY_LOCALIZATION_MANAGER = STARTING_TOOLS_MENU_PRIORITY;
+            public const int PRIORITY_TABLE_MANAGER = PRIORITY_LOCALIZATION_MANAGER + NEXT_ROW;
             public const int PRIORITY_SUFFIX_MANAGER = PRIORITY_TABLE_MANAGER + NEXT_ROW;
 
             public const int PRIORITY_SETTINGS = PRIORITY_SUFFIX_MANAGER + ADD_SEPARATOR;

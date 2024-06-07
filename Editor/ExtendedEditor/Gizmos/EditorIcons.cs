@@ -54,6 +54,8 @@ namespace Glitch9.ExtendedEditor
         public static Texture Start => Get("T_Start.png");
         public static Texture Translate => Get("T_Translate.png");
         public static Texture FindAndReplace => Get("ic_find_and_replace.png");
+        public static Texture Replace => Get("ic_replace.png");
+        public static Texture Group => Get("ic_group.png");
 
 
         // Extra
@@ -64,5 +66,6 @@ namespace Glitch9.ExtendedEditor
         public static Texture AI => Get("ic_ai.png");
         public static Texture Trash => Get("T_Delete.png");
         public static Texture NoImageHighRes => Get("no-image-high-res.png");
+        
     }
 }

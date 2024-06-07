@@ -29,8 +29,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
             public TEventHandler EventHandler { get; set; }
 
             public TData Data => Item?.Data;
-            public TData ModifiedData { get; set; }
-            public bool IsDirty => !Data.Equals(ModifiedData);
+            public TData UpdatedData { get; set; }
+            public bool IsDirty => !Data.Equals(UpdatedData);
 
 
             private string _title;
@@ -50,7 +50,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (_isInitialized) return;
                 _isInitialized = true;
                 _title = !string.IsNullOrEmpty(Data.Name) ? Data.Name : FALLBACK_TITLE;
-                ModifiedData = Data;
+                UpdatedData = Data;
             }
 
             protected abstract void DrawSubtitle();
@@ -88,9 +88,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 GUILayout.EndScrollView();
             }
 
-            private void RevertChanges()
+            public void RevertChanges()
             {
-                ModifiedData = Data;
+                UpdatedData = Data;
             }
 
             private void RepaintWindow(IResult result)
@@ -104,10 +104,10 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             private void DrawToolMenuButton()
             {
-                if (GUILayout.Button(GUIContents.k_ToolMenu, ExtendedEditorStyles.miniButton))
+                if (GUILayout.Button(GUIContents.k_ToolMenu, EGUIStyles.miniButton))
                 {
                     if (EventHandler == null) return;
-                    EventHandler.ShowEditWindowMenu(Item, RepaintWindow, IsDirty, RevertChanges);
+                    EventHandler.ShowEditWindowMenu(Item, RepaintWindow);
                 }
             }
         }

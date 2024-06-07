@@ -170,7 +170,7 @@ namespace Glitch9.ExtendedEditor.Collections
             }
         }
 
-        public void Save()
+        private void Save()
         {
             string json = JsonConvert.SerializeObject(_dictionary, JsonUtils.DefaultSettings);
             EditorPrefs.SetString(_prefsKey, json);

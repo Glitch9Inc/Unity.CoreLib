@@ -6,198 +6,101 @@ using UnityEngine;
 
 namespace Glitch9.ExtendedEditor
 {
-    public static class ExtendedEditorStyles
+    public static class EGUIStyles
     {
         private static readonly Dictionary<string, GUIStyle> _cache = new();
-        // private static readonly RectOffset _defaultBoxPadding = new(6, 6, 2, 2);
+        private static GUIStyle Get(string key, GUIStyle defaultStyle)
+        {
+            if (!_cache.TryGetValue(key, out GUIStyle style))
+            {
+                style = new GUIStyle(defaultStyle);
+                _cache[key] = style;
+            }
+            return style;
+        }
+
         private static readonly RectOffset _defaultBoxMargin = new(2, 2, 2, 2);
         private static readonly RectOffset _defaultBoxPadding = new(2, 2, 2, 2);
 
 
-        public static GUIStyle centeredRedMiniLabel
+        public static GUIStyle centeredRedMiniLabel => Get(nameof(centeredRedMiniLabel), new GUIStyle(EditorStyles.centeredGreyMiniLabel)
         {
-            get
-            {
-                string key = "centeredRedMiniLabel";
-                if (!_cache.TryGetValue(key, out GUIStyle _centeredRedMiniLabel))
-                {
-                    _centeredRedMiniLabel = new GUIStyle(EditorStyles.centeredGreyMiniLabel)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        normal = { textColor = Color.red }
-                    };
-                    _cache.Add(key, _centeredRedMiniLabel);
-                }
-                return _centeredRedMiniLabel;
-            }
-        }
+            alignment = TextAnchor.MiddleCenter,
+            normal = { textColor = Color.red }
+        });
 
-        public static GUIStyle centeredBlueMiniLabel
+        public static GUIStyle centeredBlueMiniLabel => Get(nameof(centeredBlueMiniLabel), new GUIStyle(EditorStyles.centeredGreyMiniLabel)
         {
-            get
-            {
-                string key = "centeredBlueMiniLabel";
-                if (!_cache.TryGetValue(key, out GUIStyle _centeredBlueMiniLabel))
-                {
-                    _centeredBlueMiniLabel = new GUIStyle(EditorStyles.centeredGreyMiniLabel)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        normal = { textColor = Color.blue }
-                    };
-                    _cache.Add(key, _centeredBlueMiniLabel);
-                }
-                return _centeredBlueMiniLabel;
-            }
-        }
+            alignment = TextAnchor.MiddleCenter,
+            normal = { textColor = Color.blue }
+        });
 
-
-        public static GUIStyle background
+        public static GUIStyle background => Get(nameof(background), new GUIStyle
         {
-            get
-            {
-                string key = "background";
-                if (!_cache.ContainsKey(key))
-                {
-                    _cache.Add(key, new GUIStyle
-                    {
-                        padding = new RectOffset(7, 7, 7, 7),
-                        normal = { background = EGUIUtility.grayTexture }
-                    });
-                }
-                return _cache[key];
-            }
-        }
+            padding = new RectOffset(7, 7, 7, 7),
+            normal = { background = EGUIUtility.grayTexture }
+        });
 
-        public static GUIStyle foldout
+        public static GUIStyle foldout => Get(nameof(foldout), new GUIStyle(EditorStyles.foldout)
         {
-            get
-            {
-                string key = "foldout";
-                if (!_cache.TryGetValue(key, out GUIStyle style))
-                {
-                    style = new(EditorStyles.foldout);
-                    style.fontStyle = FontStyle.Bold;
-                    _cache.Add(key, style);
-                }
-                return style;
-            }
-        }
+            fontStyle = FontStyle.Bold
+        });
 
-        public static GUIStyle title
+
+        public static GUIStyle title => Get(nameof(title), new GUIStyle(EditorStyles.boldLabel)
         {
-            get
-            {
-                string key = "title";
-                if (!_cache.TryGetValue(key, out GUIStyle style))
-                {
-                    style = new GUIStyle(EditorStyles.boldLabel);
-                    style.fontSize = 14;
-                    style.margin = new RectOffset(0, 0, 10, 10);
-                    _cache.Add(key, style);
-                }
-                return style;
-            }
-        }
+            fontSize = 14,
+            margin = new RectOffset(0, 0, 10, 10)
+        });
 
-        public static GUIStyle array
+        public static GUIStyle array => Get(nameof(array), new GUIStyle(EditorStyles.helpBox)
         {
-            get
-            {
-                string key = "array";
-                if (!_cache.TryGetValue(key, out GUIStyle style))
-                {
-                    style = new GUIStyle(EditorStyles.helpBox);
-                    style.padding = new RectOffset(5, 5, 5, 5);
-                    style.margin = new RectOffset(0, 0, 3, 5);
-                    _cache.Add(key, style);
-                }
-                return style;
-            }
-        }
+            padding = new RectOffset(5, 5, 5, 5),
+            margin = new RectOffset(0, 0, 3, 5)
+        });
 
-        public static GUIStyle centeredIconButton
+        public static GUIStyle centeredIconButton => Get(nameof(centeredIconButton), new GUIStyle(EditorStyles.iconButton)
         {
-            get
-            {
-                string key = "centeredIconButton";
-                if (!_cache.TryGetValue(key, out GUIStyle style))
-                {
-                    style = new GUIStyle(EditorStyles.iconButton)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        fixedHeight = EditorGUIUtility.singleLineHeight + 2,
-                    };
-                    _cache.Add(key, style);
-                }
-                return style;
-            }
-        }
+            alignment = TextAnchor.MiddleCenter,
+            fixedHeight = EditorGUIUtility.singleLineHeight + 2,
+        });
 
-        public static GUIStyle miniButton
+        public static GUIStyle miniButton => Get(nameof(miniButton), new GUIStyle(EditorStyles.miniButton)
         {
-            get
-            {
-                string key = "miniButton";
-                if (!_cache.TryGetValue(key, out GUIStyle style))
-                {
-                    style = new GUIStyle(EditorStyles.miniButton)
-                    {
-                        padding = new RectOffset(1, 1, 1, 1),
-                        margin = new RectOffset(2, 2, 2, 2),
-                        fixedHeight = 20,
-                        fixedWidth = 20,
-                    };
-                    _cache.Add(key, style);
-                }
-                return style;
-            }
-        }
+            padding = new RectOffset(1, 1, 1, 1),
+            margin = new RectOffset(2, 2, 2, 2),
+            fixedHeight = 20,
+            fixedWidth = 20,
+        });
 
-        public static GUIStyle iconButton
+        public static GUIStyle iconButton => Get(nameof(iconButton), new GUIStyle(EditorStyles.iconButton)
         {
-            get
-            {
-                string key = "iconButton";
-                if (!_cache.TryGetValue(key, out GUIStyle style))
-                {
-                    style = new GUIStyle(EditorStyles.iconButton)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        fixedHeight = 18,
-                        fixedWidth = 18,
-                    };
-                    _cache.Add(key, style);
-                }
-                return style;
-            }
-        }
+            alignment = TextAnchor.MiddleCenter,
+            fixedHeight = 18,
+            fixedWidth = 18,
+        });
 
-        public static GUIStyle disabledTextField
+
+        public static GUIStyle disabledTextField => Get(nameof(disabledTextField), new GUIStyle()
         {
-            get
+            border = new RectOffset(2, 2, 2, 2),
+            margin = new RectOffset(2, 2, 2, 2),
+            padding = new RectOffset(3, 3, 3, 3),
+            normal =
             {
-                string key = "disabledTextField";
-                if (!_cache.TryGetValue(key, out GUIStyle style))
-                {
-                    style = new GUIStyle()
-                    {
-                        border = new RectOffset(2, 2, 2, 2),
-                        margin = new RectOffset(2, 2, 2, 2),
-                        padding = new RectOffset(3, 3, 3, 3),
-                        normal =
-                        {
-                            background = EditorGUITextures.TextField(GUIColor.Gray),
-                            textColor = ExColor.charcoal,
-                        },
-                        fontSize = 12,
-                        fontStyle = FontStyle.Normal,
-                    };
-                    _cache.Add(key, style);
-                }
-                return style;
-            }
-        }
+                background = EditorGUITextures.TextField(GUIColor.Gray),
+                textColor = ExColor.charcoal,
+            },
+            fontSize = 12,
+            fontStyle = FontStyle.Normal,
+        });
 
+        public static GUIStyle popupBody => Get(nameof(popupBody), new GUIStyle()
+        {
+            padding = new RectOffset(5, 5, 10, 5)
+        });
+
+        
         private static GUIStyle Border(GUIBorder direction, RectOffset padding)
         {
             string key = $"{direction}_{padding.left},{padding.right},{padding.top},{padding.bottom}";

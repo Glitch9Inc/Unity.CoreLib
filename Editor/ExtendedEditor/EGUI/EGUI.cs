@@ -20,7 +20,7 @@ namespace Glitch9.ExtendedEditor
         {
             get
             {
-                if (_defaultSkin == null) _defaultSkin = EditorSkin.skin;
+                if (_defaultSkin == null) _defaultSkin = EGUISkin.skin;
                 return _defaultSkin;
             }
         }
@@ -72,7 +72,7 @@ namespace Glitch9.ExtendedEditor
         public static void Title(Rect rect, string label)
         {
             rect.y = rect.y;
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.title);
+            EditorGUI.LabelField(rect, label, EGUIStyles.title);
             float thickness = 1.2f;
             float height = 5f;
             Rect r = new(rect.x, rect.y + rect.height - 5, rect.width, height);
@@ -88,15 +88,15 @@ namespace Glitch9.ExtendedEditor
         #region Box
 
         // Margin goes first.
-        public static GUIStyle Box(int margin = 0, GUIColor color = GUIColor.None) => ExtendedEditorStyles.Box(color, new RectOffset(margin, margin, margin, margin));
-        public static GUIStyle Box(RectOffset margin, GUIColor color = GUIColor.None) => ExtendedEditorStyles.Box(color, margin);
+        public static GUIStyle Box(int margin = 0, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin));
+        public static GUIStyle Box(RectOffset margin, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, margin);
 
         // Margin + Padding
-        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None) => ExtendedEditorStyles.Box(color, new RectOffset(margin, margin, margin, margin), new RectOffset(padding, padding, padding, padding));
-        public static GUIStyle Box(RectOffset margin, RectOffset padding, GUIColor color = GUIColor.None) => ExtendedEditorStyles.Box(color, margin, padding);
+        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin), new RectOffset(padding, padding, padding, padding));
+        public static GUIStyle Box(RectOffset margin, RectOffset padding, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, margin, padding);
 
         // Color goes last. When only need color
-        public static GUIStyle Box(GUIColor color) => ExtendedEditorStyles.Box(color, new RectOffset(0, 0, 0, 0));
+        public static GUIStyle Box(GUIColor color) => EGUIStyles.Box(color, new RectOffset(0, 0, 0, 0));
 
 
         #endregion
@@ -131,7 +131,7 @@ namespace Glitch9.ExtendedEditor
         {
             GUIStyle style = bold ? new GUIStyle(EditorStyles.boldLabel) : new GUIStyle(GUI.skin.label);
             style.normal.textColor = textColor;
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.Label(alignment, fontSize, textColor, bold));
+            EditorGUI.LabelField(rect, label, EGUIStyles.Label(alignment, fontSize, textColor, bold));
         }
 
         public static void Label(Rect rect, string label, Color textColor, bool bold = false) =>
@@ -152,7 +152,7 @@ namespace Glitch9.ExtendedEditor
         {
             GUIStyle style = bold ? new GUIStyle(EditorStyles.boldLabel) : new GUIStyle(GUI.skin.label);
             style.normal.textColor = textColor;
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.Label(alignment, fontSize, textColor, bold));
+            EditorGUI.LabelField(rect, label, EGUIStyles.Label(alignment, fontSize, textColor, bold));
         }
 
         #endregion
@@ -160,28 +160,28 @@ namespace Glitch9.ExtendedEditor
 
         #region BoxField
         public static void BoxField(Rect rect, string label, GUIColor color) =>
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.Box(TextAnchor.MiddleCenter, color));
+            EditorGUI.LabelField(rect, label, EGUIStyles.Box(TextAnchor.MiddleCenter, color));
 
         public static void BoxField(Rect rect, string label, TextAnchor alignment, GUIColor color) =>
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.Box(alignment, color));
+            EditorGUI.LabelField(rect, label, EGUIStyles.Box(alignment, color));
 
         public static void BoxField(Rect rect, string label, TextAnchor alignment, int fontSize = 12,
             GUIColor color = GUIColor.None) =>
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.Box(alignment, fontSize, color));
+            EditorGUI.LabelField(rect, label, EGUIStyles.Box(alignment, fontSize, color));
 
         #endregion
 
         #region TreeViewField
 
         public static void TreeViewField(Rect rect, string label, GUIColor color) =>
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.TreeViewField(TextAnchor.MiddleCenter, color));
+            EditorGUI.LabelField(rect, label, EGUIStyles.TreeViewField(TextAnchor.MiddleCenter, color));
 
         public static void TreeViewField(Rect rect, string label, TextAnchor alignment, GUIColor color) =>
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.TreeViewField(alignment, color));
+            EditorGUI.LabelField(rect, label, EGUIStyles.TreeViewField(alignment, color));
 
         public static void TreeViewField(Rect rect, string label, TextAnchor alignment = TextAnchor.MiddleCenter,
             int fontSize = 12, GUIColor color = GUIColor.None) =>
-            EditorGUI.LabelField(rect, label, ExtendedEditorStyles.TreeViewField(alignment, fontSize, color));
+            EditorGUI.LabelField(rect, label, EGUIStyles.TreeViewField(alignment, fontSize, color));
 
         #endregion
 

@@ -80,7 +80,6 @@ namespace Glitch9
             return System.IO.Path.GetFileNameWithoutExtension(callerFilaPath);
         }
 
-        // Helper method to handle logging.
         private static void HandleError(string message, bool showCallerInfo = false, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
             GNLog.ContinueWithLogger(message, LogType.Error, showCallerInfo, callerMemberName, callerFilePath);

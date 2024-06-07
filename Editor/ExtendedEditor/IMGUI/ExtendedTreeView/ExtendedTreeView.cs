@@ -17,13 +17,6 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TFilter : class, IFilter<TFilter, TData>
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
-        internal static class Strings
-        {
-            // Styles
-            internal const string STYLE_TREEVIEW_ITEM = "treeviewitem";
-            internal const string STYLE_TREEVIEW_GROUP = "treeviewgroup";
-        }
-
         public abstract class ExtendedTreeView : TreeView
         {
             public TFilter Filter { get; private set; }
@@ -102,12 +95,40 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 if (eventHandler == null) return Activator.CreateInstance<TEventHandler>();
 
-                eventHandler.DeleteItem?.AddListener((item, deleted) =>
+                eventHandler.AddOnItemAdded((item, added) =>
+                {
+                    if (added) AddItem(item);
+                });
+
+                eventHandler.AddOnItemUpdated((item, updated) =>
+                {
+                    if (updated) UpdateItem(item);
+                });
+
+                eventHandler.AddOnItemRemoved((item, deleted) =>
                 {
                     if (deleted) RemoveItem(item);
                 });
 
+                eventHandler.CreateEvent(TreeViewItemEvent.Revert)
+                    .WithAction(RevertChanges)
+                    .WithCondition(RevertCondition)
+                    .Add();
+
                 return eventHandler;
+            }
+
+            private void RevertChanges(TTreeViewItem item, Action<bool> onResult)
+            {
+                if (_editWindowInstance == null) return;
+                _editWindowInstance.RevertChanges();
+                onResult?.Invoke(true);
+            }
+
+            private bool RevertCondition(TTreeViewItem item)
+            {
+                if (_editWindowInstance == null) return false;
+                return _editWindowInstance.IsDirty;
             }
 
             protected override TreeViewItem BuildRoot()
@@ -184,7 +205,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (Event.current.type == EventType.Repaint)
                 {
                     bool isNotGroupRow = treeViewItem is TTreeViewItem;
-                    GUIStyle backgroundStyle = isNotGroupRow ? EGUI.skin.GetStyle(Strings.STYLE_TREEVIEW_ITEM) : EGUI.skin.GetStyle(Strings.STYLE_TREEVIEW_GROUP);
+                    GUIStyle backgroundStyle = isNotGroupRow ? TreeViewStyles.TreeViewItem : TreeViewStyles.TreeViewGroup;
                     backgroundStyle.Draw(args.rowRect, false, false, false, false);
                 }
 
@@ -374,6 +395,51 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 // replace the existing data with the new data
                 int index = SourceData.IndexOf(existingData);
                 SourceData[index] = data;
+
+                UpdateTreeView();
+            }
+
+            public void AddItem(TTreeViewItem item)
+            {
+                if (item == null) return;
+
+                // add the new item to the cached items
+                _cachedItems.Add(item);
+
+                if (item.Data != null)
+                {
+                    SourceData.Add(item.Data);
+                }
+
+                UpdateTreeView();
+            }
+
+            public void UpdateItem(TTreeViewItem item)
+            {
+                if (item == null) return;
+
+                // find the same item by comparing id
+                TreeViewItem foundItem = _cachedItems.Find(x => x.id == item.id);
+
+                if (foundItem != null)
+                {
+                    _cachedItems.Remove(foundItem);
+                    _cachedItems.Add(item);
+                }
+
+                if (item.Data != null)
+                {
+                    TData existingData = SourceData.FirstOrDefault(d => d.Id == item.Data.Id);
+                    if (existingData == null)
+                    {
+                        Debug.LogError($"Data with id {item.Data.Id} not found in TreeView.");
+                        return;
+                    }
+
+                    // replace the existing data with the new data
+                    int index = SourceData.IndexOf(existingData);
+                    SourceData[index] = item.Data;
+                }
 
                 UpdateTreeView();
             }

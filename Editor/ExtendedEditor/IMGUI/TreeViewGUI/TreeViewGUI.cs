@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public class ExtendedTreeViewGUI
+    public class TreeViewGUI
     {
         private static class Strings
         {

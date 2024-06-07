@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 namespace Glitch9.ExtendedEditor
@@ -10,7 +9,7 @@ namespace Glitch9.ExtendedEditor
         Yellow,
         Red,
     }
-    
+
     /// <summary>
     /// Built-in Editor Icons
     /// </summary>

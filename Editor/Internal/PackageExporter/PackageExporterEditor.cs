@@ -76,7 +76,7 @@ namespace Glitch9.Internal
             for (int i = 0; i < this.libraries.arraySize; i++)
             {
                 int enumIndex = libraries.GetArrayElementAtIndex(i).enumValueIndex;
-                string path = LibraryPaths.GetPath((Glitch9Library)enumIndex);
+                string path = PackagePaths.GetAssetsPath((Glitch9Library)enumIndex);
                 if (string.IsNullOrEmpty(path)) continue;
                 list.Add(path);
             }

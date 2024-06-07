@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Glitch9.ExtendedEditor
 {
-    public static class EditorSkin
+    public static class EGUISkin
     {
         private const string ASSET_PATH = "CoreLib/Editor/Gizmos/Skins/";
         private const string SKIN_NAME_LIGHT = "ExSkin_Light.guiskin";
