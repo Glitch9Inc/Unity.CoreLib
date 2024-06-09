@@ -20,7 +20,7 @@ namespace Glitch9
         public override object GetValue() => Value;
         public override void SetValue(object value)
         {
-            if (value is not string str) throw new ArgumentException("Value must be a string");
+            if (value is not string str) return;
             Value = str;
         }
 

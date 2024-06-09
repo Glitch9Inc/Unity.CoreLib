@@ -31,8 +31,8 @@ namespace Glitch9.Internal.Git
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            
-            EGUILayout.Title("Git Module");
+
+            InternalGUI.Title("Git Module");
             EditorGUILayout.PropertyField(gitUrl);
 
             GUILayout.BeginHorizontal();
@@ -50,7 +50,7 @@ namespace Glitch9.Internal.Git
             serializedObject.ApplyModifiedProperties();
 
             GUILayout.Space(10);
-            EGUILayout.Title("Git Window");
+            InternalGUI.Title("Git Window");
 
             if (_git == null || !_git.IsInitialized)
             {

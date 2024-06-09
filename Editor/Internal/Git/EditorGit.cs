@@ -18,6 +18,7 @@ namespace Glitch9.Internal.Git
         private string _gitUrl;
         private string _repoName;
         private string _gitBranch;
+        private string _localDir;
 
         private string commitMessage;
         private EPrefs<string> _commitMessage;
@@ -35,7 +36,7 @@ namespace Glitch9.Internal.Git
             { GitOutputStatus.Success, Color.blue },
             { GitOutputStatus.Warning, ExColor.firebrick },
             { GitOutputStatus.Hint, Color.magenta },
-            { GitOutputStatus.Error, ExColor.orange },
+            { GitOutputStatus.Error, Color.red },
             { GitOutputStatus.Fatal, Color.red },
             { GitOutputStatus.Completed, ExColor.teal },
         };
@@ -79,6 +80,7 @@ namespace Glitch9.Internal.Git
             _repoName = gitUrl.Substring(gitUrl.LastIndexOf('/') + 1);
             _gitBranch = gitBranch;
             _onRepaint = onRepaint;
+            _localDir = localDir;
 
             _git = new GitManager(_repoName, gitUrl, gitBranch, localDir, onRepaint);
             _git.OnGitOutput += OnGitOutput;
@@ -320,6 +322,16 @@ namespace Glitch9.Internal.Git
                 if (GUILayout.Button("Set Upstream to Origin"))
                 {
                     RunGitCommandsAsync($"branch --set-upstream-to=origin/{_gitBranch}");
+                }
+
+                if (GUILayout.Button("Fix Code 128"))
+                {
+                    string localDirWithoutAssets = _localDir.Replace("Assets/", "");
+                    string fullPath = Application.dataPath + "/" + localDirWithoutAssets;
+                    // fix slashes
+                    fullPath = fullPath.Replace("\\", "/");
+                    fullPath = fullPath.Replace("Assets/Assets", "Assets");
+                    RunGitCommandsAsync($"config --global --add safe.directory {fullPath}");
                 }
             }
             GUILayout.EndHorizontal();

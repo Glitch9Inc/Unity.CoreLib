@@ -1,21 +1,27 @@
+using Glitch9.UI;
+using System;
 using UnityEditor;
 using UnityEngine;
 
 namespace Glitch9.ExtendedEditor.IMGUI
 {
-    public class TreeViewGUI
+    public class TreeViewEGUI
     {
         private static class Strings
         {
             internal const string UNKNOWN_TIME = "Unknown";
             internal const string UNIX_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+            internal const string BOOL_TRUE = "Yes";
+            internal const string BOOL_FALSE = "No";
         }
+
+        #region Cell GUIs
 
         public static void StringCell(Rect cellRect, string text, GUIStyle style)
         {
             StringCell(cellRect, text, null, style);
         }
-        
+
         public static void StringCell(Rect cellRect, string text, string defaultText = null, GUIStyle style = null)
         {
             if (string.IsNullOrEmpty(text))
@@ -37,9 +43,15 @@ namespace Glitch9.ExtendedEditor.IMGUI
             StringCell(cellRect, timeString, style);
         }
 
+        public static void IconCell(Rect cellRect, Texture2D icon)
+        {
+            if (icon == null) return;
+            GUI.Label(cellRect, icon, EditorStyles.centeredGreyMiniLabel);
+        }
+
         public static void BoolCell(Rect cellRect, bool value)
         {
-            GUI.Label(cellRect, value ? "Yes" : "No");
+            GUI.Label(cellRect, value ? Strings.BOOL_TRUE : Strings.BOOL_FALSE);
         }
 
         public static bool CheckboxCell(Rect cellRect, bool value)
@@ -52,7 +64,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             labelRect.width -= toggleRect.width;
 
             value = GUI.Toggle(toggleRect, value, "");
-            GUI.Label(labelRect, value ? "Yes" : "No");
+            GUI.Label(labelRect, value ? Strings.BOOL_TRUE : Strings.BOOL_FALSE);
 
             return value;
         }
@@ -71,6 +83,46 @@ namespace Glitch9.ExtendedEditor.IMGUI
             GUI.Label(priceRect, $"${displayValue}");
             GUI.Label(perRect, $"per {per}");
         }
+
+        public static string DelayedTextCell(Rect cellRect, string value, GUIColor fieldColor)
+        {
+            return EditorGUI.DelayedTextField(cellRect, value, TreeViewStyles.TextField(12, fieldColor));
+        }
+
+        public static int DelayedIntCell(Rect cellRect, int value, int min, int max, GUIColor fieldColor)
+        {
+            int newValue = EditorGUI.DelayedIntField(cellRect, value, TreeViewStyles.TextField(12, fieldColor));
+            return Mathf.Clamp(newValue, min, max);
+        }
+
+        public static TEnum EnumPopupCell<TEnum>(Rect cellRect, TEnum color) where TEnum : Enum
+        {
+            cellRect = EGUIUtility.AdjustTreeViewRect(cellRect);
+            return EGUI.ResizableEnumPopup(cellRect, color);
+        }
+
+        private static readonly GUIStyle k_ToolbarDropDown = new(EditorStyles.toolbarDropDown)
+        {
+            padding = new RectOffset(6, 6, 2, 2),
+            fontSize = 11,
+            normal = { textColor = ExColor.charcoal },
+        };
+
+        public static int IntPopupMenu( string prefix, int selected, int[] optionValues, params GUILayoutOption[] options)
+        {
+            string[] optionNames = new string[optionValues.Length];
+            for (int i = 0; i < optionValues.Length; i++)
+            {
+                optionNames[i] = $"{prefix}{optionValues[i]}";
+            }
+
+            return EditorGUILayout.IntPopup(selected, optionNames, optionValues, k_ToolbarDropDown, options);
+        }
+
+
+        #endregion
+
+        #region Edit Window GUIs
 
         public static void LeftSubtitle(string text)
         {
@@ -91,5 +143,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             }
             GUILayout.EndHorizontal();
         }
+
+        #endregion
     }
 }

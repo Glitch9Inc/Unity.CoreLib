@@ -12,8 +12,10 @@ namespace Glitch9.Internal
         private const string ASSET_PATHS_HELP = "Asset Paths must start with 'Assets/' and can contain wildcards (*).";
         private static readonly string[] _forbiddenWords = new string[]
         {
-            "Sirenix",
+            "using Sirenix",
+            "using Microsoft",
             "HttpUtility",
+            "codice",
         };
 
         private PackageExporter _target;

@@ -53,7 +53,7 @@ namespace Glitch9.ExtendedEditor
             }
         }
 
-        [MenuItem(UnityMenu.Utils.PATH_RELOAD_SKINS, priority = UnityMenu.Utils.PRIORITY_RELOAD_SKINS)]
+        [MenuItem(UnityMenu.Support.PATH_RELOAD_SKINS, priority = UnityMenu.Support.PRIORITY_RELOAD_SKINS)]
         public static void ReloadSkins()
         {
             if (EditorGUIUtility.isProSkin)

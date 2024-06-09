@@ -60,15 +60,15 @@ namespace Glitch9.ExtendedEditor
 
                     if (i == startIndex)
                     {
-                        flagSet = ToolBarLeft(names[i], flagSet, options: options);
+                        flagSet = ToolbarLeft(names[i], flagSet, options: options);
                     }
                     else if (i == values.Length - 1)
                     {
-                        flagSet = ToolBarRight(names[i], flagSet, options: options);
+                        flagSet = ToolbarRight(names[i], flagSet, options: options);
                     }
                     else
                     {
-                        flagSet = ToolBarMid(names[i], flagSet, options: options);
+                        flagSet = ToolbarMid(names[i], flagSet, options: options);
                     }
 
                     // Update the int value based on toggle button state
@@ -118,6 +118,28 @@ namespace Glitch9.ExtendedEditor
         public static bool EnumToolbar<T>(T enumValue, out T newEnum, params GUILayoutOption[] options) where T : Enum
         {
             return EnumToolbar(enumValue, out newEnum, null, options);
+        }
+
+        public static TEnum ResizableEnumPopup<TEnum>(TEnum selected, GUIContent label, params GUILayoutOption[] options) where TEnum : Enum
+        {
+            string[] names = EnumUtils.GetNames(typeof(TEnum));
+            int index = Array.IndexOf(names, selected.ToString());
+            // The regular EnumPopup has a fixed height, so we need to use a custom implementation to make it resizable.
+            // Make a button that shows the currently selected enum value, with a dropdown arrow to the right.
+            if (EditorGUILayout.DropdownButton(label, FocusType.Passive, options))
+            {
+                // When the button is clicked, show a dropdown with all the enum values.
+                GenericMenu menu = new();
+                for (int i = 0; i < names.Length; i++)
+                {
+                    int localIndex = i;
+                    menu.AddItem(new GUIContent(names[i]), i == index, () => { index = localIndex; });
+                }
+
+                menu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
+            }
+
+            return (TEnum)Enum.Parse(typeof(TEnum), names[index]);
         }
     }
 }

@@ -1,7 +1,7 @@
+using Glitch9.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Glitch9.UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -234,7 +234,7 @@ namespace Glitch9.ExtendedEditor
 
         #endregion
 
-        public static string ResizableListPopup(Rect rect, string currentValue, IList<string> list, GUIContent label = null)
+        public static string ResizableStringPopup(Rect rect, string currentValue, IList<string> list, GUIContent label = null)
         {
             if (list == null || list.Count == 0)
             {
@@ -271,13 +271,47 @@ namespace Glitch9.ExtendedEditor
             return list[Mathf.Max(index, 0)];
         }
 
-        public static void ResizableEnumPopup<TEnum>(Rect rect, TEnum selected, Action<TEnum> onSelect) where TEnum : Enum
+        public static int ResizableIntPopup(Rect rect, string prefix, int selected, int[] optionsValues, GUIStyle style = null, GUIContent label = null)
+        {
+            if (label != null)
+            {
+                rect = EditorGUI.PrefixLabel(rect, label);
+            }
+
+            string[] options = Array.ConvertAll(optionsValues, item => item.ToString());
+            int index = Array.IndexOf(optionsValues, selected);
+
+            GUIStyle resizablePopupStyle = style ?? new GUIStyle(EditorStyles.popup);
+            resizablePopupStyle.fixedHeight = rect.height;
+
+            string selectedString;
+
+            if (!string.IsNullOrEmpty(prefix)) selectedString = $"{prefix} {options[index]}";
+            else selectedString = options[index];
+
+            if (GUI.Button(rect, selectedString, resizablePopupStyle))
+            {
+                GenericMenu menu = new();
+                for (int i = 0; i < options.Length; i++)
+                {
+                    int localValue = optionsValues[i];
+                    menu.AddItem(new GUIContent(options[i]), i == index, () => selected = localValue);
+                }
+
+                menu.DropDown(rect);
+            }
+
+            return selected;
+        }
+
+        public static TEnum ResizableEnumPopup<TEnum>(Rect rect, TEnum selected) where TEnum : Enum
         {
             string[] names = Enum.GetNames(typeof(TEnum));
             GUIContent label = new(selected.ToString());
 
             GUIStyle resizablePopupStyle = new(EditorStyles.popup);
             resizablePopupStyle.fixedHeight = rect.height;
+            TEnum selectedCopy = selected;
 
             if (GUI.Button(rect, label, resizablePopupStyle))
             {
@@ -287,11 +321,13 @@ namespace Glitch9.ExtendedEditor
                     TEnum localValue = (TEnum)Enum.Parse(typeof(TEnum), names[i]);
                     menu.AddItem(new GUIContent(names[i]), Equals(selected, localValue), () =>
                     {
-                        onSelect(localValue);
+                        selectedCopy = localValue;
                     });
                 }
                 menu.DropDown(rect);
             }
+
+            return selectedCopy;
         }
 
         private static int s_ProgressBarHash = "ProgressBar".GetHashCode();

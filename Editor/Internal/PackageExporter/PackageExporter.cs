@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Glitch9.Internal
 {
-    [CreateAssetMenu(fileName = nameof(PackageExporter), menuName = "Glitch9/Package Exporter")]
+    [CreateAssetMenu(fileName = nameof(PackageExporter), menuName = UnityMenu.Utility.CREATE_PACKAGE_EXPORTER, order = UnityMenu.Utility.ORDER_PACKAGE_EXPORTER)]
     public class PackageExporter : ScriptableObject
     {
         [SerializeField] private string packageName;

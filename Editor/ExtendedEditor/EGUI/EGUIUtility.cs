@@ -267,6 +267,14 @@ namespace Glitch9.ExtendedEditor
             return cellRect;
         }
 
+        public static Rect AdjustTreeViewMenuRect(Rect cellRect)
+        {
+            //cellRect.width += 6;
+            cellRect.x -= 3;
+            cellRect.y -= 1.2f;
+            return cellRect;
+        }
+
         public static void DrawHorizontalBorder(float yPos)
         {
             GUI.DrawTexture(new Rect(0, yPos, EditorGUIUtility.currentViewWidth, 1.2f), borderTexture);

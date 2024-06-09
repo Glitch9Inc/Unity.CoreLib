@@ -1,36 +1,97 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Glitch9
 {
     public static class AssetUtils
     {
-        private static T CreateAsset<T>(string name, T obj) where T : ScriptableObject
+        private const string ASSETS_RESOURCES = "Assets/Resources";
+
+#if UNITY_EDITOR
+        private static string FixPathSlashes(string path)
         {
-            string path = $"Assets/{name}.asset";
+            return path.Replace('\\', '/');
+        }
+        
+        private static T CreateAsset<T>(string fileName, T obj, string customPathWithFileName) where T : ScriptableObject
+        {
+            string path;
+
+            if (string.IsNullOrEmpty(customPathWithFileName))
+            {
+                path = $"Assets/{fileName}.asset";
+            }
+            else
+            {
+                if (Path.HasExtension(customPathWithFileName)) // if path contains extension, remove it
+                {
+                    path = $"Assets/{customPathWithFileName}";
+                }
+                else
+                {
+                    path = $"Assets/{customPathWithFileName}/{fileName}.asset";
+                }
+            }
+
+            path = path.Replace("Assets/Assets/", "Assets/");
+
             string dir = Path.GetDirectoryName(path);
             if (!Directory.Exists(dir) && dir != null) Directory.CreateDirectory(dir);
             AssetDatabase.CreateAsset(obj, path);
             EditorUtility.SetDirty(obj);
+            AssetDatabase.Refresh();
             return obj;
         }
 
-        public static T LoadAsset<T>(bool create = true) where T : ScriptableObject
+        public static T LoadAsset<T>(string customPathWithFileName, bool create = true) where T : ScriptableObject
         {
             string name = typeof(T).Name;
+
             string[] guids = AssetDatabase.FindAssets($"t:{name}");
             if (guids.Length == 0)
             {
                 if (!create) return null;
                 Debug.LogWarning($"{name} does not exist in the project. Creating a new one...");
-                return CreateAsset(name, ScriptableObject.CreateInstance<T>());
+                return CreateAsset(name, ScriptableObject.CreateInstance<T>(), customPathWithFileName);
             }
             string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            Debug.Log($"Loading {name} from {path}");
             return AssetDatabase.LoadAssetAtPath<T>(path);
+        }
+
+        public static T[] LoadAssets<T>(string assetDirectoryPath) where T : ScriptableObject
+        {
+            // filename can be anything. load all.
+            assetDirectoryPath = FixPathSlashes(assetDirectoryPath);
+            if (!assetDirectoryPath.EndsWith("/")) assetDirectoryPath += "/";
+            Debug.Log($"Loading assets of type {typeof(T).Name} from {assetDirectoryPath}");
+            string[] guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { assetDirectoryPath });
+            if (guids.Length == 0)
+            {
+                Debug.LogWarning($"No assets of type {typeof(T).Name} found in {assetDirectoryPath}");
+                return null;
+            }
+            else
+            {
+                Debug.Log($"Found {guids.Length} assets of type {typeof(T).Name} in {assetDirectoryPath}");
+            }
+            T[] assets = new T[guids.Length];
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                if (path == null)
+                {
+                    Debug.LogError($"Failed to load asset at {guids[i]}");
+                    continue;
+                }
+                assets[i] = AssetDatabase.LoadAssetAtPath<T>(path);
+            }
+            return assets;
         }
 
         public static Texture2D LoadTexture(string assetName, ref Dictionary<string, Texture2D> cache)
@@ -104,28 +165,63 @@ namespace Glitch9
             return obj;
         }
 
-        public static TScriptableObject CreateResourcesAsset<TScriptableObject>(string objectName = null) where TScriptableObject : ScriptableObject
+        public static TScriptableObject CreateResourcesAsset<TScriptableObject>(string objectName = null, string customPath = null) where TScriptableObject : ScriptableObject
         {
             if (string.IsNullOrEmpty(objectName)) objectName = typeof(TScriptableObject).Name;
             TScriptableObject asset = ScriptableObject.CreateInstance<TScriptableObject>();
-            AssetDatabase.CreateAsset(asset, $"Assets/Resources/{objectName}.asset");
+            string resourcesPath = customPath ?? ASSETS_RESOURCES;
+            AssetDatabase.CreateAsset(asset, $"{resourcesPath}/{objectName}.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             return asset;
         }
+#endif
 
-        public static T LoadResourceAsset<T>(bool create = false) where T : ScriptableObject
+        public static T LoadResource<T>(bool create = false) where T : ScriptableObject
         {
-            string name = typeof(T).Name;
-            string path = $"Assets/Resources/{name}.asset";
-            T asset = AssetDatabase.LoadAssetAtPath<T>(path);
-            if (asset == null && create)
+            return LoadResource<T>(null, create);
+        }
+
+
+        public static T LoadResource<T>(string customPathWithFileName, bool create = false) where T : ScriptableObject
+        {
+            string assetPath = string.IsNullOrEmpty(customPathWithFileName) ? ASSETS_RESOURCES : customPathWithFileName;
+
+#if UNITY_EDITOR
+            return LoadAsset<T>(assetPath, create);
+#else
+            return LoadResourceInternal<T>(assetPath);
+#endif
+        }
+
+        public static T[] LoadAllResources<T>(string customResourcesPath, string subDirectory) where T : ScriptableObject
+        {
+#if UNITY_EDITOR
+            return LoadAssets<T>($"{customResourcesPath}/{subDirectory}");
+#else
+            return LoadResourcesInternal<T>(subDirectory);
+#endif
+        }
+
+        private static T LoadResourceInternal<T>(string path) where T : ScriptableObject
+        {
+            if (Path.HasExtension(path)) // if path contains extension, remove it
             {
-                Debug.LogWarning($"{name} does not exist in the project. Creating a new one...");
-                return CreateResourcesAsset<T>();
+                string fileName = Path.GetFileNameWithoutExtension(path);
+                string dir = Path.GetDirectoryName(path);
+                path = $"{dir}/{fileName}";
             }
+            T asset = Resources.Load<T>(path);
+            if (asset == null) Debug.LogWarning($"{path} does not exist in the Resources folder.");
             return asset;
         }
+
+        private static T[] LoadResourcesInternal<T>(string subDirectory) where T : ScriptableObject
+        {
+            T[] assets = Resources.LoadAll<T>(subDirectory);
+            if (assets.Length == 0) Debug.LogWarning($"{subDirectory} does not exist in the Resources folder.");
+            return assets;
+        }
+
     }
 }
-#endif

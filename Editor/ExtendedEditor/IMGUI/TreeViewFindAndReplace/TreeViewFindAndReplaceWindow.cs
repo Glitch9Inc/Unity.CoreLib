@@ -157,7 +157,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             GUILayout.BeginVertical(TreeViewStyles.FindAndReplaceLayout);
             {
-                EGUILayout.Title(_windowTitle);
+                InternalGUI.Title(_windowTitle);
 
                 GUILayout.Space(5);
 

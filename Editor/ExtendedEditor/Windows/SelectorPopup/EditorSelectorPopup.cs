@@ -41,7 +41,7 @@ namespace Glitch9.ExtendedEditor
             // Draw Title
             if (ShowTitle)
             {
-                EGUILayout.Title(Title);
+                InternalGUI.Title(Title);
             }
             else
             {

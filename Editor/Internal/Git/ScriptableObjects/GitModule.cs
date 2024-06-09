@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Glitch9.Internal.Git
 {
-    [CreateAssetMenu(fileName = "GitModule", menuName = "Glitch9/GitModule", order = 0)]
+    [CreateAssetMenu(fileName = nameof(GitModule), menuName = UnityMenu.Utility.CREATE_GIT_MODULE, order = UnityMenu.Utility.ORDER_GIT_MODULE)]
     public class GitModule : ScriptableObject
     {
         [SerializeField] private string gitUrl;

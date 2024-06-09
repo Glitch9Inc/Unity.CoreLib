@@ -1,7 +1,7 @@
+using Glitch9.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Glitch9.UI;
 using UnityEditor;
 using UnityEngine;
 using MessageType = UnityEditor.MessageType;
@@ -11,92 +11,7 @@ namespace Glitch9.ExtendedEditor
 {
     public partial class EGUILayout
     {
-        #region CheckBox
-        public static bool CheckBox(string label, bool value)
-        {
-            GUILayout.BeginHorizontal();
-            value = EditorGUILayout.Toggle(value, GUILayout.Width(10));
-            GUILayout.Label(new GUIContent(label), GUILayout.MinWidth(10));
-            GUILayout.EndHorizontal();
-            return value;
-        }
-
-        #endregion
-
-        #region Toggle
-        public static bool Toggle(GUIContent content, bool isOn, params GUILayoutOption[] options)
-        {
-            if (isOn) GUI.backgroundColor = new Color(0.5f, 0.9f, 0.9f);
-            if (GUILayout.Button(content, options))
-            {
-                isOn = !isOn;
-            }
-            GUI.backgroundColor = Color.white;
-            return isOn;
-        }
-        public static bool Toggle(string label, bool isOn, params GUILayoutOption[] options)
-            => Toggle(new GUIContent(label), isOn, options);
-        public static bool Toggle(Texture2D tex, bool isOn, params GUILayoutOption[] options)
-            => Toggle(new GUIContent(tex), isOn, options);
-        #endregion
-
-        #region ToolBarToggle
-        public static bool ToolBarMid(GUIContent content, bool isOn, params GUILayoutOption[] options)
-            => GUILayout.Toggle(isOn, content, EditorStyles.miniButtonMid, options);
-        public static bool ToolBarMid(string label, bool isOn, params GUILayoutOption[] options)
-            => ToolBarMid(new GUIContent(label), isOn, options);
-        public static bool ToolBarMid(Texture2D tex, bool isOn, params GUILayoutOption[] options)
-            => ToolBarMid(new GUIContent(tex), isOn, options);
-        public static bool ToolBarLeft(GUIContent content, bool isOn, params GUILayoutOption[] options)
-            => GUILayout.Toggle(isOn, content, EditorStyles.miniButtonLeft, options);
-        public static bool ToolBarLeft(string label, bool isOn, params GUILayoutOption[] options)
-            => ToolBarLeft(new GUIContent(label), isOn, options);
-        public static bool ToolBarLeft(Texture2D tex, bool isOn, params GUILayoutOption[] options)
-            => ToolBarLeft(new GUIContent(tex), isOn, options);
-        public static bool ToolBarRight(GUIContent content, bool isOn, params GUILayoutOption[] options)
-            => GUILayout.Toggle(isOn, content, EditorStyles.miniButtonRight, options);
-        public static bool ToolBarRight(string label, bool isOn, params GUILayoutOption[] options)
-            => ToolBarRight(new GUIContent(label), isOn, options);
-        public static bool ToolBarRight(Texture2D tex, bool isOn, params GUILayoutOption[] options)
-            => ToolBarRight(new GUIContent(tex), isOn, options);
-        #endregion
-
-        #region BoxedLabel
-        public static void BoxedLabel(GUIContent label, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter), options);
-        public static void BoxedLabel(GUIContent label, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, color), options);
-        public static void BoxedLabel(GUIContent label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
-        public static void BoxedLabel(GUIContent label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, color), options);
-        public static void BoxedLabel(GUIContent label, TextAnchor alignment = TextAnchor.MiddleCenter, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, color), options);
-
-        public static void BoxedLabel(string label, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter), options);
-        public static void BoxedLabel(string label, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, color), options);
-        public static void BoxedLabel(string label, int fontSize, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize), options);
-        public static void BoxedLabel(string label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
-        public static void BoxedLabel(string label, int fontSize, TextAnchor alignment, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, GUIColor.None), options);
-        public static void BoxedLabel(string label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, color), options);
-        public static void BoxedLabel(string label, TextAnchor alignment = TextAnchor.MiddleCenter, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, color), options);
-        #endregion
-
-        #region TableBox
-        public static void TableBox(string label, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.TableBox(fontSize, color), options);
-        public static void TableBox(string label, int fontSize = 12, params GUILayoutOption[] options)
-            => EditorGUILayout.LabelField(label, EGUIStyles.TableBox(fontSize, GUIColor.None), options);
-        #endregion
-
-        #region Label
+        #region Labels
         public static void Label(GUIContent label, params GUILayoutOption[] options)
             => EditorGUILayout.LabelField(label, EGUIStyles.Label(TextAnchor.UpperLeft), options);
         public static void Label(GUIContent label, GUIColor color, params GUILayoutOption[] options)
@@ -128,7 +43,108 @@ namespace Glitch9.ExtendedEditor
             => EditorGUILayout.LabelField(label, EGUIStyles.Label(alignment, fontSize, color), options);
         #endregion
 
-        #region InfoLabel
+        #region CheckBox
+        public static bool CheckBox(string label, bool value)
+        {
+            GUILayout.BeginHorizontal();
+            value = EditorGUILayout.Toggle(value, GUILayout.Width(10));
+            GUILayout.Label(new GUIContent(label), GUILayout.MinWidth(10));
+            GUILayout.EndHorizontal();
+            return value;
+        }
+
+        #endregion
+
+        #region Toggles
+        public static bool Toggle(GUIContent content, bool isOn, params GUILayoutOption[] options)
+        {
+            if (isOn) GUI.backgroundColor = new Color(0.5f, 0.9f, 0.9f);
+            if (GUILayout.Button(content, options))
+            {
+                isOn = !isOn;
+            }
+            GUI.backgroundColor = Color.white;
+            return isOn;
+        }
+        public static bool Toggle(string label, bool isOn, params GUILayoutOption[] options)
+            => Toggle(new GUIContent(label), isOn, options);
+        public static bool Toggle(Texture2D tex, bool isOn, params GUILayoutOption[] options)
+            => Toggle(new GUIContent(tex), isOn, options);
+        #endregion
+
+        #region Toolbar Toggles
+        public static bool ToolbarMid(GUIContent content, bool isOn, params GUILayoutOption[] options)
+            => GUILayout.Toggle(isOn, content, EditorStyles.miniButtonMid, options);
+        public static bool ToolbarMid(string label, bool isOn, params GUILayoutOption[] options)
+            => ToolbarMid(new GUIContent(label), isOn, options);
+        public static bool ToolbarMid(Texture2D tex, bool isOn, params GUILayoutOption[] options)
+            => ToolbarMid(new GUIContent(tex), isOn, options);
+        public static bool ToolbarLeft(GUIContent content, bool isOn, params GUILayoutOption[] options)
+            => GUILayout.Toggle(isOn, content, EditorStyles.miniButtonLeft, options);
+        public static bool ToolbarLeft(string label, bool isOn, params GUILayoutOption[] options)
+            => ToolbarLeft(new GUIContent(label), isOn, options);
+        public static bool ToolbarLeft(Texture2D tex, bool isOn, params GUILayoutOption[] options)
+            => ToolbarLeft(new GUIContent(tex), isOn, options);
+        public static bool ToolbarRight(GUIContent content, bool isOn, params GUILayoutOption[] options)
+            => GUILayout.Toggle(isOn, content, EditorStyles.miniButtonRight, options);
+        public static bool ToolbarRight(string label, bool isOn, params GUILayoutOption[] options)
+            => ToolbarRight(new GUIContent(label), isOn, options);
+        public static bool ToolbarRight(Texture2D tex, bool isOn, params GUILayoutOption[] options)
+            => ToolbarRight(new GUIContent(tex), isOn, options);
+        #endregion
+
+        #region BoxedLabel
+        public static void BoxedLabel(GUIContent label, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter), options);
+        public static void BoxedLabel(GUIContent label, GUIColor color, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, color), options);
+        public static void BoxedLabel(GUIContent label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
+        public static void BoxedLabel(GUIContent label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, color), options);
+        public static void BoxedLabel(GUIContent label, TextAnchor alignment = TextAnchor.MiddleCenter, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, color), options);
+
+        public static void BoxedLabel(string label, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter), options);
+        public static void BoxedLabel(string label, GUIColor color, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, color), options);
+        public static void BoxedLabel(string label, int fontSize, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize), options);
+        public static void BoxedLabel(string label, int fontSize, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(TextAnchor.MiddleCenter, fontSize, color), options);
+        public static void BoxedLabel(string label, int fontSize, TextAnchor alignment, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, GUIColor.None), options);
+        public static void BoxedLabel(string label, TextAnchor alignment, GUIColor color, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, color), options);
+        public static void BoxedLabel(string label, TextAnchor alignment = TextAnchor.MiddleCenter, int fontSize = 12, GUIColor color = GUIColor.None, params GUILayoutOption[] options)
+            => EditorGUILayout.LabelField(label, EGUIStyles.Box(alignment, fontSize, color), options);
+        #endregion
+
+        #region Boxed Layout
+
+        public static void BoxedLayout(string label, Action callback, Texture texture = null)
+        {
+            Rect r = (Rect)EditorGUILayout.BeginVertical(EGUI.skin.box);
+            if (texture == null) texture = EditorIcons.NoImageHighRes;
+            /* Header */
+            GUI.DrawTexture(new Rect(r.position.x + 10, r.position.y + 5, 24, 24), texture);
+            GUI.skin.label.fontSize = 14;
+            GUI.Label(EGUI.GetHeaderRect(r, indent: 40, width: r.width), label.ToUpper());
+            GUI.skin.label.fontSize = 12;
+            GUILayout.Space(30);
+            callback?.Invoke();
+            EditorGUILayout.EndVertical();
+        }
+
+        public static void BoxedLayout(GUIContent label, Action callback, Texture texture = null)
+        {
+            BoxedLayout(label.text, callback, texture);
+        }
+
+        #endregion
+ 
+        #region Info Fields
 
         public static void InfoField(string label, string info, float labelWidth = -1f, int infoFontSize = 12, bool boldLabel = false, params GUILayoutOption[] options)
         {
@@ -162,44 +178,15 @@ namespace Glitch9.ExtendedEditor
 
         #endregion
 
-        #region DescriptionField
+        #region Description Fields
         public static string DescriptionField(string text, params GUILayoutOption[] options)
             => EditorGUILayout.TextArea(text, EGUI.skin.textArea, options);
         public static string DescriptionField(SerializedProperty property, params GUILayoutOption[] options)
             => EditorGUILayout.TextArea(property.stringValue, EGUI.skin.textArea, options);
         #endregion
 
-        #region Horizontal/VerticalLayout
-        public static void HorizontalLayout(Action action, params GUILayoutOption[] options)
-        {
-            GUILayout.BeginHorizontal(options);
-            action();
-            GUILayout.EndHorizontal();
-        }
-
-        public static void VerticalLayout(Action action, params GUILayoutOption[] options)
-        {
-            GUILayout.BeginVertical(options);
-            action();
-            GUILayout.EndVertical();
-        }
-
-        public static void HorizontalLayout(GUIStyle style, Action action, params GUILayoutOption[] options)
-        {
-            GUILayout.BeginHorizontal(style, options);
-            action();
-            GUILayout.EndHorizontal();
-        }
-
-        public static void VerticalLayout(GUIStyle style, Action action, params GUILayoutOption[] options)
-        {
-            GUILayout.BeginVertical(style, options);
-            action();
-            GUILayout.EndVertical();
-        }
-        #endregion
-
-        #region TextureField
+        #region Texture Fields
+        
         public static void TextureField(Texture texture, Vector2? size = null, float yOffset = 0)
         {
             try
@@ -217,9 +204,10 @@ namespace Glitch9.ExtendedEditor
             => TextureField(asset == null ? null : AssetPreview.GetAssetPreview(asset), size);
         public static void TextureField(GUIContent content, Vector2? size = null)
             => TextureField(content.image, size);
+        
         #endregion
 
-        #region DateTimeField       
+        #region DateTime Fields   
         public static DateTime DateTimeField(string label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
         {
             EditorGUILayout.BeginHorizontal(options);
@@ -731,30 +719,6 @@ namespace Glitch9.ExtendedEditor
 
         #endregion
 
-        public static TEnum ResizableEnumPopup<TEnum>(TEnum selected, GUIContent label, params GUILayoutOption[] options) where TEnum : Enum
-        {
-            string[] names = EnumUtils.GetNames(typeof(TEnum));
-            int index = Array.IndexOf(names, selected.ToString());
-            // The regular EnumPopup has a fixed height, so we need to use a custom implementation to make it resizable.
-            // Make a button that shows the currently selected enum value, with a dropdown arrow to the right.
-            if (EditorGUILayout.DropdownButton(label, FocusType.Passive, options))
-            {
-                // When the button is clicked, show a dropdown with all the enum values.
-                GenericMenu menu = new();
-                for (int i = 0; i < names.Length; i++)
-                {
-                    int localIndex = i;
-                    menu.AddItem(new GUIContent(names[i]), i == index, () =>
-                    {
-                        index = localIndex;
-                    });
-                }
-                menu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
-            }
-
-            return (TEnum)Enum.Parse(typeof(TEnum), names[index]);
-        }
-
         #region Non-Editable Field
 
         public static void NonEditableField(string label, string value)
@@ -770,6 +734,89 @@ namespace Glitch9.ExtendedEditor
             GUILayout.EndHorizontal();
         }
 
+        #endregion
+
+        #region Reverse Bool Field
+
+        public static bool ReverseBoolField(string label, SerializedProperty p)
+        {
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(p, GUIContent.none, GUILayout.Width(10));
+            label ??= p.displayName;
+            GUILayout.Label(new GUIContent(label), GUILayout.MinWidth(10));
+            GUILayout.EndHorizontal();
+            return p.boolValue;
+        }
+
+        public static bool ReverseBoolField(SerializedProperty p)
+        {
+            return ReverseBoolField(null, p);
+        }
+
+        #endregion
+
+        #region Foldout
+        
+        public static void Foldout(string label, Action callback)
+        {
+            int space = 3;
+            EGUIUtility.DrawHorizontalLine(1);
+            GUILayout.Space(space);
+            bool b = EditorPrefs.GetBool(label, true);
+            b = EditorGUILayout.Foldout(b, label, EGUIStyles.foldout);
+            EditorPrefs.SetBool(label, b);
+
+            if (b)
+            {
+                GUILayout.Space(space);
+                EGUIUtility.DrawHorizontalLine(1);
+
+                GUIStyle style = new();
+                style.margin = new RectOffset(0, 0, 10, 10);
+
+                GUILayout.BeginVertical(style);
+                callback?.Invoke();
+                GUILayout.EndVertical();
+            }
+            else
+            {
+                GUILayout.Space(space);
+                EGUIUtility.DrawHorizontalLine(1);
+            }
+
+            GUILayout.Space(-space);
+        }
+
+        #endregion
+
+        #region [Deprecated] Horizontal/VerticalLayout
+        public static void HorizontalLayout(Action action, params GUILayoutOption[] options)
+        {
+            GUILayout.BeginHorizontal(options);
+            action();
+            GUILayout.EndHorizontal();
+        }
+
+        public static void VerticalLayout(Action action, params GUILayoutOption[] options)
+        {
+            GUILayout.BeginVertical(options);
+            action();
+            GUILayout.EndVertical();
+        }
+
+        public static void HorizontalLayout(GUIStyle style, Action action, params GUILayoutOption[] options)
+        {
+            GUILayout.BeginHorizontal(style, options);
+            action();
+            GUILayout.EndHorizontal();
+        }
+
+        public static void VerticalLayout(GUIStyle style, Action action, params GUILayoutOption[] options)
+        {
+            GUILayout.BeginVertical(style, options);
+            action();
+            GUILayout.EndVertical();
+        }
         #endregion
     }
 }

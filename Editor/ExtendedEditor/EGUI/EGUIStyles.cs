@@ -319,5 +319,20 @@ namespace Glitch9.ExtendedEditor
             return style;
         }
 
+        public static GUIStyle Popup(int fontSize)
+        {
+            string key = $"popup_{fontSize}";
+            if (!_cache.TryGetValue(key, out GUIStyle style))
+            {
+                style = new GUIStyle(EditorStyles.popup)
+                {
+                    fontSize = fontSize,
+                    alignment = TextAnchor.MiddleLeft,
+                    wordWrap = true
+                };
+                _cache[key] = style;
+            }
+            return style;
+        }
     }
 }

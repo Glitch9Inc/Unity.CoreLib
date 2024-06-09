@@ -6,6 +6,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
 {
     public class TreeViewStyles
     {
+        private static class EGUISkinStyles
+        {
+            internal const string TREEVIEW_ITEM = "treeviewitem";
+            internal const string TREEVIEW_GROUP = "treeviewgroup";
+        }
+        
         private static readonly Dictionary<string, GUIStyle> _styles = new();
         private static GUIStyle Get(string key, GUIStyle defaultStyle)
         {
@@ -70,10 +76,40 @@ namespace Glitch9.ExtendedEditor.IMGUI
             stretchWidth = true,
             stretchHeight = true
         });
+ 
+        public static GUIStyle TreeViewItem => Get(nameof(TreeViewItem), EGUI.skin.GetStyle(EGUISkinStyles.TREEVIEW_ITEM));
+        public static GUIStyle TreeViewGroup => Get(nameof(TreeViewGroup), EGUI.skin.GetStyle(EGUISkinStyles.TREEVIEW_GROUP));
 
-        internal const string STYLE_TREEVIEW_ITEM = "treeviewitem";
-        internal const string STYLE_TREEVIEW_GROUP = "treeviewgroup";
-        public static GUIStyle TreeViewItem => Get(nameof(TreeViewItem), EGUI.skin.GetStyle(STYLE_TREEVIEW_ITEM));
-        public static GUIStyle TreeViewGroup => Get(nameof(TreeViewGroup), EGUI.skin.GetStyle(STYLE_TREEVIEW_GROUP));
+        public static GUIStyle TextField(int fontSize = 12, GUIColor color = GUIColor.None) => GetTextFieldStyle(fontSize, color, 3, 3);
+        private static GUIStyle GetTextFieldStyle(int fontSize, GUIColor color, int leftOverflow, int rightOverflow)
+        {
+            string key = $"textfield_{fontSize}_{color}_{leftOverflow}_{rightOverflow}";
+            Texture2D texDefault = EditorGUITextures.TextField(color);
+            Texture2D texFocused = EditorGUITextures.TextField(color, true);
+            if (texDefault == null || texFocused == null) Debug.LogError("TextField texture is null");
+
+            return Get(key, new GUIStyle(GUI.skin.textField)
+            {
+                border = new RectOffset(5, 5, 5, 5),
+                margin = new RectOffset(0, 0, 0, 0),
+                padding = new RectOffset(4, 4, 4, 4),
+                overflow = new RectOffset(leftOverflow, rightOverflow, 0, 0),
+                stretchWidth = true,
+                stretchHeight = true,
+                fontSize = fontSize,
+                normal =
+                {
+                    background = texDefault,
+                    scaledBackgrounds = new Texture2D[]{ texDefault }
+                },
+                focused =
+                {
+                    background = texFocused,
+                    scaledBackgrounds = new Texture2D[]{ texFocused }
+                },
+                alignment = TextAnchor.UpperLeft,
+                wordWrap = true
+            });
+        }
     }
 }
