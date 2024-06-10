@@ -24,17 +24,32 @@ namespace Glitch9.Internal
 
         public const string URL_SUPPORT_REPO = "https://github.com/Glitch9Inc/Glitch9-Support";
 
+        public static class Game
+        {
+            private const string NAME = "Game";
+            private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
+            private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
+
+            public const string CREATE_GAME_SETTINGS = CREATE_PATH + "Game Settings";
+            public const string CREATE_ITEM_SETTINGS = CREATE_PATH + "Item Settings";
+            public const string CREATE_SEASON_PASS_SETTINGS = CREATE_PATH + "Season Pass Settings";
+
+            public const int ORDER_CREATE_GAME_SETTINGS = STARTING_CREATE_MENU_ORDER;
+            public const int ORDER_CREATE_ITEM_SETTINGS = ORDER_CREATE_GAME_SETTINGS + NEXT_ROW;
+            public const int ORDER_CREATE_SEASON_PASS_SETTINGS = ORDER_CREATE_ITEM_SETTINGS + NEXT_ROW;
+        }
+
+
         public static class Support
         {
             private const string PATH = ROOT_TOOL_PATH + "Support/";
-            
+
             public const string PATH_REPORT_AN_ISSUE = PATH + NAME_REPORT_ISSUES;
             public const string PATH_RELOAD_SKINS = PATH + "Reload EditorGUI Skins";
             public const string PATH_RENAME_UI_PREFAB_RESOURCES = PATH + "Rename UIPrefabResource Files";
 
-            
             public const int PRIORITY_REPORT_AN_ISSUE = STARTING_SUPPORT_MENU_PRIORITY;
-            
+
             public const int PRIORITY_RELOAD_SKINS = PRIORITY_REPORT_AN_ISSUE + ADD_SEPARATOR;
             public const int PRIORITY_RENAME_UI_PREFAB_RESOURCES = PRIORITY_RELOAD_SKINS - 1;
 
@@ -61,7 +76,6 @@ namespace Glitch9.Internal
 
             public const int ORDER_PACKAGE_EXPORTER = STARTING_CREATE_MENU_ORDER + 2000;
             public const int ORDER_GIT_MODULE = ORDER_PACKAGE_EXPORTER + NEXT_ROW;
-
         }
 
         // AI Development Kit
