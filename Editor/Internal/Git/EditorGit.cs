@@ -92,7 +92,7 @@ namespace Glitch9.Internal.Git
 
         private void OnGitOutput(GitOutput output)
         {
-            if (_gitOutputs.Contains(output)) return;
+            //if (_gitOutputs.Contains(output)) return;
 
             _gitOutputs.Add(output);
             _gitOutputUpdated++;
@@ -106,7 +106,7 @@ namespace Glitch9.Internal.Git
             {
                 _commitMessage.Value = commitMessage;
             }
-          
+
             _saveCommitMessage.Value = saveCommitMessage;
         }
 
@@ -180,7 +180,7 @@ namespace Glitch9.Internal.Git
                     saveCommitMessage = GUILayout.Toggle(saveCommitMessage, "Save");
                 }
                 GUILayout.EndHorizontal();
-       
+
                 commitMessage = EditorGUILayout.TextField(commitMessage);
             }
             GUILayout.EndVertical();
@@ -296,10 +296,7 @@ namespace Glitch9.Internal.Git
 
                 if (GUILayout.Button("Master => Main"))
                 {
-                    if (EGUI.Confirmation("Are you sure you want to continue?"))
-                    {
-                        RunGitCommandsAsync("branch -m master main");
-                    }
+                    RunGitCommandsAsync("branch -m master main");
                 }
             }
             GUILayout.EndHorizontal();
@@ -309,49 +306,37 @@ namespace Glitch9.Internal.Git
         {
             EditorGUILayout.LabelField("Debug Settings", EditorStyles.boldLabel);
 
-            DrawTrueOrFalseButton("core.autocrlf", _git.ConfigureLocalCoreAutoCRLFAsync);
-            DrawTrueOrFalseButton("core.autocrlf (global)", _git.ConfigureGlobalCoreAutoCRLFAsync);
+            EditorGitGUI.DrawTrueOrFalseButton("core.autocrlf", _git.ConfigureLocalCoreAutoCRLFAsync);
+            EditorGitGUI.DrawTrueOrFalseButton("core.autocrlf (global)", _git.ConfigureGlobalCoreAutoCRLFAsync);
+            EditorGitGUI.DrawSetOrUnsetButton("Upstream to origin", SetUpstreamToOrigin);
 
             GUILayout.BeginHorizontal();
             {
+                GUILayout.Label("Other Commands", GUILayout.Width(240));
+
                 if (GUILayout.Button("Normalize Line Endings"))
                 {
                     RunGitCommandsAsync("add --renormalize .");
                 }
 
-                if (GUILayout.Button("Set Upstream to Origin"))
+                if (GUILayout.Button("Push tag"))
                 {
-                    RunGitCommandsAsync($"branch --set-upstream-to=origin/{_gitBranch}");
-                }
-
-                if (GUILayout.Button("Fix Code 128"))
-                {
-                    string localDirWithoutAssets = _localDir.Replace("Assets/", "");
-                    string fullPath = Application.dataPath + "/" + localDirWithoutAssets;
-                    // fix slashes
-                    fullPath = fullPath.Replace("\\", "/");
-                    fullPath = fullPath.Replace("Assets/Assets", "Assets");
-                    RunGitCommandsAsync($"config --global --add safe.directory {fullPath}");
+                    _git.PushVersionTagAsync();
                 }
             }
             GUILayout.EndHorizontal();
         }
 
-        private void DrawTrueOrFalseButton(string label, Action<bool> action)
+        private void SetUpstreamToOrigin(bool isSet)
         {
-            GUILayout.BeginHorizontal();
+            if (isSet)
             {
-                GUILayout.Label(label, GUILayout.Width(200));
-                if (GUILayout.Button("True"))
-                {
-                    action(true);
-                }
-                if (GUILayout.Button("False"))
-                {
-                    action(false);
-                }
+                RunGitCommandsAsync($"branch --set-upstream-to=origin/{_gitBranch}");
             }
-            GUILayout.EndHorizontal();
+            else
+            {
+                RunGitCommandsAsync($"branch --unset-upstream");
+            }
         }
 
         private void GoToBottom()
@@ -396,7 +381,7 @@ namespace Glitch9.Internal.Git
                 _gitOutputs.Add(new GitOutput("Empty Command"));
                 return;
             }
-            await _git.RunGitCommandAsync(_commandLine, true);
+            await _git.RunGitCommandAsync(_commandLine, true, true);
             _commandLine = "";
         }
 
@@ -416,7 +401,7 @@ namespace Glitch9.Internal.Git
                     continue;
                 }
 
-                IResult iResult = await _git.RunGitCommandAsync(command, true);
+                IResult iResult = await _git.RunGitCommandAsync(command, true, true);
                 if (iResult.IsSuccess) return;
             }
         }

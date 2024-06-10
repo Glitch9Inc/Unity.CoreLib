@@ -33,7 +33,7 @@ namespace Glitch9
             FieldInfo field = type.GetField(enumName);
             if (field != null)
             {
-                DisplayNameAttribute nameAttribute = CachedAttribute<DisplayNameAttribute>.Get(field);
+                DisplayNameAttribute nameAttribute = AttributeCache<DisplayNameAttribute>.Get(field);
 
                 if (nameAttribute != null)
                 {

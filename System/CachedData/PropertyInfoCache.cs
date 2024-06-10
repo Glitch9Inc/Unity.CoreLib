@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Glitch9
 {
-    public static class CachedPropertyInfo
+    public static class PropertyInfoCache
     {
         private static readonly ConcurrentDictionary<Type, List<PropertyInfo>> k_TypePropertyInfoCache = new();
 
