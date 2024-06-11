@@ -214,18 +214,18 @@ namespace Glitch9.Internal.Git
             DrawCommitMessageTextField();
 
             EGUILayout.MultiButton("Upload (Commit & Push)",
-                new EGUIButtonEntry("Default", () => GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, false))),
-                new EGUIButtonEntry("Force", () => GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, true))));
+                new EGUIButtonEntry("Commit & Push", () => GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, false))),
+                new EGUIButtonEntry("Force Push", () => GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, true))));
 
             EGUILayout.MultiButton("Download (Pull)",
-                new EGUIButtonEntry("Default", () => RunGitCommandsAsync("pull")),
-                new EGUIButtonEntry("Force", () => RunGitCommandsAsync("fetch --all", "reset --hard origin/master")));
+                new EGUIButtonEntry("Pull", () => RunGitCommandsAsync("pull")),
+                new EGUIButtonEntry("Force Pull (Hard Reset)", () => RunGitCommandsAsync("fetch --all", "reset --hard origin/master")));
         }
 
         private void DrawMergeMenu()
         {
             EGUILayout.MultiButton("Merge",
-                new EGUIButtonEntry("Default", () => MergeAsync(MergeStrategy.NoFastForward)),
+                new EGUIButtonEntry("Default (No Fast Forward)", () => MergeAsync(MergeStrategy.NoFastForward)),
                 new EGUIButtonEntry("Keep Ours", () => MergeAsync(MergeStrategy.Ours)),
                 new EGUIButtonEntry("Keep Theirs", () => MergeAsync(MergeStrategy.Theirs)));
         }
