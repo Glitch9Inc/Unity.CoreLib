@@ -225,7 +225,7 @@ namespace Glitch9.Internal.Git
         private void DrawMergeMenu()
         {
             EGUILayout.MultiButton("Merge",
-                new EGUIButtonEntry("Default (No Fast Forward)", () => MergeAsync(MergeStrategy.NoFastForward)),
+                new EGUIButtonEntry("No Fast Forward", () => MergeAsync(MergeStrategy.NoFastForward)),
                 new EGUIButtonEntry("Keep Ours", () => MergeAsync(MergeStrategy.Ours)),
                 new EGUIButtonEntry("Keep Theirs", () => MergeAsync(MergeStrategy.Theirs)));
         }
