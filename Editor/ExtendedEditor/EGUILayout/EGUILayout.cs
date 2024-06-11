@@ -143,7 +143,7 @@ namespace Glitch9.ExtendedEditor
         }
 
         #endregion
- 
+
         #region Info Fields
 
         public static void InfoField(string label, string info, float labelWidth = -1f, int infoFontSize = 12, bool boldLabel = false, params GUILayoutOption[] options)
@@ -186,7 +186,7 @@ namespace Glitch9.ExtendedEditor
         #endregion
 
         #region Texture Fields
-        
+
         public static void TextureField(Texture texture, Vector2? size = null, float yOffset = 0)
         {
             try
@@ -204,7 +204,7 @@ namespace Glitch9.ExtendedEditor
             => TextureField(asset == null ? null : AssetPreview.GetAssetPreview(asset), size);
         public static void TextureField(GUIContent content, Vector2? size = null)
             => TextureField(content.image, size);
-        
+
         #endregion
 
         #region DateTime Fields   
@@ -756,7 +756,7 @@ namespace Glitch9.ExtendedEditor
         #endregion
 
         #region Foldout
-        
+
         public static void Foldout(string label, Action callback)
         {
             int space = 3;
@@ -785,6 +785,62 @@ namespace Glitch9.ExtendedEditor
             }
 
             GUILayout.Space(-space);
+        }
+
+        #endregion
+
+        #region Multi Buttons
+
+        private const float MULTI_BUTTON_OFFSET = 0.5f;
+        public static void TrueOrFalseButton(string label, Action<bool> action)
+        {
+            BoolMultiButton(label, action, "True", "False");
+        }
+
+        public static void SetOrUnsetButton(string label, Action<bool> action)
+        {
+            BoolMultiButton(label, action, "Set", "Unset");
+        }
+
+        public static void BoolMultiButton(string label, Action<bool> action, string yes, string no)
+        {
+            GUILayout.BeginHorizontal();
+            {
+                GUILayout.Label(label);
+
+                float buttonWidth = (EditorGUIUtility.currentViewWidth - EditorGUIUtility.labelWidth) / 2;
+                buttonWidth -= MULTI_BUTTON_OFFSET * 2;
+
+                if (GUILayout.Button(yes, GUILayout.Width(buttonWidth)))
+                {
+                    action(true);
+                }
+                if (GUILayout.Button(no, GUILayout.Width(buttonWidth)))
+                {
+                    action(false);
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        public static void MultiButton(string label, params EGUIButtonEntry[] buttonEntries)
+        {
+            GUILayout.BeginHorizontal();
+            {
+                GUILayout.Label(label);
+
+                float buttonWidth = (EditorGUIUtility.currentViewWidth - EditorGUIUtility.labelWidth) / buttonEntries.Length;
+                buttonWidth -= MULTI_BUTTON_OFFSET * buttonEntries.Length;
+
+                foreach (EGUIButtonEntry entry in buttonEntries)
+                {
+                    if (GUILayout.Button(entry.label, GUILayout.Width(buttonWidth)))
+                    {
+                        entry.action?.Invoke();
+                    }
+                }
+            }
+            GUILayout.EndHorizontal();
         }
 
         #endregion

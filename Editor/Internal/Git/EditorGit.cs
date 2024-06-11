@@ -1,415 +1,339 @@
-using Glitch9.ExtendedEditor;
 using System;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using Debug = UnityEngine.Debug;
 
 namespace Glitch9.Internal.Git
 {
     public class EditorGit
     {
-        internal bool IsInitialized { get; set; } = false;
+        #region Status Checks
 
-        private GitManager _git;
-        private Vector2 _scrollPosition;
-        private List<GitOutput> _gitOutputs;
-        private Action _onRepaint;
+        public bool PullAvailable => _remoteVersion > _localVersion && _remoteVersion.Build != 0 && _localVersion.Build != 0;
+        public bool PushAvailable => _remoteVersion < _localVersion && _remoteVersion.Build != 0 && _localVersion.Build != 0;
 
-        private string _gitUrl;
-        private string _repoName;
-        private string _gitBranch;
-        private string _localDir;
-
-        private string commitMessage;
-        private EPrefs<string> _commitMessage;
-
-        private bool saveCommitMessage;
-        private EPrefs<bool> _saveCommitMessage;
-
-        private string _commandLine;
-        private int _gitOutputUpdated = 0;
-        private bool _isInitializing = false;
+        #endregion
 
 
-        private readonly Dictionary<GitOutputStatus, Color> _gitOutputColors = new()
+        public event Action<GitOutput> OnGitOutput;
+
+        private readonly string _gitBranch;
+        private readonly string _localDir;
+        private readonly string _gitUrl; // should look like https://github.com/amaiichigopurin/CodeqoShared.git
+        private readonly string _repoName;
+
+        private readonly Action _onRepaint;
+
+
+        private GitVersion _localVersion;
+        private GitVersion _remoteVersion;
+        public GitVersion LocalVersion => _localVersion;
+        public GitVersion RemoteVersion => _remoteVersion;
+
+        public EditorGit(string repoName, string gitUrl, string gitBranch, string localDir, Action onRepaint)
         {
-            { GitOutputStatus.Success, Color.blue },
-            { GitOutputStatus.Warning, ExColor.firebrick },
-            { GitOutputStatus.Hint, Color.magenta },
-            { GitOutputStatus.Error, Color.red },
-            { GitOutputStatus.Fatal, Color.red },
-            { GitOutputStatus.Completed, ExColor.teal },
-        };
-
-        private static class Strings
-        {
-            internal const string MISSING_URL_OR_DIR = "Git URL and Local Directory must be set.";
-            internal const string NEW_VERSION_AVAILABLE = "New version available. Please download the latest version";
-            internal const string UP_TO_DATE = "You are up to date with the latest version.";
-        }
-
-        private GUIStyle GetColoredStyle(Color color)
-        {
-            return new(EditorStyles.wordWrappedLabel)
+            if (string.IsNullOrEmpty(repoName))
             {
-                normal = { textColor = color }
-            };
-        }
-
-        internal async void InitializeAsync(string gitUrl, string gitBranch, string localDir, Action onRepaint)
-        {
-            if (IsInitialized || _isInitializing) return;
-            _isInitializing = true;
-
-            if (string.IsNullOrEmpty(gitUrl) || string.IsNullOrEmpty(localDir))
-            {
-                Debug.LogError(Strings.MISSING_URL_OR_DIR);
-                return;
+                throw new ArgumentException("Project name cannot be null or empty.", nameof(repoName));
             }
 
-            string commitMessageKey = $"{gitUrl}-{gitBranch}-commitMessage";
-            _commitMessage = new EPrefs<string>(commitMessageKey, string.Empty);
-            commitMessage = _commitMessage.Value;
+            if (string.IsNullOrEmpty(localDir))
+            {
+                throw new ArgumentException("Working directory cannot be null or empty.", nameof(localDir));
+            }
 
-            string saveCommitMessageKey = $"{gitUrl}-{gitBranch}-saveCommitMessage";
-            _saveCommitMessage = new EPrefs<bool>(saveCommitMessageKey, false);
-            saveCommitMessage = _saveCommitMessage.Value;
+            if (string.IsNullOrEmpty(gitUrl))
+            {
+                throw new ArgumentException("Git URL cannot be null or empty.", nameof(gitUrl));
+            }
 
-            _gitOutputs = new List<GitOutput>();
-            _gitUrl = gitUrl;
-            _repoName = gitUrl.Substring(gitUrl.LastIndexOf('/') + 1);
-            _gitBranch = gitBranch;
-            _onRepaint = onRepaint;
+            if (string.IsNullOrEmpty(gitBranch))
+            {
+                throw new ArgumentException("Git branch cannot be null or empty.", nameof(gitBranch));
+            }
+
             _localDir = localDir;
-
-            _git = new GitManager(_repoName, gitUrl, gitBranch, localDir, onRepaint);
-            _git.OnGitOutput += OnGitOutput;
-
-            await _git.InitializeAsync();
-            IsInitialized = true;
-            _isInitializing = false;
+            _gitUrl = gitUrl;
+            _gitBranch = gitBranch;
+            _repoName = repoName;
+            _onRepaint = onRepaint;
         }
 
-        private void OnGitOutput(GitOutput output)
+        public async Task InitializeAsync()
         {
-            //if (_gitOutputs.Contains(output)) return;
+            _localVersion = GitVersion.CreateCurrentVersion(_repoName);
 
-            _gitOutputs.Add(output);
-            _gitOutputUpdated++;
-            GoToBottom();
-            _onRepaint?.Invoke();
-        }
-
-        internal void OnDestroy()
-        {
-            if (saveCommitMessage)
+            try
             {
-                _commitMessage.Value = commitMessage;
+                IResult iResult = await InitGitRepoAsync();
+                if (iResult.IsFailure) return;
+                iResult = await RetrieveRemoteVersionAsync();
+                if (iResult.IsFailure) return;
+                await ValidateBranch();
             }
-
-            _saveCommitMessage.Value = saveCommitMessage;
-        }
-
-        internal void DrawGit()
-        {
-            GUILayout.BeginVertical(EGUI.Box(3, 7));
+            catch (Exception e)
             {
-                GUILayout.Label($"{_repoName}-{_gitBranch} (Output {_gitOutputUpdated})", EditorStyles.boldLabel);
-                GUILayout.Space(3);
-                DrawVersionInfo();
-                DrawGitPanel();
-
-                // Menu Buttons
-                DrawPushAndPullMenu();
-                DrawRemoteMenu();
-                DrawBranchMenu();
-                DrawDebugMenu();
+                Debug.LogError(e);
             }
-            GUILayout.EndVertical();
-        }
-
-        private void DrawVersionInfo()
-        {
-            if (_git == null || _git.LocalVersion == null || _git.RemoteVersion == null) return;
-
-            GUILayout.BeginVertical(EGUI.box);
+            finally
             {
-                GUILayout.Label($"Local: {_git.LocalVersion.CreateTagInfo()}");
-                GUILayout.Label($"Remote: {_git.RemoteVersion.CreateTagInfo()}");
-
-                if (_git.PullAvailable)
-                {
-                    GUILayout.Label(Strings.NEW_VERSION_AVAILABLE, GetColoredStyle(Color.red));
-                }
-                else
-                {
-                    GUILayout.Label(Strings.UP_TO_DATE, GetColoredStyle(Color.blue));
-                }
-            }
-            GUILayout.EndVertical();
-        }
-
-        private void DrawGitPanel()
-        {
-            GUILayout.BeginVertical(EGUI.box, GUILayout.MinHeight(500), GUILayout.ExpandHeight(true));
-            {
-                _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
-
-                foreach (GitOutput gitOutput in _gitOutputs)
-                {
-                    DrawGitOutput(gitOutput);
-                }
-
-                GUILayout.EndScrollView();
-
-                GUILayout.FlexibleSpace();
-                DrawMainMenu();
-                DrawCommandLineInput();
-            }
-            GUILayout.EndVertical();
-        }
-
-        private void DrawCommitMessageTextField()
-        {
-            GUILayout.BeginVertical(EGUI.box);
-            {
-                GUILayout.BeginHorizontal();
-                {
-                    GUILayout.Label("Commit Message");
-                    GUILayout.FlexibleSpace();
-                    saveCommitMessage = GUILayout.Toggle(saveCommitMessage, "Save");
-                }
-                GUILayout.EndHorizontal();
-
-                commitMessage = EditorGUILayout.TextField(commitMessage);
-            }
-            GUILayout.EndVertical();
-        }
-
-        private void DrawMainMenu()
-        {
-            GUILayout.BeginHorizontal();
-            {
-                if (GUILayout.Button("Git Status (status)"))
-                {
-                    RunGitCommandsAsync("status");
-                }
-
-                if (GUILayout.Button("Remote Status (remove -v)"))
-                {
-                    RunGitCommandsAsync("remote -v");
-                }
-
-                if (GUILayout.Button("Fix 'index.lock'"))
-                {
-                    RunGitCommandsAsync("update-index --refresh", "update-index --really-refresh");
-                }
-
-                if (GUILayout.Button("Open Repo"))
-                {
-                    Application.OpenURL(_gitUrl);
-                }
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private void DrawPushAndPullMenu()
-        {
-            EditorGUILayout.LabelField("Push / Pull", EditorStyles.boldLabel);
-
-            DrawCommitMessageTextField();
-
-            GUILayout.BeginHorizontal();
-            {
-                if (GUILayout.Button("Upload (commit and push)"))
-                {
-                    GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, true));
-                }
-
-                if (GUILayout.Button("Force Upload (commit and push -f)"))
-                {
-                    GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, false));
-                }
-            }
-            GUILayout.EndHorizontal();
-
-
-            if (GUILayout.Button("Download (pull)"))
-            {
-                if (_git.PullAvailable) // check if there is a new version available
-                {
-                    RunGitCommandsAsync("pull");
-                }
-                else
-                {
-                    Debug.Log(Strings.UP_TO_DATE);
-                }
+                _onRepaint?.Invoke();
             }
         }
 
-        private void DrawRemoteMenu()
+        private async Task<IResult> InitGitRepoAsync()
         {
-            EditorGUILayout.LabelField("Remote Settings", EditorStyles.boldLabel);
-
-            GUILayout.BeginHorizontal();
+            string gitDirectory = Path.Combine(_localDir, ".git");
+            if (Directory.Exists(gitDirectory))
             {
-                if (GUILayout.Button("Remote Add Origin"))
-                {
-                    // if the url doesn't end with .git, add it
-                    if (!_gitUrl.EndsWith(".git")) _gitUrl += ".git";
-                    RunGitCommandsAsync($"remote add origin {_gitUrl}");
-                }
-
-                if (GUILayout.Button("Remote Set URL"))
-                {
-                    // if the url doesn't end with .git, add it
-                    if (!_gitUrl.EndsWith(".git")) _gitUrl += ".git";
-                    RunGitCommandsAsync($"remote set-url origin {_gitUrl}");
-                }
-
-                if (GUILayout.Button("Remote Remove"))
-                {
-                    RunGitCommandsAsync("remote remove origin");
-                }
+                Debug.Log("Git repository already initialized.");
+                return Result.Success();
             }
-            GUILayout.EndHorizontal();
+
+            try
+            {
+                IResult iResult = await RunGitCommandAsync("init", false, false);
+                if (iResult.IsFailure) return iResult;
+                if (Directory.Exists(gitDirectory)) return Result.Success();
+                return Result.Fail("Failed to initialize Git repository.");
+            }
+            catch (Exception ex)
+            {
+                string error = $"Failed to initialize Git repository:  {ex.Message}";
+                Debug.LogError(error);
+                OnGitOutput?.Invoke(new GitOutput(error, GitOutputStatus.Error));
+            }
+
+            return Result.Fail("Failed to initialize Git repository.");
         }
 
-        private void DrawBranchMenu()
+        public async Task<IResult> RetrieveRemoteVersionAsync()
         {
-            GUILayout.BeginHorizontal();
+            Debug.Log("Getting version info...");
+
+            // Set the current branch to track the remote branch
+            //IResult iResult = await RunGitCommandAsync($"branch --set-upstream-to=origin/{_gitBranch}", false);
+            //if (iResult.IsFailure) return iResult;
+
+            // Fetch the tags from the remote repository
+            IResult iResult = await RunGitCommandAsync("fetch --tags", false, false);
+            if (iResult.IsFailure) return iResult;
+
+            // Get the latest tag from the fetched tags
+            iResult = await RunGitCommandAsync("describe --tags --abbrev=0", false, false);
+            if (iResult.IsFailure || iResult is not Result result) return iResult;
+            string latestTag = result.Message.Trim();
+
+            _remoteVersion ??= new GitVersion();
+
+            // Check if the latestTag is not null or empty after trimming
+            if (!string.IsNullOrEmpty(latestTag))
             {
-                if (GUILayout.Button("Current Branch"))
-                {
-                    RunGitCommandsAsync("rev-parse --abbrev-ref HEAD");
-                }
-
-                if (GUILayout.Button("List Branches"))
-                {
-                    RunGitCommandsAsync("branch -a");
-                }
-
-                if (GUILayout.Button("Branch Checkout"))
-                {
-                    RunGitCommandsAsync("checkout branch-name");
-                }
-
-                if (GUILayout.Button("Master => Main"))
-                {
-                    RunGitCommandsAsync("branch -m master main");
-                }
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private void DrawDebugMenu()
-        {
-            EditorGUILayout.LabelField("Debug Settings", EditorStyles.boldLabel);
-
-            EditorGitGUI.DrawTrueOrFalseButton("core.autocrlf", _git.ConfigureLocalCoreAutoCRLFAsync);
-            EditorGitGUI.DrawTrueOrFalseButton("core.autocrlf (global)", _git.ConfigureGlobalCoreAutoCRLFAsync);
-            EditorGitGUI.DrawSetOrUnsetButton("Upstream to origin", SetUpstreamToOrigin);
-
-            GUILayout.BeginHorizontal();
-            {
-                GUILayout.Label("Other Commands", GUILayout.Width(240));
-
-                if (GUILayout.Button("Normalize Line Endings"))
-                {
-                    RunGitCommandsAsync("add --renormalize .");
-                }
-
-                if (GUILayout.Button("Push tag"))
-                {
-                    _git.PushVersionTagAsync();
-                }
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private void SetUpstreamToOrigin(bool isSet)
-        {
-            if (isSet)
-            {
-                RunGitCommandsAsync($"branch --set-upstream-to=origin/{_gitBranch}");
+                _remoteVersion = new GitVersion(_repoName, latestTag);
+                Debug.Log($"Latest version tag pulled: {_remoteVersion}");
             }
             else
             {
-                RunGitCommandsAsync($"branch --unset-upstream");
+                Debug.LogWarning("No valid version tag found.");
+                _remoteVersion = new GitVersion();
             }
+
+            iResult = await RunGitCommandAsync("status", false, true);
+            if (iResult.IsFailure) return iResult;
+
+            return Result.Success();
         }
 
-        private void GoToBottom()
+        private async Task<IResult> ValidateBranch()
         {
-            _scrollPosition.y = int.MaxValue;
+            IResult iResult = await RunGitCommandAsync("rev-parse --abbrev-ref HEAD", false, true);
+            if (iResult.IsFailure || iResult is not Result result) return iResult;
+
+            string currentBranch = result.Message;
+            if (string.IsNullOrEmpty(currentBranch)) return Result.Fail("Failed to get current branch.");
+            currentBranch = currentBranch.Trim();
+            Debug.Log($"Current branch: {currentBranch}");
+
+            if (currentBranch != _gitBranch)
+            {
+                Debug.LogWarning($"Current branch ({currentBranch}) does not match the expected branch ({_gitBranch}).");
+                Debug.Log("Attempting to checkout branch...");
+                return await RunGitCommandAsync($"checkout {_gitBranch}", false, true);
+            }
+
+            return Result.Success();
         }
 
-        private void DrawGitOutput(GitOutput gitOutput)
+        public async Task<IResult> PushAsync(string commitMessage, VersionIncrement versionInc, bool force = false)
         {
-            if (_gitOutputColors.TryGetValue(gitOutput.Status, out Color color))
-            {
-                GUILayout.Label(gitOutput.Message, GetColoredStyle(color));
-            }
-            else
-            {
-                GUILayout.Label(gitOutput.Message, EditorStyles.wordWrappedLabel);
-            }
+            string pushCommand = $"push origin {_gitBranch}";
+            if (force) pushCommand += " --force";
+
+            _remoteVersion ??= new GitVersion();
+            string cm = _remoteVersion.CreateTagInfo(commitMessage);
+
+            // Commit changes
+            IResult iResult = await RunGitCommandAsync("add .", true, true);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await RunGitCommandAsync("commit -m \"" + cm + "\"", true, true);
+            if (iResult.IsFailure) return iResult;
+
+            // Push changes
+            iResult = await RunGitCommandAsync(pushCommand, true, true);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await PushVersionTagAsync(versionInc);
+            if (iResult.IsFailure) return iResult;
+
+            _localVersion = _remoteVersion;
+            return Result.Success();
         }
 
-        private void DrawCommandLineInput()
+        /// <summary>
+        /// git tag -a "tag" -m "tagInfo"
+        /// git push origin--tags
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IResult> PushVersionTagAsync(VersionIncrement versionInc = VersionIncrement.Patch)
         {
-            GUILayout.BeginHorizontal();
-            {
-                _commandLine = GUILayout.TextField(_commandLine);
+            _remoteVersion ??= new GitVersion();
 
-                if (GUILayout.Button(EditorIcons.Enter, GUILayout.Height(18f), GUILayout.Width(30f)))
+            string tag = _remoteVersion.CreateUpdatedTag(versionInc);
+            string tagInfo = _remoteVersion.CreateTagInfo();
+
+            IResult iResult = await RunGitCommandAsync($"tag -a {tag} -m \"{tagInfo}\"", true, false);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await RunGitCommandAsync("push origin --tags", true, false);
+            if (iResult.IsFailure) return iResult;
+
+            _localVersion = _remoteVersion;
+            return Result.Success();
+        }
+
+        public async Task<IResult> MergeAsync(string branchToMerge, MergeStrategy strategy = MergeStrategy.FastForward)
+        {
+            if (string.IsNullOrEmpty(branchToMerge))
+            {
+                return Result.Fail("Branch to merge cannot be null or empty.");
+            }
+
+            Debug.Log($"Merging branch: {branchToMerge}");
+
+            // Fetch the latest changes from the remote
+            IResult iResult = await RunGitCommandAsync("fetch", false, true);
+            if (iResult.IsFailure) return iResult;
+
+            // Choose merge strategy
+            string mergeCommand = strategy switch
+            {
+                MergeStrategy.NoFastForward => $"merge --no-ff {branchToMerge}",
+                MergeStrategy.Squash => $"merge --squash {branchToMerge}",
+                MergeStrategy.Ours => $"merge -X ours {branchToMerge}",
+                MergeStrategy.Theirs => $"merge -X theirs {branchToMerge}",
+                _ => $"merge {branchToMerge}",
+            };
+
+            return await RunGitCommandAsync(mergeCommand, true, true);
+        }
+        
+
+        public async void ConfigureLocalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}", false, true);
+        public async void ConfigureGlobalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}", false, true);
+
+        public async Task<IResult> RunGitCommandAsync(string command, bool leaveCommand, bool leaveLog)
+        {
+            Debug.Log($"Running Git command: {command}");
+            if (leaveCommand) OnGitOutput?.Invoke(new GitOutput(command));
+
+            if (string.IsNullOrEmpty(_localDir) || string.IsNullOrEmpty(_gitUrl))
+            {
+                Debug.LogError("GitManager is not initialized properly.");
+                return null;
+            }
+
+            ProcessStartInfo startInfo = new("git", command)
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                WorkingDirectory = _localDir
+            };
+
+            try
+            {
+                using Process process = new() { StartInfo = startInfo };
+                StringBuilder outputBuilder = new();
+                StringBuilder errorBuilder = new();
+
+                process.OutputDataReceived += (sender, args) =>
                 {
-                    EnterGitCommand();
-                    GoToBottom();
-                }
-            }
-            GUILayout.EndHorizontal();
-        }
+                    if (args.Data != null)
+                    {
+                        outputBuilder.AppendLine(args.Data);
+                    }
+                };
 
-        private async void EnterGitCommand()
-        {
-            _commandLine = _commandLine.Trim();
-
-            if (_commandLine.StartsWith("git ")) _commandLine = _commandLine.Substring(4); // if it starts with git, remove it
-            if (string.IsNullOrEmpty(_commandLine))
-            {
-                _gitOutputs.Add(new GitOutput("Empty Command"));
-                return;
-            }
-            await _git.RunGitCommandAsync(_commandLine, true, true);
-            _commandLine = "";
-        }
-
-        private async void RunGitCommandsAsync(params string[] commands)
-        {
-            if (commands == null || commands.Length == 0)
-            {
-                _gitOutputs.Add(new GitOutput("Empty Command"));
-                return;
-            }
-
-            foreach (string command in commands)
-            {
-                if (string.IsNullOrEmpty(command))
+                process.ErrorDataReceived += (sender, args) =>
                 {
-                    _gitOutputs.Add(new GitOutput("Empty Command"));
-                    continue;
+                    if (args.Data != null)
+                    {
+                        errorBuilder.AppendLine(args.Data);
+                    }
+                };
+
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                await process.WaitForExitAsync();
+
+                if (process.ExitCode != 0)
+                {
+                    string errorMessage = errorBuilder.ToString().Trim();
+                    string error = $"Git command Failed with exit code {process.ExitCode}: {errorMessage}";
+                    return HandleResult(command, error, GitOutputStatus.Error);
                 }
 
-                IResult iResult = await _git.RunGitCommandAsync(command, true, true);
-                if (iResult.IsSuccess) return;
+                string output = outputBuilder.ToString().Trim();
+                return HandleResult(command, output, GitOutputStatus.Unknown, leaveLog);
+            }
+            catch (Exception ex)
+            {
+                string error = $"Git command Failed: {ex.Message}";
+                return HandleResult(command, error, GitOutputStatus.Error);
             }
         }
 
-        private async void Push(VersionIncrement versionType, bool force)
+
+        private IResult HandleResult(string command, string output, GitOutputStatus status = GitOutputStatus.Unknown, bool leaveLog = true)
         {
-            IResult iResult = await _git.PushAsync(commitMessage, versionType, force);
-            if (iResult.IsSuccess && !saveCommitMessage) commitMessage = "";
+            if (status == GitOutputStatus.Unknown)
+            {
+                status = GitEditorUtils.ParseStatus(output);
+            }
+
+            if (status == GitOutputStatus.Error || status == GitOutputStatus.Fatal)
+            {
+                if (leaveLog) OnGitOutput?.Invoke(new GitOutput(output, status));
+                
+                if (output.Contains("CONFLICT"))
+                {
+                    return Result.Fail("Merge conflict detected. Please resolve conflicts manually.");
+                }
+                return Result.Fail(output);
+            }
+
+            if (leaveLog)
+            {
+                OnGitOutput?.Invoke(new GitOutput(output, status));
+            }
+
+            return Result.Success(output);
         }
     }
 }

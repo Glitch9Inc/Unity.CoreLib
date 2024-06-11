@@ -11,7 +11,7 @@ namespace Glitch9.Internal.Git
         private SerializedProperty gitUrl;
         private SerializedProperty gitBranch;
         private SerializedProperty localDir;
-        private EditorGit _git;
+        private EditorGitGUI _git;
 
         private void OnEnable()
         {
@@ -19,7 +19,7 @@ namespace Glitch9.Internal.Git
             gitUrl = serializedObject.FindProperty(nameof(gitUrl));
             gitBranch = serializedObject.FindProperty(nameof(gitBranch));
             localDir = serializedObject.FindProperty(nameof(localDir));
-            _git = new EditorGit();
+            _git = new EditorGitGUI();
             _git.InitializeAsync(gitUrl.stringValue, gitBranch.stringValue, localDir.stringValue, Repaint);
         }
 
@@ -61,7 +61,7 @@ namespace Glitch9.Internal.Git
                 GUILayout.EndVertical();
                 return;
             }
-
+       
             _git.DrawGit();      
         }
     }

@@ -9,7 +9,7 @@ namespace Glitch9.Internal.Git
         protected abstract string GIT_BRANCH { get; }
         protected abstract string WORKING_DIR { get; }
 
-        private EditorGit _git;
+        private EditorGitGUI _git;
 
 
         private void OnEnable()
@@ -26,7 +26,7 @@ namespace Glitch9.Internal.Git
                 return;
             }
 
-            _git = new EditorGit();
+            _git = new EditorGitGUI();
             _git.InitializeAsync(GIT_URL, GIT_BRANCH, WORKING_DIR, Repaint);
         }
 

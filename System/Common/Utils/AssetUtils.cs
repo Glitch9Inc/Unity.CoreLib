@@ -17,7 +17,7 @@ namespace Glitch9
         {
             return path.Replace('\\', '/');
         }
-        
+
         private static T CreateAsset<T>(string fileName, T obj, string customPathWithFileName) where T : ScriptableObject
         {
             string path;
@@ -128,7 +128,7 @@ namespace Glitch9
             }
         }
 
-        public static void AssureDirectory(string path)
+        public static void EnsureDirectory(string path)
         {
             if (!Directory.Exists(path))
             {

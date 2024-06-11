@@ -13,6 +13,7 @@ namespace Glitch9.Internal
         private static readonly string[] _forbiddenWords = new string[]
         {
             "using Sirenix",
+            "using DG",
             "using Microsoft",
             "HttpUtility",
             "codice",

@@ -13,7 +13,7 @@ namespace Glitch9.Internal
             {
                 EditorGUI.BeginProperty(position, label, property);
 
-                System.Type enumType = fieldInfo.FieldType;
+                Type enumType = fieldInfo.FieldType;
                 string[] enumNames = EnumUtils.GetNames(enumType);
                 int[] enumValues = Enum.GetValues(enumType) as int[];
 
