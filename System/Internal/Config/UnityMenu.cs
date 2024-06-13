@@ -24,62 +24,21 @@ namespace Glitch9.Internal
 
         public const string URL_SUPPORT_REPO = "https://github.com/Glitch9Inc/Glitch9-Support";
 
-        public static class Game
+
+        public static class NativeMediaPlayer
         {
-            private const string NAME = "Game";
+            private const string NAME = "Native Media Player";
             private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
-            public const string CREATE_GAME_SETTINGS = CREATE_PATH + "Game Settings";
-            public const string CREATE_ITEM_SETTINGS = CREATE_PATH + "Item Settings";
-            public const string CREATE_SEASON_PASS_SETTINGS = CREATE_PATH + "Season Pass Settings";
+            // Menus
+            public const string PATH_PREFERENCES = TOOLS_PATH + NAME_PREFERENCES;
+            public const string PATH_DOCUMENTATION = TOOLS_PATH + NAME_DOCUMENTATION;
 
-            public const int ORDER_CREATE_GAME_SETTINGS = STARTING_CREATE_MENU_ORDER;
-            public const int ORDER_CREATE_ITEM_SETTINGS = ORDER_CREATE_GAME_SETTINGS + NEXT_ROW;
-            public const int ORDER_CREATE_SEASON_PASS_SETTINGS = ORDER_CREATE_ITEM_SETTINGS + NEXT_ROW;
+            public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/native-media-player";
         }
 
-
-        public static class Support
-        {
-            private const string PATH = ROOT_TOOL_PATH + "Support/";
-
-            public const string PATH_REPORT_AN_ISSUE = PATH + NAME_REPORT_ISSUES;
-            public const string PATH_RELOAD_SKINS = PATH + "Reload EditorGUI Skins";
-            public const string PATH_RENAME_UI_PREFAB_RESOURCES = PATH + "Rename UIPrefabResource Files";
-
-            public const int PRIORITY_REPORT_AN_ISSUE = STARTING_SUPPORT_MENU_PRIORITY;
-
-            public const int PRIORITY_RELOAD_SKINS = PRIORITY_REPORT_AN_ISSUE + ADD_SEPARATOR;
-            public const int PRIORITY_RENAME_UI_PREFAB_RESOURCES = PRIORITY_RELOAD_SKINS - 1;
-
-
-            [MenuItem(PATH_REPORT_AN_ISSUE, priority = PRIORITY_REPORT_AN_ISSUE)]
-            public static void OpenSupportURL()
-            {
-                Application.OpenURL(URL_SUPPORT_REPO);
-            }
-        }
-
-        public static class Utility
-        {
-            private const string NAME = "Utility";
-            private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
-            private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
-
-            // Scriptable Objects
-            public const string PACKAGE_EXPORTER = "Package Exporter";
-            public const string GIT_MODULE = "Git Module";
-
-            public const string CREATE_PACKAGE_EXPORTER = CREATE_PATH + PACKAGE_EXPORTER;
-            public const string CREATE_GIT_MODULE = CREATE_PATH + GIT_MODULE;
-
-            public const int ORDER_PACKAGE_EXPORTER = STARTING_CREATE_MENU_ORDER + 2000;
-            public const int ORDER_GIT_MODULE = ORDER_PACKAGE_EXPORTER + NEXT_ROW;
-        }
-
-        // AI Development Kit
-        public static class OpenAI
+        public static class OpenAI // AI Development Kit
         {
             private const string NAME = "OpenAI";
             private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
@@ -133,7 +92,7 @@ namespace Glitch9.Internal
             public const string PATH_AI_MODEL_MANAGER = TOOLS_PATH + NAME_AI_MODEL_MANAGER;
             public const string PATH_ASSISTANT_MANAGER = TOOLS_PATH + NAME_ASSISTANT_MANAGER;
 
-            public const string PATH_SETTINGS = TOOLS_PATH + NAME_PREFERENCES;
+            public const string PATH_PREFERENCES = TOOLS_PATH + NAME_PREFERENCES;
             public const string PATH_DOCUMENTATION = TOOLS_PATH + NAME_DOCUMENTATION;
             public const string PATH_SUPPORT = TOOLS_PATH + NAME_REPORT_ISSUES;
 
@@ -156,7 +115,6 @@ namespace Glitch9.Internal
             public const string PROVIDER_SETTINGS = ROOT_USER_PREFERENCE + NAME;
         }
 
-        // Smart Localization
         public static class SmartLocalization
         {
             private const string NAME = "Smart Localization";
@@ -196,24 +154,75 @@ namespace Glitch9.Internal
             //public const string URL_SUPPORT = "https://github.com/Glitch9Inc/Smart-Localization/issues";
             public const string PROVIDER_SETTINGS = ROOT_USER_PREFERENCE + NAME;
         }
-
-        // PlayHT
-        public static class PlayHT
-        {
-            private const string NAME = "PlayHT";
-            private const string TOOL_PATH = ROOT_TOOL_PATH + NAME + "/";
-
-
-        }
-
-        // Commit-Gen (Only has 1 tool)
-        public static class CommitGen
+        
+        public static class CommitGen // Commit-Gen (Only has 1 tool)
         {
             public const int PRIORITY = STARTING_TOOLS_MENU_PRIORITY - ADD_SEPARATOR;
             public const string TOOL_PATH = ROOT_TOOL_PATH + "Commit Message Generator";
         }
 
-        // Google Sheets
+
+
+        
+        #region Extra Menu
+
+        public static class Support
+        {
+            private const string PATH = ROOT_TOOL_PATH + "Support/";
+
+            public const string PATH_REPORT_AN_ISSUE = PATH + NAME_REPORT_ISSUES;
+            public const string PATH_RELOAD_SKINS = PATH + "Reload EditorGUI Skins";
+            public const string PATH_RENAME_UI_PREFAB_RESOURCES = PATH + "Rename UIPrefabResource Files";
+
+            public const int PRIORITY_REPORT_AN_ISSUE = STARTING_SUPPORT_MENU_PRIORITY;
+
+            public const int PRIORITY_RELOAD_SKINS = PRIORITY_REPORT_AN_ISSUE + ADD_SEPARATOR;
+            public const int PRIORITY_RENAME_UI_PREFAB_RESOURCES = PRIORITY_RELOAD_SKINS - 1;
+
+
+            [MenuItem(PATH_REPORT_AN_ISSUE, priority = PRIORITY_REPORT_AN_ISSUE)]
+            public static void OpenSupportURL()
+            {
+                Application.OpenURL(URL_SUPPORT_REPO);
+            }
+        }
+
+        public static class Utility
+        {
+            private const string NAME = "Utility";
+            private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
+            private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
+
+            // Scriptable Objects
+            public const string PACKAGE_EXPORTER = "Package Exporter";
+            public const string GIT_MODULE = "Git Module";
+
+            public const string CREATE_PACKAGE_EXPORTER = CREATE_PATH + PACKAGE_EXPORTER;
+            public const string CREATE_GIT_MODULE = CREATE_PATH + GIT_MODULE;
+
+            public const int ORDER_PACKAGE_EXPORTER = STARTING_CREATE_MENU_ORDER + 2000;
+            public const int ORDER_GIT_MODULE = ORDER_PACKAGE_EXPORTER + NEXT_ROW;
+        }
+
+        #endregion
+        
+        #region Not Available to Public yet
+
+        public static class Game
+        {
+            private const string NAME = "Game";
+            private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
+            private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
+
+            public const string CREATE_GAME_SETTINGS = CREATE_PATH + "Game Settings";
+            public const string CREATE_ITEM_SETTINGS = CREATE_PATH + "Item Settings";
+            public const string CREATE_SEASON_PASS_SETTINGS = CREATE_PATH + "Season Pass Settings";
+
+            public const int ORDER_CREATE_GAME_SETTINGS = STARTING_CREATE_MENU_ORDER;
+            public const int ORDER_CREATE_ITEM_SETTINGS = ORDER_CREATE_GAME_SETTINGS + NEXT_ROW;
+            public const int ORDER_CREATE_SEASON_PASS_SETTINGS = ORDER_CREATE_ITEM_SETTINGS + NEXT_ROW;
+        }
+
         public static class GoogleSheets
         {
             private const string NAME = "Google Sheets";
@@ -228,8 +237,13 @@ namespace Glitch9.Internal
             public const string PATH_GOOGLE_SHEETS_MANAGER = TOOL_PATH + NAME_GOOGLE_SHEETS_MANAGER;
             public const int PRIORITY_GOOGLE_SHEETS_MANAGER = STARTING_TOOLS_MENU_PRIORITY;
         }
+        
+        public static class PlayHT
+        {
+            private const string NAME = "PlayHT";
+            private const string TOOL_PATH = ROOT_TOOL_PATH + NAME + "/";
+        }
 
-        // AI Dialogue Generator
         public static class AIDialogGenerator
         {
             private const string NAME = "AI Dialog Generator";
@@ -244,6 +258,8 @@ namespace Glitch9.Internal
             public const string PATH_AI_DIALOG_GENERATOR = TOOL_PATH + NAME_AI_DIALOG_GENERATOR;
             public const int PRIORITY_AI_DIALOG_GENERATOR = STARTING_TOOLS_MENU_PRIORITY;
         }
+        
+        #endregion
     }
 }
 #endif
