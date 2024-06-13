@@ -100,7 +100,7 @@ namespace Glitch9.ExtendedEditor
             GUI.DrawTexture(r, image);
         }
 
-        public static Rect DrawRoundedTexture(float size, Texture2D tex)
+        public static Rect DrawRoundedTextureAndroid(float size, Texture2D tex)
         {
             Rect r = EditorGUILayout.GetControlRect(GUILayout.Width(size - 2), GUILayout.Height(size - 2));
             GUI.DrawTexture(r, tex);
@@ -109,6 +109,22 @@ namespace Glitch9.ExtendedEditor
             r.x--;
             r.y--;
             GUI.Box(r, "", EGUI.skin.GetStyle("rounded_texture"));
+            return r;
+        }
+
+        public static Rect DrawRoundedTextureiOS(float size, Texture2D tex)
+        {
+            Rect r = EditorGUILayout.GetControlRect(GUILayout.Width(size - 2), GUILayout.Height(size - 2));
+            GUI.DrawTexture(r, tex);
+            r.width += 2;
+            r.height += 2;
+            r.x--;
+            r.y--;
+
+            Texture2D roundedCorners = EditorGUITextures.iOSRoundedCorners;
+            GUIStyle style = new GUIStyle(EGUI.skin.GetStyle("rounded_texture"));
+            style.normal.background = roundedCorners;
+            GUI.Box(r, "", style);
             return r;
         }
 

@@ -18,6 +18,7 @@ namespace Glitch9.ExtendedEditor
 
         // Sub Dirs
         private const string DIR_ANDROID12 = "Android12/";
+        private const string DIR_IOS13 = "iOS13/";
         private const string DIR_BACKGROUND = "Background/";
         private const string DIR_BORDER = "Border/";
         private const string DIR_BOX = "Box/";

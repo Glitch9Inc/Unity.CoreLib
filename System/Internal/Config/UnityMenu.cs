@@ -32,11 +32,19 @@ namespace Glitch9.Internal
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
             // Menus
+            public const string NAME_ANDROID12_PREVIEW = "Android 12 Preview";
+            public const string NAME_IOS13_PREVIEW = "iOS 13 Preview";
+
+            public const string PATH_ANDROID12_PREVIEW = TOOLS_PATH + NAME_ANDROID12_PREVIEW;
+            public const string PATH_IOS13_PREVIEW = TOOLS_PATH + NAME_IOS13_PREVIEW;
             public const string PATH_PREFERENCES = TOOLS_PATH + NAME_PREFERENCES;
             public const string PATH_DOCUMENTATION = TOOLS_PATH + NAME_DOCUMENTATION;
 
             // Priorities
-            public const int PRIORITY_PREFERENCES = STARTING_TOOLS_MENU_PRIORITY;
+            public const int PRIORITY_ANDROID12_PREVIEW = STARTING_TOOLS_MENU_PRIORITY;
+            public const int PRIORITY_IOS13_PREVIEW = PRIORITY_ANDROID12_PREVIEW + NEXT_ROW;
+
+            public const int PRIORITY_PREFERENCES = PRIORITY_IOS13_PREVIEW + ADD_SEPARATOR;
             public const int PRIORITY_DOCUMENTATION = PRIORITY_PREFERENCES + NEXT_ROW;  
 
             public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/native-media-player";

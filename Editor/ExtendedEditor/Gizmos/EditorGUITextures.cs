@@ -63,5 +63,8 @@ namespace Glitch9.ExtendedEditor
         public static Texture2D ToggleLinebreakOff => Get(DIR_CONFIG, "toggle_linebreak_off.psd");
         public static Texture2D ToggleNextlineOn => Get(DIR_CONFIG, "toggle_nextline_on.psd");
         public static Texture2D ToggleNextlineOff => Get(DIR_CONFIG, "toggle_nextline_off.psd");
+
+        public static Texture2D iOSCircle => Get(DIR_IOS13, "circle_ios13.psd");
+        public static Texture2D iOSRoundedCorners => Get(DIR_IOS13, "rounded_corners.psd");
     }
 }
