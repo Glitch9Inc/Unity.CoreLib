@@ -217,10 +217,8 @@ namespace Glitch9.Internal.Git
                 new EGUIButtonEntry("Commit & Push", () => GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, false))),
                 new EGUIButtonEntry("Force Push", () => GitEditorUtils.ShowGitVersionSelector((ver) => Push(ver, true))));
 
-            EGUILayout.MultiButton("Download (Pull)",
-                new EGUIButtonEntry("Pull", () => RunGitCommandsAsync("pull")),
-                new EGUIButtonEntry("Fetch All", () => RunGitCommandsAsync("fetch --all")),
-                new EGUIButtonEntry("Hard Reset", () => RunGitCommandsAsync("reset --hard origin/main")));
+            EGUILayout.MultiButton("Download (Pull)", new EGUIButtonEntry("Pull", () => RunGitCommandsAsync("pull")),
+                new EGUIButtonEntry("Hard Reset", () => _editorGit.HardResetAsync()));
         }
 
         private void DrawMergeMenu()

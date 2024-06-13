@@ -37,7 +37,7 @@ namespace Glitch9.Internal
 
             // Priorities
             public const int PRIORITY_PREFERENCES = STARTING_TOOLS_MENU_PRIORITY;
-            public const int PRIORITY_DOCUMENTATION = PRIORITY_PREFERENCES + NEXT_ROW;
+            public const int PRIORITY_DOCUMENTATION = PRIORITY_PREFERENCES + NEXT_ROW;  
 
             public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/native-media-player";
             public const string PROVIDER_SETTINGS = ROOT_USER_PREFERENCE + NAME;

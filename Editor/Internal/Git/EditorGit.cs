@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
 using Debug = UnityEngine.Debug;
 
 namespace Glitch9.Internal.Git
@@ -239,7 +240,23 @@ namespace Glitch9.Internal.Git
 
             return await RunGitCommandAsync(mergeCommand, true, true);
         }
-        
+
+
+        public async Task<IResult> HardResetAsync()
+        {
+            IResult iResult = await RunGitCommandAsync("fetch --all", false, true);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await RunGitCommandAsync("reset --hard origin/" + _gitBranch, true, true);
+            if (iResult.IsFailure) return iResult;
+
+            iResult = await RunGitCommandAsync("clean -fd", true, true);
+            if (iResult.IsFailure) return iResult;
+
+            // refresh all files
+            AssetDatabase.Refresh();
+            return Result.Success();
+        }
 
         public async void ConfigureLocalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config core.autocrlf {(value ? "true" : "false")}", false, true);
         public async void ConfigureGlobalCoreAutoCRLFAsync(bool value) => await RunGitCommandAsync($"config --global core.autocrlf {(value ? "true" : "false")}", false, true);
