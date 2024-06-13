@@ -36,6 +36,7 @@ namespace Glitch9.Internal
             public const string PATH_DOCUMENTATION = TOOLS_PATH + NAME_DOCUMENTATION;
 
             public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/native-media-player";
+            public const string PATH_SUPPORT = ROOT_USER_PREFERENCE + NAME;
         }
 
         public static class OpenAI // AI Development Kit
@@ -123,11 +124,8 @@ namespace Glitch9.Internal
 
             // Scriptable Objects
             public const string NAME_LOCALIZATION_SETTINGS = "Localization Settings";
-
             public const string CREATE_LOCALIZATION_SETTINGS = CREATE_PATH + NAME_LOCALIZATION_SETTINGS;
-
             public const int ORDER_LOCALIZATION_SETTINGS = STARTING_CREATE_MENU_ORDER;
-
 
             // Menus
             public const string NAME_LOCALIZATION_MANAGER = "Localization Manager";

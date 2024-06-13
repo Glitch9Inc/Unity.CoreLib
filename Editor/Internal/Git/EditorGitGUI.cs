@@ -219,7 +219,7 @@ namespace Glitch9.Internal.Git
 
             EGUILayout.MultiButton("Download (Pull)",
                 new EGUIButtonEntry("Pull", () => RunGitCommandsAsync("pull")),
-                new EGUIButtonEntry("Force Pull (Hard Reset)", () => RunGitCommandsAsync("fetch --all", "reset --hard origin/master")));
+                new EGUIButtonEntry("Force Pull (Hard Reset)", () => RunGitCommandsAsync("fetch --all", "reset --hard origin/main")));
         }
 
         private void DrawMergeMenu()
