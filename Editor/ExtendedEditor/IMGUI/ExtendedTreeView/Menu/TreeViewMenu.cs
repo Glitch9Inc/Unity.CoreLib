@@ -46,10 +46,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
             }
         }
 
-        private Rect GetMenuButtonRect(int buttonIndex)
+        private Rect GetMenuButtonRect(int buttonIndex, int customWidth)
         {
+            float menuButtonWidth = k_ButtonWidth;
+            if (customWidth != -1) menuButtonWidth = customWidth;
             // y is always 20 because the toolbar height is 20
-            return new Rect(k_ButtonWidth * buttonIndex, 0, k_DropdownMenuWidth, k_DropdownMenuHeight);
+            return new Rect(menuButtonWidth * buttonIndex, 0, k_DropdownMenuWidth, k_DropdownMenuHeight);
         }
 
         private Rect GetSearchFieldRect(Rect position)
@@ -72,9 +74,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
                         continue;
                     }
 
-                    if (DrawMenuButton(kvp.Key))
+                    if (DrawMenuButton(kvp.Key, kvp.Value.Width))
                     {
-                        kvp.Value.Action(GetMenuButtonRect(i));
+                        kvp.Value.Action(GetMenuButtonRect(i, kvp.Value.Width));
                     }
                 }
 
@@ -88,9 +90,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
             GUILayout.EndHorizontal();
         }
 
-        private bool DrawMenuButton(string menuName)
+        private bool DrawMenuButton(string menuName, int customWidth)
         {
-            return GUILayout.Button(menuName, EditorStyles.toolbarButton, GUILayout.Width(k_ButtonWidth));
+            float menuButtonWidth = k_ButtonWidth;
+            if (customWidth != -1) menuButtonWidth = customWidth;
+            return GUILayout.Button(menuName, EditorStyles.toolbarButton, GUILayout.Width(menuButtonWidth));
         }
 
         private void DrawSearchField(Rect rect)
@@ -101,10 +105,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             if (searchString != SearchString)
             {
                 SearchString = searchString;
-                if (!string.IsNullOrWhiteSpace(searchString))
-                {
-                    _onSearchStringUpdated?.Invoke();
-                }
+                _onSearchStringUpdated?.Invoke();
             }
         }
     }

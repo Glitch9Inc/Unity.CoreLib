@@ -25,7 +25,7 @@ namespace Glitch9
 
         public Error(Exception exception, params string[] additionalMessages)
         {
-            Message = exception.Message;
+            TextOutput = exception.Message;
             StackTrace = exception.StackTrace;
             JoinMessage(additionalMessages);
             GNLog.Error(this);
@@ -34,7 +34,7 @@ namespace Glitch9
         public Error(Issue issue, params string[] additionalMessages)
         {
             Issue = issue;
-            Message = issue.GetMessage();
+            TextOutput = issue.GetMessage();
             JoinMessage(additionalMessages);
             GNLog.Error(this);
         }
@@ -48,24 +48,24 @@ namespace Glitch9
 
             string joinedString = string.Join("\n", errorMessages);
 
-            if (!string.IsNullOrEmpty(Message))
+            if (!string.IsNullOrEmpty(TextOutput))
             {
-                Message += "\n" + joinedString;
+                TextOutput += "\n" + joinedString;
             }
             else
             {
-                Message = joinedString;
+                TextOutput = joinedString;
             }
         }
 
-        public override string ToString() => Message;
-        public string ToString(bool includeStackTrace) => includeStackTrace ? $"{Message}\n{StackTrace}" : Message;
+        public override string ToString() => TextOutput;
+        public string ToString(bool includeStackTrace) => includeStackTrace ? $"{TextOutput}\n{StackTrace}" : TextOutput;
 
         public static bool operator ==(Error left, Error right)
         {
             if (ReferenceEquals(left, right)) return true;
             if (left is null || right is null) return false;
-            return Equals(left.Message, right.Message);
+            return Equals(left.TextOutput, right.TextOutput);
         }
 
         public static bool operator !=(Error left, Error right) => !(left == right);

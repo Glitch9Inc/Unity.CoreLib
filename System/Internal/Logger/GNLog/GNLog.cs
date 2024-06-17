@@ -16,18 +16,22 @@ namespace Glitch9
             internal const string COLORED = "GNLog.Colored";
             internal const string LOG_ERROR_ON_ERROR_INSTANCE_CREATED = "GNLog.LogErrorOnErrorInstanceCreated";
             internal const string LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED = "GNLog.LogStackTraceOnErrorInstanceCreated";
+            internal const string SHOW_CALLER_FILE_PATH = "GNLog.ShowCallerFilePath";
         }
 
         private static class DefaultValues
         {
+            internal const string UNKNOWN_SENDER = "Unknown";
             internal const bool ENABLED = true;
             internal const bool COLORED = false;
+            internal const bool SHOW_CALLER_FILE_PATH = false;
             internal const bool LOG_ERROR_ON_ERROR_INSTANCE_CREATED = true;
             internal const bool LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED = false;
         }
 
         public static Prefs<bool> IsEnabled { get; set; } = new(PrefsKeys.ENABLED, DefaultValues.ENABLED);
         public static Prefs<bool> IsColored { get; set; } = new(PrefsKeys.COLORED, DefaultValues.COLORED);
+        public static Prefs<bool> ShowCallerFilePath { get; set; } = new(PrefsKeys.SHOW_CALLER_FILE_PATH, DefaultValues.SHOW_CALLER_FILE_PATH);
         public static Prefs<bool> LogErrorOnErrorInstanceCreated { get; set; } = new(PrefsKeys.LOG_ERROR_ON_ERROR_INSTANCE_CREATED, DefaultValues.LOG_ERROR_ON_ERROR_INSTANCE_CREATED);
         public static Prefs<bool> LogStackTraceOnErrorInstanceCreated { get; set; } = new(PrefsKeys.LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED, DefaultValues.LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED);
 
@@ -54,39 +58,26 @@ namespace Glitch9
             return k_CachedColors[logType];
         }
 
-        public static void ContinueWithLogger(Issue issue, LogType logType, bool showCallerInfo = false, string callerMemberName = null, string callerFilePath = null, string tag = null)
+        public static void ContinueWithLogger(object sender, Issue issue, LogType logType, string callerMemberName = null, string callerFilePath = null)
         {
-            ContinueWithLogger(issue.ToString(), logType, showCallerInfo, callerMemberName, callerFilePath, tag);
+            ContinueWithLogger(sender, issue.ToString(), logType, callerMemberName, callerFilePath);
         }
 
-        public static void ContinueWithLogger(string msg, LogType logType, bool showCallerInfo = false, string callerMemberName = null, string callerFilePath = null, string tag = null)
+        public static void ContinueWithLogger(object sender, string msg, LogType logType, string callerMemberName = null, string callerFilePath = null)
         {
             using (StringBuilderPool.Get(out StringBuilder sb))
             {
-                bool tagAvailable = !string.IsNullOrEmpty(tag);
-                if (showCallerInfo || tagAvailable)
+                string senderAsString = ParseSender(sender, callerMemberName);
+
+                sb.Append("<color=blue>[");
+                sb.Append(senderAsString);
+                
+                if (ShowCallerFilePath && !string.IsNullOrEmpty(callerFilePath))
                 {
-                    sb.Append("<color=blue>[");
-                    if (tagAvailable)
-                    {
-                        sb.Append(tag);
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(callerFilePath))
-                        {
-                            sb.Append(Path.GetFileNameWithoutExtension(callerFilePath));
-
-                            if (!string.IsNullOrEmpty(callerMemberName))
-                            {
-                                sb.Append("|");
-                                sb.Append(callerMemberName);
-                            }
-                        }
-                    }
-
-                    sb.Append("]</color> ");
+                    sb.Append(Path.GetFileNameWithoutExtension(callerFilePath));
                 }
+
+                sb.Append("]</color> ");
 
                 bool isColored = IsColored;
 
@@ -141,19 +132,27 @@ namespace Glitch9
             return log;
 #endif
         }
+  
 
-        internal static void LogColorTest()
+        private static string ParseSender(object sender, string callerMemberName)
         {
-            ClearCachedColorHex();
-            Info("Log");
-            Warning("Warning");
-            Error("Error");
-            Critical("Critical");
-            Native("Native");
-            NativeWarning("NativeWarning");
-            NativeError("NativeError");
-            Info("Green");
-            Info("Blue");
+            if (sender == null)
+            {
+                if (string.IsNullOrEmpty(callerMemberName)) return DefaultValues.UNKNOWN_SENDER;
+                return callerMemberName;
+            }
+
+            if (sender is string s)
+            {
+                if (string.IsNullOrEmpty(s))
+                {
+                    if (string.IsNullOrEmpty(callerMemberName)) return DefaultValues.UNKNOWN_SENDER;
+                    return callerMemberName;
+                }
+                return s;
+            }
+
+            return sender.GetType().Name;
         }
     }
 }

@@ -5,21 +5,21 @@ namespace Glitch9
 {
     public static class GNLogExtensions
     {
-        public static bool LogIfNull<T>(this T obj, bool showCallerInfo = false, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
+        public static bool LogIfNull<T>(this T obj, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
             if (obj == null)
             {
-                HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} is null.", showCallerInfo, callerMemberName, callerFilePath);
+                HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} is null.", callerMemberName, callerFilePath);
                 return true;
             }
             return false;
         }
 
-        public static bool LogIfNullOrEmpty<T>(this IEnumerable<T> collection, bool showCallerInfo = false, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
+        public static bool LogIfNullOrEmpty<T>(this IEnumerable<T> collection, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
             if (collection == null)
             {
-                HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} collection is null.", showCallerInfo, callerMemberName, callerFilePath);
+                HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} collection is null.", callerMemberName, callerFilePath);
                 return true;
             }
 
@@ -28,7 +28,7 @@ namespace Glitch9
             {
                 if (coll.Count == 0)
                 {
-                    HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} collection is empty.", showCallerInfo, callerMemberName, callerFilePath);
+                    HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} collection is empty.", callerMemberName, callerFilePath);
                     return true;
                 }
             }
@@ -37,7 +37,7 @@ namespace Glitch9
                 using IEnumerator<T> enumerator = collection.GetEnumerator();
                 if (!enumerator.MoveNext())
                 {
-                    HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} collection is empty.", showCallerInfo, callerMemberName, callerFilePath);
+                    HandleError($"{ParseFilename(callerFilePath)}'s {typeof(T).Name} collection is empty.", callerMemberName, callerFilePath);
                     return true;
                 }
             }
@@ -45,31 +45,31 @@ namespace Glitch9
             return false;
         }
 
-        public static bool LogIfNullOrWhiteSpace(this string text, bool showCallerInfo = false, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
+        public static bool LogIfNullOrWhiteSpace(this string text, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
             if (string.IsNullOrWhiteSpace(text))
             {
-                HandleError($"{ParseFilename(callerFilePath)}'s string is null or whitespace.", showCallerInfo, callerMemberName, callerFilePath);
+                HandleError($"{ParseFilename(callerFilePath)}'s string is null or whitespace.", callerMemberName, callerFilePath);
                 return true;
             }
             return false;
         }
 
-        public static bool LogIfSetInInspector<T>(this T obj, bool showCallerInfo = false, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
+        public static bool LogIfSetInInspector<T>(this T obj, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
             if (obj == null)
             {
-                GNLog.ContinueWithLogger($"<color=blue><{callerMemberName}></color> is not set in inspector", LogType.Error, showCallerInfo, callerMemberName, callerFilePath);
+                GNLog.ContinueWithLogger(callerMemberName, $"<color=blue><{callerMemberName}></color> is not set in inspector", LogType.Error, callerMemberName, callerFilePath);
                 return false;
             }
             return true;
         }
 
-        public static bool LogIfNotSetInInspector<T>(this T obj, bool showCallerInfo = false, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
+        public static bool LogIfNotSetInInspector<T>(this T obj, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
             if (obj == null)
             {
-                GNLog.ContinueWithLogger($"<color=blue><{callerMemberName}></color> is not set in inspector", LogType.Error, showCallerInfo, callerMemberName, callerFilePath);
+                GNLog.ContinueWithLogger(callerMemberName, $"<color=blue><{callerMemberName}></color> is not set in inspector", LogType.Error, callerMemberName, callerFilePath);
                 return true;
             }
             return false;
@@ -80,9 +80,9 @@ namespace Glitch9
             return System.IO.Path.GetFileNameWithoutExtension(callerFilaPath);
         }
 
-        private static void HandleError(string message, bool showCallerInfo = false, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
+        private static void HandleError(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
-            GNLog.ContinueWithLogger(message, LogType.Error, showCallerInfo, callerMemberName, callerFilePath);
+            GNLog.ContinueWithLogger(callerMemberName, message, LogType.Error, callerMemberName, callerFilePath);
         }
     }
 }

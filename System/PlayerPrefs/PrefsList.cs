@@ -162,5 +162,10 @@ namespace Glitch9.Collections
             PlayerPrefs.SetString(_prefsKey, json);
             PlayerPrefs.Save();
         }
+
+        public List<T> ToList()
+        {
+            return new List<T>(_list);
+        }
     }
 }

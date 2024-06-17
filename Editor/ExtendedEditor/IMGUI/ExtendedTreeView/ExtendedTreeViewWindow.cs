@@ -16,7 +16,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
         where TEventHandler : TreeViewEventHandler<TTreeViewItem, TData, TFilter>
     {
         private const int MAX_INIT_COUNT = 3;
-        
+        private const float BOTTOM_BAR_BTN_WIDTH = 100;
+
         protected MultiColumnHeader MultiColumnHeader;
         protected TTreeView TreeView;
         protected TreeViewState TreeViewState;
@@ -121,6 +122,37 @@ namespace Glitch9.ExtendedEditor.IMGUI
             if (item.Data == null) return false;
             if (string.IsNullOrEmpty(item.Data.Id)) return false;
             return true;
+        }
+        
+        private void DrawBottomBar()
+        {
+            if (TreeView == null) return;
+
+            GUILayout.BeginHorizontal(TreeViewStyles.BottomBarStyle);
+            {
+                GUILayout.Label($"Showing {TreeView.ShowingCount} of {TreeView.TotalCount} items.");
+                GUILayout.FlexibleSpace();
+                BottomBar();
+            }
+            GUILayout.EndHorizontal();
+        }
+
+
+        /// <summary>
+        /// Override this method to add custom bottom bar
+        /// </summary>
+        protected virtual void BottomBar()
+        {
+
+            if (GUILayout.Button("Reset Filter", GUILayout.Width(BOTTOM_BAR_BTN_WIDTH)))
+            {
+                TreeView.ResetFilter();
+            }
+
+            if (GUILayout.Button("Reload Data", GUILayout.Width(BOTTOM_BAR_BTN_WIDTH)))
+            {
+                TreeView.UpdateTreeView();
+            }
         }
     }
 }
