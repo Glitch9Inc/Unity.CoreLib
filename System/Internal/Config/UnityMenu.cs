@@ -60,6 +60,7 @@ namespace Glitch9.Internal
             // Scriptable Objects
             public const string NAME_SETTINGS = "Settings";
             public const string NAME_LOGS = "Log Container";
+            public const string NAME_FILES = "File Container";
             public const string NAME_AI_MODEL_METADATA = "AI Model Metadata";
 
             public const string NAME_CHAT_STREAMER = "Chat Streamer";
@@ -69,6 +70,7 @@ namespace Glitch9.Internal
 
             public const string CREATE_SETTINGS = CREATE_PATH + NAME_SETTINGS;
             public const string CREATE_LOGS = CREATE_PATH + NAME_LOGS;
+            public const string CREATE_FILES = CREATE_PATH + NAME_FILES;
             public const string CREATE_AI_MODEL_METADATA = CREATE_PATH + NAME_AI_MODEL_METADATA;
 
             public const string CREATE_CHAT_STREAMER = CREATE_PATH + NAME_CHAT_STREAMER;
@@ -78,7 +80,8 @@ namespace Glitch9.Internal
 
             public const int ORDER_SETTINGS = STARTING_CREATE_MENU_ORDER;
             public const int ORDER_LOGS = ORDER_SETTINGS + NEXT_ROW;
-            public const int ORDER_AI_MODEL_METADATA = ORDER_LOGS + NEXT_ROW;
+            public const int ORDER_FILES = ORDER_LOGS + NEXT_ROW;
+            public const int ORDER_AI_MODEL_METADATA = ORDER_FILES + NEXT_ROW;
 
             public const int ORDER_CHAT_STREAMER = ORDER_AI_MODEL_METADATA + ADD_SEPARATOR;
             public const int ORDER_IMAGE_GENERATOR = ORDER_CHAT_STREAMER + NEXT_ROW;
@@ -91,10 +94,10 @@ namespace Glitch9.Internal
             public const string NAME_DALLE = "Editor DALL·E";
             public const string NAME_SPEECH = "Editor Speech";
 
-            public const string NAME_LOG_MANAGER = "Log Manager";
+            public const string NAME_LOG_MANAGER = "Request Log Manager";
             public const string NAME_AI_MODEL_MANAGER = "AI Model Manager";
             public const string NAME_ASSISTANT_MANAGER = "Assistant Manager";
-
+            public const string NAME_FILE_MANAGER = "File Manager";
 
             public const string PATH_COMPLETION = TOOLS_PATH + NAME_COMPLETION;
             public const string PATH_CHAT_GPT = TOOLS_PATH + NAME_CHAT_GPT;
@@ -104,6 +107,7 @@ namespace Glitch9.Internal
             public const string PATH_LOG_MANAGER = TOOLS_PATH + NAME_LOG_MANAGER;
             public const string PATH_AI_MODEL_MANAGER = TOOLS_PATH + NAME_AI_MODEL_MANAGER;
             public const string PATH_ASSISTANT_MANAGER = TOOLS_PATH + NAME_ASSISTANT_MANAGER;
+            public const string PATH_FILE_MANAGER = TOOLS_PATH + NAME_FILE_MANAGER;
 
             public const string PATH_PREFERENCES = TOOLS_PATH + NAME_PREFERENCES;
             public const string PATH_DOCUMENTATION = TOOLS_PATH + NAME_DOCUMENTATION;
@@ -118,13 +122,12 @@ namespace Glitch9.Internal
             public const int PRIORITY_LOG_MANAGER = PRIORITY_SPEECH + ADD_SEPARATOR;
             public const int PRIORITY_AI_MODEL_MANAGER = PRIORITY_LOG_MANAGER + NEXT_ROW;
             public const int PRIORITY_ASSISTANT_MANAGER = PRIORITY_AI_MODEL_MANAGER + NEXT_ROW;
+            public const int PRIORITY_FILE_MANAGER = PRIORITY_ASSISTANT_MANAGER + NEXT_ROW;
 
             public const int PRIORITY_SETTINGS = PRIORITY_ASSISTANT_MANAGER + ADD_SEPARATOR;
             public const int PRIORITY_DOCUMENTATION = PRIORITY_SETTINGS + NEXT_ROW;
-            public const int PRIORITY_SUPPORT = PRIORITY_DOCUMENTATION + NEXT_ROW;
 
-            public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/docs/ai-development-kit/getting-started";
-            //public const string URL_SUPPORT = "https://github.com/Glitch9Inc/AI-Development-Kit/issues";
+            public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/ai-development-kit/";
             public const string PROVIDER_SETTINGS = ROOT_USER_PREFERENCE + NAME;
         }
 

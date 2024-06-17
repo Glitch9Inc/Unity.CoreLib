@@ -125,7 +125,7 @@ namespace Glitch9.Internal.Git
             // Get the latest tag from the fetched tags
             iResult = await RunGitCommandAsync("describe --tags --abbrev=0", false, false);
             if (iResult.IsFailure || iResult is not Result result) return iResult;
-            string latestTag = result.Message.Trim();
+            string latestTag = result.TextOutput.Trim();
 
             _remoteVersion ??= new GitVersion();
 
@@ -152,7 +152,7 @@ namespace Glitch9.Internal.Git
             IResult iResult = await RunGitCommandAsync("rev-parse --abbrev-ref HEAD", false, true);
             if (iResult.IsFailure || iResult is not Result result) return iResult;
 
-            string currentBranch = result.Message;
+            string currentBranch = result.TextOutput;
             if (string.IsNullOrEmpty(currentBranch)) return Result.Fail("Failed to get current branch.");
             currentBranch = currentBranch.Trim();
             Debug.Log($"Current branch: {currentBranch}");
