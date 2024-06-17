@@ -183,17 +183,24 @@ namespace Glitch9.Internal
             public const string PATH_REPORT_AN_ISSUE = PATH + NAME_REPORT_ISSUES;
             public const string PATH_RELOAD_SKINS = PATH + "Reload EditorGUI Skins";
             public const string PATH_RENAME_UI_PREFAB_RESOURCES = PATH + "Rename UIPrefabResource Files";
+            public const string PATH_OPEN_PERSISTENT_DATA_PATH = PATH + "Open Persistent Data Path";
 
             public const int PRIORITY_REPORT_AN_ISSUE = STARTING_SUPPORT_MENU_PRIORITY;
-
+            
             public const int PRIORITY_RELOAD_SKINS = PRIORITY_REPORT_AN_ISSUE + ADD_SEPARATOR;
             public const int PRIORITY_RENAME_UI_PREFAB_RESOURCES = PRIORITY_RELOAD_SKINS - 1;
-
+            public const int PRIORITY_OPEN_PERSISTENT_DATA_PATH = PRIORITY_RENAME_UI_PREFAB_RESOURCES - 1;
 
             [MenuItem(PATH_REPORT_AN_ISSUE, priority = PRIORITY_REPORT_AN_ISSUE)]
             public static void OpenSupportURL()
             {
                 Application.OpenURL(URL_SUPPORT_REPO);
+            }
+
+            [MenuItem(PATH_OPEN_PERSISTENT_DATA_PATH, priority = PRIORITY_OPEN_PERSISTENT_DATA_PATH)]
+            public static void OpenPersistentDataPath()
+            {
+                EditorUtility.RevealInFinder(Application.persistentDataPath);
             }
         }
 
