@@ -273,7 +273,15 @@ namespace Glitch9.Internal.Git
             EGUILayout.SetOrUnsetButton("Upstream to origin", SetUpstreamToOrigin);
             EGUILayout.MultiButton("Other Commands",
                 new EGUIButtonEntry("Normalize Line Endings", () => RunGitCommandsAsync("add --renormalize .")),
-                new EGUIButtonEntry("Push tag", () => _editorGit.PushVersionTagAsync()));
+                new EGUIButtonEntry("Push tag", () => _editorGit.PushVersionTagAsync()),
+                new EGUIButtonEntry("Show Login Info", ShowLoginInformation));
+        }
+
+        private async void ShowLoginInformation()
+        {
+            string loginInfo = await _editorGit.GetLoginInformation();
+            Debug.Log(loginInfo);
+            EditorUtility.DisplayDialog("Login Information", loginInfo, "OK");
         }
 
         private void SetUpstreamToOrigin(bool isSet)

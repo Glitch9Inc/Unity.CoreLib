@@ -167,6 +167,20 @@ namespace Glitch9.Internal.Git
             return Result.Success();
         }
 
+        public async Task<string> GetLoginInformation()
+        {
+            // user name
+            IResult iResult = await RunGitCommandAsync("config user.name", false, true);
+            if (iResult.IsFailure || iResult is not Result result1) return string.Empty;
+            string userName = result1.TextOutput.Trim();
+
+            // user email
+            iResult = await RunGitCommandAsync("config user.email", false, true);
+            if (iResult.IsFailure || iResult is not Result result2) return string.Empty;
+            string userEmail = result2.TextOutput.Trim();
+            return $"{userName} <{userEmail}>";
+        }
+
         public async Task<IResult> PushAsync(string commitMessage, VersionIncrement versionInc, bool force = false)
         {
             string pushCommand = $"push origin {_gitBranch}";
