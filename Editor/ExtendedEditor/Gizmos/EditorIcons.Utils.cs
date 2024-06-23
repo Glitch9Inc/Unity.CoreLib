@@ -16,31 +16,45 @@ namespace Glitch9.ExtendedEditor
         {
             if (!_icons.TryGetValue(iconName, out Texture texture))
             {
-                string path = EGUIUtility.GetTexturePath(GetRootDir(), iconName);
-                if (path == null) return null;
-                texture = AssetDatabase.LoadAssetAtPath<Texture>(path);
+                if (EGUI.IsDarkMode)
+                {
+                    texture = LoadDarkTexture(iconName);
+                    if (texture == null) texture = LoadLightTexture(iconName);
+                }
+                else
+                {
+                    texture = LoadLightTexture(iconName);
+                }
+
                 _icons.Add(iconName, texture);
             }
 
             return texture;
         }
 
-        private static string GetRootDir()
+
+        private static Texture LoadLightTexture(string iconName)
         {
-            return EGUI.IsDarkMode ? ICON_DIR_DARK : ICON_DIR_LIGHT;
+            string path = EGUIUtility.GetTexturePath(ICON_DIR_LIGHT, iconName);
+            if (path == null) return null;
+            return AssetDatabase.LoadAssetAtPath<Texture>(path);
+        }
+        
+        private static Texture LoadDarkTexture(string iconName)
+        {
+            string path = EGUIUtility.GetTexturePath(ICON_DIR_DARK, iconName);
+            if (path == null) return null;
+            return AssetDatabase.LoadAssetAtPath<Texture>(path);
         }
 
         // Util that gets light/dark icon based on current editor skin 
         private static Texture GetBuiltInIcon(string iconName)
         {
+            if (EGUI.IsDarkMode) iconName = $"d_{iconName}";
+
             if (!_icons.TryGetValue(iconName, out Texture texture))
             {
-                if (EGUI.IsDarkMode)
-                {
-                    string d_iconName = $"d_{iconName}";
-                    texture = EditorGUIUtility.IconContent(d_iconName).image;
-                }
-                texture ??= EditorGUIUtility.IconContent(iconName).image;
+                texture = EditorGUIUtility.IconContent(iconName).image;
                 _icons.Add(iconName, texture);
             }
 

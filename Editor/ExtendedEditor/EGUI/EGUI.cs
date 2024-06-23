@@ -65,7 +65,7 @@ namespace Glitch9.ExtendedEditor
                 GUIColor.Red => ExColor.rose,
                 GUIColor.Orange => ExColor.orange,
                 GUIColor.Gray => Color.gray,
-                _ => Color.black,
+                _ => EGUI.IsDarkMode ? Color.white : Color.black,
             };
         }
 
@@ -88,12 +88,16 @@ namespace Glitch9.ExtendedEditor
         #region Box
 
         // Margin goes first.
-        public static GUIStyle Box(int margin = 0, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin));
-        public static GUIStyle Box(RectOffset margin, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, margin);
+        public static GUIStyle Box(int margin = 0, GUIColor color = GUIColor.None)
+            => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin));
+        public static GUIStyle Box(RectOffset margin, GUIColor color = GUIColor.None)
+            => EGUIStyles.Box(color, margin);
 
         // Margin + Padding
-        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin), new RectOffset(padding, padding, padding, padding));
-        public static GUIStyle Box(RectOffset margin, RectOffset padding, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, margin, padding);
+        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None) 
+            => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin), new RectOffset(padding, padding, padding, padding));
+        public static GUIStyle Box(RectOffset margin, RectOffset padding, GUIColor color = GUIColor.None) 
+            => EGUIStyles.Box(color, margin, padding);
 
         // Color goes last. When only need color
         public static GUIStyle Box(GUIColor color) => EGUIStyles.Box(color, new RectOffset(0, 0, 0, 0));

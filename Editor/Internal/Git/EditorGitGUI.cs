@@ -31,7 +31,7 @@ namespace Glitch9.Internal.Git
         private bool _isInitializing = false;
 
 
-        private readonly Dictionary<GitOutputStatus, Color> _gitOutputColors = new()
+        private readonly Dictionary<GitOutputStatus, Color> _outputColorsLight = new()
         {
             { GitOutputStatus.Success, Color.blue },
             { GitOutputStatus.Warning, ExColor.firebrick },
@@ -41,6 +41,17 @@ namespace Glitch9.Internal.Git
             { GitOutputStatus.Completed, ExColor.teal },
         };
 
+        private readonly Dictionary<GitOutputStatus, Color> _outputColorsDark = new()
+        {
+            { GitOutputStatus.Success, Color.cyan },
+            { GitOutputStatus.Warning, ExColor.firebrick },
+            { GitOutputStatus.Hint, Color.magenta },
+            { GitOutputStatus.Error, Color.red },
+            { GitOutputStatus.Fatal, Color.red },
+            { GitOutputStatus.Completed, ExColor.teal },
+        };
+
+        internal Dictionary<GitOutputStatus, Color> CurrentColors { get; private set; }
         private static class Strings
         {
             internal const string MISSING_URL_OR_DIR = "Git URL and Local Directory must be set.";
@@ -66,6 +77,8 @@ namespace Glitch9.Internal.Git
                 Debug.LogError(Strings.MISSING_URL_OR_DIR);
                 return;
             }
+
+            CurrentColors = EGUI.IsDarkMode ? _outputColorsDark : _outputColorsLight;
 
             string commitMessageKey = $"{gitUrl}-{gitBranch}-commitMessage";
             _commitMessage = new EPrefs<string>(commitMessageKey, string.Empty);
@@ -144,7 +157,7 @@ namespace Glitch9.Internal.Git
                 }
                 else
                 {
-                    GUILayout.Label(Strings.UP_TO_DATE, GetColoredStyle(Color.blue));
+                    GUILayout.Label(Strings.UP_TO_DATE, GetColoredStyle(EGUI.IsDarkMode ? Color.cyan : Color.blue));
                 }
             }
             GUILayout.EndVertical();
@@ -282,7 +295,7 @@ namespace Glitch9.Internal.Git
 
         private void DrawGitOutput(GitOutput gitOutput)
         {
-            if (_gitOutputColors.TryGetValue(gitOutput.Status, out Color color))
+            if (CurrentColors.TryGetValue(gitOutput.Status, out Color color))
             {
                 GUILayout.Label(gitOutput.Message, GetColoredStyle(color));
             }

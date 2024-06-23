@@ -4,15 +4,15 @@ namespace Glitch9.ExtendedEditor
 {
     public static partial class EditorGUITextures
     {
-        private static Texture2D BoxDefault => Get(DIR_BOX, "section-box-light.psd");
+        private static Texture2D BoxDefault => Get(DIR_BOX, "section-box-light.psd", "section-box-dark.psd");
         private static Texture2D BoxGreen => Get(DIR_BOX, "section-box-green.psd");
         private static Texture2D BoxYellow => Get(DIR_BOX, "section-box-yellow.psd");
         private static Texture2D BoxOrange => Get(DIR_BOX, "section-box-orange.psd");
         private static Texture2D BoxPurple => Get(DIR_BOX, "section-box-purple.psd");
         private static Texture2D BoxBlue => Get(DIR_BOX, "section-box-blue.psd");
-        
-        private static Texture2D TextFieldDefault => Get(DIR_TEXTFIELD, "textfield-light.png");
-        private static Texture2D TextFieldDefaultFocused => Get(DIR_TEXTFIELD, "textfield-light-focused.png");
+
+        private static Texture2D TextFieldDefault => Get(DIR_TEXTFIELD, "textfield-light.png", "textfield-dark.png");
+        private static Texture2D TextFieldDefaultFocused => Get(DIR_TEXTFIELD, "textfield-light-focused.png", "textfield-dark-focused.png");
         private static Texture2D TextFieldGreen => Get(DIR_TEXTFIELD, "textfield-green.png");
         private static Texture2D TextFieldGreenFocused => Get(DIR_TEXTFIELD, "textfield-green-focused.png");
         private static Texture2D TextFieldYellow => Get(DIR_TEXTFIELD, "textfield-yellow.png");

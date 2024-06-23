@@ -27,7 +27,8 @@ namespace Glitch9.Internal
 
         public static class NativeMediaPlayer
         {
-            private const string NAME = "Native Media Player";
+            public const string NAME = "Native Media Player";
+            public const int RELEASE_YEAR = 2022;
             private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
@@ -53,7 +54,7 @@ namespace Glitch9.Internal
 
         public static class OpenAI // AI Development Kit
         {
-            private const string NAME = "OpenAI";
+            private const string NAME = "AI Development Kit";
             private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
