@@ -207,8 +207,14 @@ namespace Glitch9.ExtendedEditor
 
         #endregion
 
-        #region DateTime Fields   
+        #region DateTime Fields
+
         public static DateTime DateTimeField(string label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
+        {
+            return DateTimeField(new GUIContent(label), dateTime, year, month, day, hour, minute, second, options);
+        }
+
+        public static DateTime DateTimeField(GUIContent label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
         {
             EditorGUILayout.BeginHorizontal(options);
 
@@ -228,44 +234,44 @@ namespace Glitch9.ExtendedEditor
             if (year)
             {
                 YY = EditorGUILayout.IntField(dateTime.Year, GUILayout.Width(50));
-                EditorGUILayout.LabelField("Year", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Year", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (month)
             {
                 MM = EditorGUILayout.IntField(dateTime.Month, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Month", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Mon", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (day)
             {
                 DD = EditorGUILayout.IntField(dateTime.Day, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Day", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Day", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (hour)
             {
                 hh = EditorGUILayout.IntField(dateTime.Hour, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Hour", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Hr", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (minute)
             {
                 mm = EditorGUILayout.IntField(dateTime.Minute, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Minute", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Min", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (second)
             {
                 ss = EditorGUILayout.IntField(dateTime.Second, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Second", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Sec", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             EditorGUILayout.EndHorizontal();
             return new DateTime(YY, MM, DD, hh, mm, ss);
         }
         public static DateTime DateTimeField(DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
-            => DateTimeField(null, dateTime, year, month, day, hour, minute, second, options);
+            => DateTimeField(GUIContent.none, dateTime, year, month, day, hour, minute, second, options);
         public static UnixTime UnixTimeField(string label, UnixTime unixTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
         {
             EditorGUILayout.BeginHorizontal(options);
@@ -286,37 +292,37 @@ namespace Glitch9.ExtendedEditor
             if (year)
             {
                 YY = EditorGUILayout.IntField(unixTime.Year, GUILayout.Width(50));
-                EditorGUILayout.LabelField("Year", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Year", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (month)
             {
                 MM = EditorGUILayout.IntField(unixTime.Month, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Month", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Mon", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (day)
             {
                 DD = EditorGUILayout.IntField(unixTime.Day, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Day", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Day", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (hour)
             {
                 hh = EditorGUILayout.IntField(unixTime.Hour, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Hour", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Hr", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (minute)
             {
                 mm = EditorGUILayout.IntField(unixTime.Minute, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Minute", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Min", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
             if (second)
             {
                 ss = EditorGUILayout.IntField(unixTime.Second, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Second", GUILayout.Width(20));
+                EditorGUILayout.LabelField("Sec", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
 
@@ -593,7 +599,7 @@ namespace Glitch9.ExtendedEditor
         {
             GUILayout.BeginHorizontal();
 
-            string[] displayNames = EnumUtils.GetNames(typeof(T));
+            string[] displayNames = EnumUtils.GetDisplayNames(typeof(T));
             int enumIndex = Convert.ToInt32(value);
             int newEnumIndex = EditorGUILayout.Popup(label, enumIndex, displayNames);
             T newValue = (T)Enum.ToObject(typeof(T), newEnumIndex);
@@ -602,6 +608,30 @@ namespace Glitch9.ExtendedEditor
             {
                 newValue = defaultValue;
             }
+
+            GUILayout.EndHorizontal();
+            return newValue;
+        }
+
+        public static T EnumPopup<T>(T value, params GUILayoutOption[] options) where T : Enum
+        {
+            return EnumPopup(GUIContent.none, value, options);
+        }
+
+
+        public static T EnumPopup<T>(string label, T value, params GUILayoutOption[] options) where T : Enum
+        {
+            return EnumPopup(new GUIContent(label), value, options);
+        }
+
+        public static T EnumPopup<T>(GUIContent label, T value, params GUILayoutOption[] options) where T : Enum
+        {
+            GUILayout.BeginHorizontal();
+
+            string[] displayNames = EnumUtils.GetDisplayNames(typeof(T));
+            int enumIndex = Convert.ToInt32(value);
+            int newEnumIndex = EditorGUILayout.Popup(label, enumIndex, displayNames, options);
+            T newValue = (T)Enum.ToObject(typeof(T), newEnumIndex);
 
             GUILayout.EndHorizontal();
             return newValue;

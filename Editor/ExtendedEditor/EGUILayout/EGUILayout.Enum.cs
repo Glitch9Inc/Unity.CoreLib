@@ -14,7 +14,7 @@ namespace Glitch9.ExtendedEditor
 
             // Get all values and names of the ApiEnumDE
             Array values = Enum.GetValues(typeof(T));
-            string[] names = EnumUtils.GetNames(typeof(T));
+            string[] names = EnumUtils.GetDisplayNames(typeof(T));
 
             EditorGUILayout.BeginHorizontal();
 
@@ -95,7 +95,7 @@ namespace Glitch9.ExtendedEditor
         public static bool EnumToolbar<T>(T enumValue, out T newEnum, GUIStyle toolbarStyle, params GUILayoutOption[] options) where T : Enum
         {
 
-            string[] enumNames = EnumUtils.GetNames(typeof(T));
+            string[] enumNames = EnumUtils.GetDisplayNames(typeof(T));
             int currentIndex = Convert.ToInt32(enumValue);
 
             toolbarStyle ??= new(EditorStyles.toolbarButton);
@@ -122,7 +122,7 @@ namespace Glitch9.ExtendedEditor
 
         public static TEnum ResizableEnumPopup<TEnum>(TEnum selected, GUIContent label, params GUILayoutOption[] options) where TEnum : Enum
         {
-            string[] names = EnumUtils.GetNames(typeof(TEnum));
+            string[] names = EnumUtils.GetDisplayNames(typeof(TEnum));
             int index = Array.IndexOf(names, selected.ToString());
             // The regular EnumPopup has a fixed height, so we need to use a custom implementation to make it resizable.
             // Make a button that shows the currently selected enum value, with a dropdown arrow to the right.

@@ -19,7 +19,7 @@ namespace Glitch9.Internal
             string[] packageExporters = AssetDatabase.FindAssets("t:PackageExporter");
             foreach (string packageExporterGuid in packageExporters)
             {
-                PackageExporter packageExporter = AssetDatabase.LoadAssetAtPath<PackageExporter>(AssetDatabase.GUIDToAssetPath(packageExporterGuid));
+                PackageSettings packageExporter = AssetDatabase.LoadAssetAtPath<PackageSettings>(AssetDatabase.GUIDToAssetPath(packageExporterGuid));
                 if (packageExporter.PackageName == packageName)
                 {
                     version = packageExporter.Version;

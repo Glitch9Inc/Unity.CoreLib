@@ -92,7 +92,8 @@ namespace Glitch9.ExtendedEditor
         public static GUIStyle Box(RectOffset margin, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, margin);
 
         // Margin + Padding
-        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin), new RectOffset(padding, padding, padding, padding));
+        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None) 
+            => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin), new RectOffset(padding, padding, padding, padding));
         public static GUIStyle Box(RectOffset margin, RectOffset padding, GUIColor color = GUIColor.None) => EGUIStyles.Box(color, margin, padding);
 
         // Color goes last. When only need color

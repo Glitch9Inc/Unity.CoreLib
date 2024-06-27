@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Glitch9.Internal
 {
@@ -11,10 +10,13 @@ namespace Glitch9.Internal
         CoreLibIO,
         CoreLibUI,
         SerializationSaver,
-        OpenAI,
-        CommitGet,
+        AIDevKit,
+        AIDevKit_OpenAI,
+        AIDevKit_PlayHT,
+        AIDevKit_Pro,
+        AIDevKit_CodeGen,
+        AIDevKit_CommitGet,
         SmartLocalization,
-        PlayHT,
     }
 
     public class PackagePaths
@@ -23,28 +25,42 @@ namespace Glitch9.Internal
         {
             internal const string ASSETS = "Assets";
         }
-        
-        private static readonly Dictionary<Glitch9Library, string> _paths = new()
+
+        private static readonly Dictionary<Glitch9Library, string[]> _dirs = new()
         {
-            { Glitch9Library.Auth, "Glitch9/Auth" },
-            { Glitch9Library.CoreLib, "Glitch9/CoreLib" },
-            { Glitch9Library.CoreLibIO, "Glitch9/CoreLib.IO" },
-            { Glitch9Library.CoreLibUI, "Glitch9/CoreLib.UI" },
-            { Glitch9Library.SerializationSaver, "Glitch9/Toolkits/SerializationSaver" },
-            { Glitch9Library.OpenAI, "Glitch9/Apis/OpenAI" },
-            { Glitch9Library.CommitGet, "Glitch9/Toolkits/CommitGet" },
-            { Glitch9Library.SmartLocalization, "Glitch9/SmartLocalization" },
-            { Glitch9Library.PlayHT, "Glitch9/Apis/PlayHT" },
+            { Glitch9Library.Auth, new []{"Glitch9/Auth"}},
+            { Glitch9Library.CoreLib, new []{"Glitch9/CoreLib" }},
+            { Glitch9Library.CoreLibIO, new []{"Glitch9/CoreLib.IO"}},
+            { Glitch9Library.CoreLibUI, new []{"Glitch9/CoreLib.UI"}},
+            { Glitch9Library.SerializationSaver, new []{"Glitch9/Toolkits/SerializationSaver"}},
+            { Glitch9Library.AIDevKit, new []
+            {
+                "Glitch9/AIDevKit/Core/Common",
+                "Glitch9/AIDevKit/Core/Resources",
+                "Glitch9/AIDevKit/Core/Demos/Common",
+                "Glitch9/AIDevKit/Documentation",
+            }},
+            { Glitch9Library.AIDevKit_OpenAI, new []{"Glitch9/AIDevKit/Core/OpenAI"}},
+            { Glitch9Library.AIDevKit_PlayHT,new []{ "Glitch9/AIDevKit/Core/PlayHT"}},
+            { Glitch9Library.AIDevKit_Pro, new []
+            {
+                "Glitch9/AIDevKit/Pro",
+                "Glitch9/AIDevKit/Demos/Pro",
+            }},
+            { Glitch9Library.AIDevKit_CodeGen, new []{"Glitch9/AIDevKit/Tools/CodeGen"}},
+            { Glitch9Library.AIDevKit_CommitGet, new []{"Glitch9/AIDevKit/Tools/CommitGet"}},
+            { Glitch9Library.SmartLocalization, new []{"Glitch9/SmartLocalization"}},
         };
 
-        public static string GetAssetsPath(Glitch9Library library)
+        public static string[] GetAssetDirs(Glitch9Library library)
         {
-            return $"{Strings.ASSETS}/{_paths.GetValueOrDefault(library)}";
-        }
-
-        public static string GetFullPath(Glitch9Library library)
-        {
-            return $"{Application.dataPath}/{_paths.GetValueOrDefault(library)}";
+            // return $"{Strings.ASSETS}/{_dirs.GetValueOrDefault(library)}";
+            List<string> dirs = new();
+            foreach (string dir in _dirs[library])
+            {
+                dirs.Add($"{Strings.ASSETS}/{dir}");
+            }
+            return dirs.ToArray();
         }
     }
 }

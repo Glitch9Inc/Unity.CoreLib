@@ -66,6 +66,6 @@ namespace Glitch9.ExtendedEditor
         public static Texture AI => Get("ic_ai.png");
         public static Texture Trash => Get("T_Delete.png");
         public static Texture NoImageHighRes => Get("no-image-high-res.png");
-        
+        public static Texture History => Get("ic_history.png");
     }
 }

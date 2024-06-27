@@ -59,7 +59,7 @@ namespace Glitch9
         {
             if (obj == null)
             {
-                GNLog.ContinueWithLogger(callerMemberName, $"<color=blue><{callerMemberName}></color> is not set in inspector", LogType.Error, callerMemberName, callerFilePath);
+                GNLog.ContinueWithLogger(LogType.Error, callerMemberName, $"<color=blue><{callerMemberName}></color> is not set in inspector",callerMemberName, callerFilePath);
                 return false;
             }
             return true;
@@ -69,7 +69,7 @@ namespace Glitch9
         {
             if (obj == null)
             {
-                GNLog.ContinueWithLogger(callerMemberName, $"<color=blue><{callerMemberName}></color> is not set in inspector", LogType.Error, callerMemberName, callerFilePath);
+                GNLog.ContinueWithLogger(LogType.Error, callerMemberName, $"<color=blue><{callerMemberName}></color> is not set in inspector",callerMemberName, callerFilePath);
                 return true;
             }
             return false;
@@ -82,7 +82,7 @@ namespace Glitch9
 
         private static void HandleError(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "")
         {
-            GNLog.ContinueWithLogger(callerMemberName, message, LogType.Error, callerMemberName, callerFilePath);
+            GNLog.ContinueWithLogger(LogType.Error, callerMemberName, message, callerMemberName, callerFilePath);
         }
     }
 }

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Glitch9.UI;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 // ReSharper disable All
@@ -53,6 +53,18 @@ namespace Glitch9.ExtendedEditor
             margin = new RectOffset(0, 0, 10, 10)
         });
 
+        public static GUIStyle componentTitle => Get(nameof(componentTitle), new GUIStyle(EditorStyles.boldLabel)
+        {
+            fontSize = 14,
+            margin = new RectOffset(0, 0, 0, 0)
+        });
+
+        public static GUIStyle componentSubtitle => Get(nameof(componentSubtitle), new GUIStyle(EditorStyles.label)
+        {
+            fontSize = 11,
+            margin = new RectOffset(0, 0, 0, 0)
+        });
+
         public static GUIStyle array => Get(nameof(array), new GUIStyle(EditorStyles.helpBox)
         {
             padding = new RectOffset(5, 5, 5, 5),
@@ -100,7 +112,7 @@ namespace Glitch9.ExtendedEditor
             padding = new RectOffset(5, 5, 10, 5)
         });
 
-        
+
         private static GUIStyle Border(GUIBorder direction, RectOffset padding)
         {
             string key = $"{direction}_{padding.left},{padding.right},{padding.top},{padding.bottom}";

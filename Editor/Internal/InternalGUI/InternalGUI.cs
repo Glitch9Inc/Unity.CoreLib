@@ -1,3 +1,5 @@
+using Glitch9.ScriptableObjects;
+using Glitch9.UI;
 using UnityEditor;
 using UnityEngine;
 using MessageType = UnityEditor.MessageType;
@@ -32,6 +34,22 @@ namespace Glitch9.ExtendedEditor
             EditorGUILayout.Space();
             EditorGUILayout.LabelField(label, EGUIStyles.title);
             EGUIUtility.DrawTitleLine();
+        }
+
+        public static void ComponentTitle(Texture icon, string title, string subtitle)
+        {
+            GUILayout.BeginHorizontal(EGUI.box);
+            {
+                GUILayout.Label(icon, GUILayout.Width(32), GUILayout.Height(32));
+
+                GUILayout.BeginVertical();
+                {
+                    GUILayout.Label(title, EGUIStyles.componentTitle);
+                    GUILayout.Label(subtitle, EGUIStyles.componentSubtitle);
+                }
+                GUILayout.EndVertical();
+            }
+            GUILayout.EndHorizontal();
         }
 
         public static void ScriptableObjectNotInResourcesFolder<TScriptableObject>() where TScriptableObject : ScriptableObject

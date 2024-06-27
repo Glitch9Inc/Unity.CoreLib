@@ -5,145 +5,145 @@ namespace Glitch9
 {
     public partial class GNLog
     {
-        private const string NATIVE_PLUGIN_TAG = "NativePlugin";
+        private const string NATIVE_PLUGINS_TAG = "Native (Android/iOS)";
 
         public static void Info(string msg,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(callerMemberName, msg, LogType.Info, callerMemberName, callerFilePath);
+            ContinueWithLogger(LogType.Info, null, msg, callerMemberName, callerFilePath);
         }
 
-        public static void Info(object sender, string msg)
+        public static void Info(string msg, object sender,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(sender, msg, LogType.Info);
+            ContinueWithLogger(LogType.Info, sender, msg, callerMemberName, callerFilePath);
         }
 
         public static void Warning(string msg,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(callerMemberName, msg, LogType.Warning, callerMemberName, callerFilePath);
+            ContinueWithLogger(LogType.Warning, null, msg,  callerMemberName, callerFilePath);
         }
 
-        public static void Warning(object sender, string msg)
+        public static void Warning(string msg, object sender,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(sender, msg, LogType.Warning);
+            ContinueWithLogger(LogType.Warning, sender, msg, callerMemberName, callerFilePath);
         }
 
         public static void Error(string msg,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(callerMemberName, msg, LogType.Error, callerMemberName, callerFilePath);
+            ContinueWithLogger(LogType.Error, null, msg, callerMemberName, callerFilePath);
         }
 
-        public static void Error(object sender, string msg)
+        public static void Error(string msg, object sender,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(sender, msg, LogType.Error);
+            ContinueWithLogger(LogType.Error, sender, msg, callerMemberName, callerFilePath);
         }
 
         public static void Error(Issue issue,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(callerMemberName, issue, LogType.Error, callerMemberName, callerFilePath);
+            ContinueWithLogger(LogType.Error, null, issue, callerMemberName, callerFilePath);
         }
 
-        public static void Error(object sender, Issue issue)
-        {
-            ContinueWithLogger(sender, issue, LogType.Error);
-        }
-
-        public static void ParseFail(Type targetType,
+        public static void Error(Issue issue, object sender,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            string msg = $"Failed to convert <color=blue>object</color> to <color=blue>{targetType.Name}</color>";
-            ContinueWithLogger(callerMemberName, msg, LogType.Error, callerMemberName, callerFilePath);
+            ContinueWithLogger(LogType.Error, sender, issue, callerMemberName, callerFilePath);
         }
 
-        public static void ParseFail(object sender, Type targetType)
+        internal static void Error(Error error, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerFilePath] string callerFilePath = "")
         {
-            string msg = $"Failed to convert <color=blue>object</color> to <color=blue>{targetType.Name}</color>";
-            ContinueWithLogger(sender, msg, LogType.Error);
+            if (!LogErrorOnErrorInstanceCreated) return;
+            ContinueWithLogger(LogType.Error, null, error.ToString(LogStackTraceOnErrorInstanceCreated), callerMemberName, callerFilePath);
         }
 
-        public static void Critical(string msg,
+        internal static void Error(Error error, object sender,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(callerMemberName, msg, LogType.Critical, callerMemberName, callerFilePath);
+            if (!LogErrorOnErrorInstanceCreated) return;
+            ContinueWithLogger(LogType.Error, sender, error.ToString(LogStackTraceOnErrorInstanceCreated), callerMemberName, callerFilePath);
         }
 
-        public static void Critical(object sender, string msg)
+        internal static void Error<T>(Error<T> error,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(sender, msg, LogType.Critical);
+            if (!LogErrorOnErrorInstanceCreated) return;
+            ContinueWithLogger(LogType.Error, null, error.ToString(LogStackTraceOnErrorInstanceCreated), callerMemberName, callerFilePath);
         }
 
+        internal static void Error<T>(Error<T> error, object sender,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
+        {
+            if (!LogErrorOnErrorInstanceCreated) return;
+            ContinueWithLogger(LogType.Error, sender, error.ToString(LogStackTraceOnErrorInstanceCreated), callerMemberName, callerFilePath);
+        }
+        
         public static void Exception(Exception e,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
             string msg = e.Message + "\n" + e.StackTrace;
-            ContinueWithLogger(callerMemberName, msg, LogType.Critical, callerMemberName, callerFilePath);
+            ContinueWithLogger(LogType.Exception, null, msg, callerMemberName, callerFilePath);
         }
 
-        public static void Exception(object sender, Exception e)
+        public static void Exception(Exception e, object sender, 
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
         {
             string msg = e.Message + "\n" + e.StackTrace;
-            ContinueWithLogger(sender, msg, LogType.Critical);
+            ContinueWithLogger(LogType.Exception, sender, msg, callerMemberName, callerFilePath);
         }
 
         /// <summary>
         /// Temporary log for debugging purposes
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="showCallerInfo"></param>
         /// <param name="callerMemberName"></param>
         /// <param name="callerFilePath"></param>
         public static void Debug(string msg,
             [CallerMemberName] string callerMemberName = "",
             [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(callerMemberName, msg, LogType.Debug, callerMemberName, callerFilePath);
+            ContinueWithLogger(LogType.Debug,null, msg, callerMemberName, callerFilePath);
         }
 
-        /// <summary>
-        /// Temporary log for debugging purposes
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="msg"></param>
-        public static void Debug(object sender, string msg)
+        public static void Debug(string msg, object sender,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerFilePath] string callerFilePath = "")
         {
-            ContinueWithLogger(sender, msg, LogType.Debug);
+            ContinueWithLogger(LogType.Debug, sender, msg, callerMemberName, callerFilePath);
         }
 
-        public static void Native(string msg)
+        public static void Native(string msg, object sender = null)
         {
-            ContinueWithLogger(NATIVE_PLUGIN_TAG, msg, LogType.NativeInfo);
+            ContinueWithLogger(LogType.NativeInfo, sender, msg, NATIVE_PLUGINS_TAG);
         }
 
-        public static void NativeWarning(string msg)
+        public static void NativeWarning(string msg, object sender = null)
         {
-            ContinueWithLogger(NATIVE_PLUGIN_TAG, msg, LogType.NativeWarning);
+            ContinueWithLogger(LogType.NativeWarning, sender, msg, NATIVE_PLUGINS_TAG);
         }
 
-        public static void NativeError(string msg)
+        public static void NativeError(string msg, object sender = null)
         {
-            ContinueWithLogger(NATIVE_PLUGIN_TAG, msg, LogType.NativeError);
-        }
-
-        internal static void Error(Error error, [CallerMemberName] string callerMemberName = "")
-        {
-            if (!LogErrorOnErrorInstanceCreated) return;
-            ContinueWithLogger(callerMemberName, error.ToString(LogStackTraceOnErrorInstanceCreated), LogType.Error);
-        }
-
-        internal static void Error<T>(Error<T> error, [CallerMemberName] string callerMemberName = "")
-        {
-            if (!LogErrorOnErrorInstanceCreated) return;
-            ContinueWithLogger(callerMemberName, error.ToString(LogStackTraceOnErrorInstanceCreated), LogType.Error);
+            ContinueWithLogger(LogType.NativeError, sender, msg, NATIVE_PLUGINS_TAG);
         }
     }
 }

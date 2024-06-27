@@ -45,48 +45,37 @@ namespace Glitch9.Internal
             public const int PRIORITY_IOS13_PREVIEW = PRIORITY_ANDROID12_PREVIEW + NEXT_ROW;
 
             public const int PRIORITY_PREFERENCES = PRIORITY_IOS13_PREVIEW + ADD_SEPARATOR;
-            public const int PRIORITY_DOCUMENTATION = PRIORITY_PREFERENCES + NEXT_ROW;  
+            public const int PRIORITY_DOCUMENTATION = PRIORITY_PREFERENCES + NEXT_ROW;
 
             public const string URL_DOCUMENTATION = "https://glitch9.gitbook.io/native-media-player";
             public const string PROVIDER_SETTINGS = ROOT_USER_PREFERENCE + NAME;
         }
 
-        public static class OpenAI // AI Development Kit
+        public static class AIDevKit // AI Development Kit
         {
-            private const string NAME = "OpenAI";
+            private const string NAME = "AI Development Kit";
             private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
             // Scriptable Objects
-            public const string NAME_SETTINGS = "Settings";
-            public const string NAME_LOGS = "Log Container";
-            public const string NAME_FILES = "File Container";
+            public const string NAME_OPENAI_SETTINGS = "OpenAI Settings";
+            public const string NAME_GEMINI_SETTINGS = "Gemini Settings";
+            public const string NAME_LOGS_REPO = "Log Repository";
+            public const string NAME_MODEL_METADATA_REPO = "Model Metadata Repository";
+            public const string NAME_FILES_REPO = "File Repository";
             public const string NAME_AI_MODEL_METADATA = "AI Model Metadata";
 
-            public const string NAME_CHAT_STREAMER = "Chat Streamer";
-            public const string NAME_IMAGE_GENERATOR = "Image Generator";
-            public const string NAME_VOICE_GENERATOR = "Voice Generator";
-            public const string NAME_VOICE_TRANSCRIBER = "Voice Transcriber";
-
-            public const string CREATE_SETTINGS = CREATE_PATH + NAME_SETTINGS;
-            public const string CREATE_LOGS = CREATE_PATH + NAME_LOGS;
-            public const string CREATE_FILES = CREATE_PATH + NAME_FILES;
+            public const string CREATE_OPENAI_SETTINGS = CREATE_PATH + NAME_OPENAI_SETTINGS;
+            public const string CREATE_GEMINI_SETTINGS = CREATE_PATH + NAME_GEMINI_SETTINGS;
+            public const string CREATE_LOGS = CREATE_PATH + NAME_LOGS_REPO;
+            public const string CREATE_FILES = CREATE_PATH + NAME_FILES_REPO;
             public const string CREATE_AI_MODEL_METADATA = CREATE_PATH + NAME_AI_MODEL_METADATA;
 
-            public const string CREATE_CHAT_STREAMER = CREATE_PATH + NAME_CHAT_STREAMER;
-            public const string CREATE_IMAGE_GENERATOR = CREATE_PATH + NAME_IMAGE_GENERATOR;
-            public const string CREATE_VOICE_GENERATOR = CREATE_PATH + NAME_VOICE_GENERATOR;
-            public const string CREATE_VOICE_TRANSCRIBER = CREATE_PATH + NAME_VOICE_TRANSCRIBER;
-
-            public const int ORDER_SETTINGS = STARTING_CREATE_MENU_ORDER;
-            public const int ORDER_LOGS = ORDER_SETTINGS + NEXT_ROW;
+            public const int ORDER_OPENAI_SETTINGS = STARTING_CREATE_MENU_ORDER;
+            public const int ORDER_GEMINI_SETTINGS = ORDER_OPENAI_SETTINGS + NEXT_ROW;
+            public const int ORDER_LOGS = ORDER_GEMINI_SETTINGS + NEXT_ROW;
             public const int ORDER_FILES = ORDER_LOGS + NEXT_ROW;
             public const int ORDER_AI_MODEL_METADATA = ORDER_FILES + NEXT_ROW;
-
-            public const int ORDER_CHAT_STREAMER = ORDER_AI_MODEL_METADATA + ADD_SEPARATOR;
-            public const int ORDER_IMAGE_GENERATOR = ORDER_CHAT_STREAMER + NEXT_ROW;
-            public const int ORDER_VOICE_GENERATOR = ORDER_IMAGE_GENERATOR + NEXT_ROW;
-            public const int ORDER_VOICE_TRANSCRIBER = ORDER_VOICE_GENERATOR + NEXT_ROW;
 
             // Menus
             public const string NAME_COMPLETION = "Editor Completion";
@@ -167,7 +156,7 @@ namespace Glitch9.Internal
             //public const string URL_SUPPORT = "https://github.com/Glitch9Inc/Smart-Localization/issues";
             public const string PROVIDER_SETTINGS = ROOT_USER_PREFERENCE + NAME;
         }
-        
+
         public static class CommitGen // Commit-Gen (Only has 1 tool)
         {
             public const int PRIORITY = STARTING_TOOLS_MENU_PRIORITY - ADD_SEPARATOR;
@@ -176,7 +165,7 @@ namespace Glitch9.Internal
 
 
 
-        
+
         #region Extra Menu
 
         public static class Support
@@ -186,11 +175,13 @@ namespace Glitch9.Internal
             public const string PATH_REPORT_AN_ISSUE = PATH + NAME_REPORT_ISSUES;
             public const string PATH_RELOAD_SKINS = PATH + "Reload EditorGUI Skins";
             public const string PATH_RENAME_UI_PREFAB_RESOURCES = PATH + "Rename UIPrefabResource Files";
+            public const string PATH_FIX_EDITOR_FONT_SIZE = PATH + "Fix Editor Font Size";
 
             public const int PRIORITY_REPORT_AN_ISSUE = STARTING_SUPPORT_MENU_PRIORITY;
 
             public const int PRIORITY_RELOAD_SKINS = PRIORITY_REPORT_AN_ISSUE + ADD_SEPARATOR;
             public const int PRIORITY_RENAME_UI_PREFAB_RESOURCES = PRIORITY_RELOAD_SKINS - 1;
+            public const int PRIORITY_FIX_EDITOR_FONT_SIZE = PRIORITY_RENAME_UI_PREFAB_RESOURCES - 1;
 
 
             [MenuItem(PATH_REPORT_AN_ISSUE, priority = PRIORITY_REPORT_AN_ISSUE)]
@@ -198,6 +189,13 @@ namespace Glitch9.Internal
             {
                 Application.OpenURL(URL_SUPPORT_REPO);
             }
+
+            //[MenuItem(PATH_FIX_EDITOR_FONT_SIZE, priority = PRIORITY_FIX_EDITOR_FONT_SIZE)]
+            //public static void FixEditorFontSize()
+            //{
+            //    // reset the editor font size
+
+            //}
         }
 
         public static class Utility
@@ -207,18 +205,21 @@ namespace Glitch9.Internal
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
             // Scriptable Objects
-            public const string PACKAGE_EXPORTER = "Package Exporter";
+            public const string PACKAGE_SETTINGS = "Package Settings";
             public const string GIT_MODULE = "Git Module";
+            public const string DEFINE_SYMBOL_SETTINGS = "Define Symbol Settings";
 
-            public const string CREATE_PACKAGE_EXPORTER = CREATE_PATH + PACKAGE_EXPORTER;
+            public const string CREATE_PACKAGE_SETTINGS = CREATE_PATH + PACKAGE_SETTINGS;
             public const string CREATE_GIT_MODULE = CREATE_PATH + GIT_MODULE;
+            public const string CREATE_DEFINE_SYMBOL_SETTINGS = CREATE_PATH + DEFINE_SYMBOL_SETTINGS;
 
-            public const int ORDER_PACKAGE_EXPORTER = STARTING_CREATE_MENU_ORDER + 2000;
-            public const int ORDER_GIT_MODULE = ORDER_PACKAGE_EXPORTER + NEXT_ROW;
+            public const int ORDER_PACKAGE_SETTINGS = STARTING_CREATE_MENU_ORDER + 2000;
+            public const int ORDER_GIT_MODULE = ORDER_PACKAGE_SETTINGS + NEXT_ROW;
+            public const int ORDER_DEFINE_SYMBOL_SETTINGS = ORDER_GIT_MODULE + NEXT_ROW;
         }
 
         #endregion
-        
+
         #region Not Available to Public yet
 
         public static class Game
@@ -250,7 +251,7 @@ namespace Glitch9.Internal
             public const string PATH_GOOGLE_SHEETS_MANAGER = TOOL_PATH + NAME_GOOGLE_SHEETS_MANAGER;
             public const int PRIORITY_GOOGLE_SHEETS_MANAGER = STARTING_TOOLS_MENU_PRIORITY;
         }
-        
+
         public static class PlayHT
         {
             private const string NAME = "PlayHT";
@@ -271,7 +272,7 @@ namespace Glitch9.Internal
             public const string PATH_AI_DIALOG_GENERATOR = TOOL_PATH + NAME_AI_DIALOG_GENERATOR;
             public const int PRIORITY_AI_DIALOG_GENERATOR = STARTING_TOOLS_MENU_PRIORITY;
         }
-        
+
         #endregion
     }
 }

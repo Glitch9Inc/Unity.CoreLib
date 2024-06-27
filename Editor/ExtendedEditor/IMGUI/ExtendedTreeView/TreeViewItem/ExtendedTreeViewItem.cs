@@ -12,14 +12,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         protected ExtendedTreeViewItem(int id, int depth, string displayName, TData data) : base(id, depth, displayName)
         {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-            Data = data;
+            Data = data ?? throw new ArgumentNullException(nameof(data));
         }
 
         public bool IsFiltered(TFilter filter)
         {
-            Validate.Argument.NotNull(filter);
+            ValidateAndThrow.ArgumentNotNull(filter);
             return filter.IsFiltered(Data);
         }
 

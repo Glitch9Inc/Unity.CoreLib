@@ -1,86 +1,85 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.PackageManager;
-using UnityEditor.PackageManager.Requests;
-using UnityEngine;
 
 namespace Glitch9.Internal
 {
+
     [InitializeOnLoad] // Unity가 로드될 때마다 이 클래스를 초기화합니다.
     public class DefineSymbolManager
     {
-        // Package Names
-        private const string PACKAGE_NAME_ADDRESSABLES = "com.unity.addressables";
-        private const string PACKAGE_NAME_TMPRO = "com.unity.textmeshpro";
-
-        // Asset Folder Names
-        private const string FOLDER_NAME_SERIALIZATION_SAVER = "SerializationSaver";
-        private const string FOLDER_NAME_GLITCH9_LOCALIZATION = "SmartLocalization";
-
-        // Symbols
-        private const string SYMBOL_ADDRESSABLES = "UNITY_ADDRESSABLES";
-        private const string SYMBOL_TMPRO = "UNITY_TMPRO";
-        private const string SYMBOL_SERIALIZATION_SAVER = "GLITCH9_SERIALIZATION_SAVER";
-        private const string SYMBOL_SMART_LOCALIZATION = "GLITCH9_SMART_LOCALIZATION";
-
-        private static readonly ListRequest _listRequest;
-
         static DefineSymbolManager()
         {
-            _listRequest = Client.List(true); // Include dependencies in the list
-            EditorApplication.update += CheckPackageListCompletion;
+            EditorApplication.update += OnEditorUpdate;
         }
 
-        private static void CheckPackageListCompletion()
+        internal const string SYMBOL_PREFIX = "GLITCH9_";
+
+        private static void OnEditorUpdate()
         {
-            if (!_listRequest.IsCompleted) return;
-
-            EditorApplication.update -= CheckPackageListCompletion;
-
-            if (_listRequest.Status == StatusCode.Success)
-            {
-                UpdateDefineSymbols(_listRequest.Result);
-            }
-            else
-            {
-                Debug.LogError("Failed to list packages.");
-            }
+            EditorApplication.update -= OnEditorUpdate;
+            UpdateDefineSymbols();
         }
 
-        private static void UpdateDefineSymbols(PackageCollection packages)
+        private static List<string> GetAllDefines(BuildTargetGroup buildTargetGroup)
         {
-            (string packageName, string symbol)[] packageSymbols = new[]
-            {
-                (PACKAGE_NAME_ADDRESSABLES, SYMBOL_ADDRESSABLES),
-                (PACKAGE_NAME_TMPRO, SYMBOL_TMPRO),
-            };
-
-            (string folderName, string symbol)[] folderSymbols = new[]
-            {
-                (FOLDER_NAME_SERIALIZATION_SAVER, SYMBOL_SERIALIZATION_SAVER),
-                (FOLDER_NAME_GLITCH9_LOCALIZATION, SYMBOL_SMART_LOCALIZATION),
-            };
-            
-            foreach ((string packageName, string symbol) packageSymbol in packageSymbols)
-            {
-                bool packageExists = packages.Any(p => p.name == packageSymbol.packageName);
-                UpdateDefineSymbol(packageSymbol.symbol, packageExists);
-            }
-
-            foreach ((string folderName, string symbol) folderSymbol in folderSymbols)
-            {
-                bool folderExists = AssetDatabase.FindAssets($"t:Folder {folderSymbol.folderName}").Length > 0;
-                UpdateDefineSymbol(folderSymbol.symbol, folderExists);
-            }
-        }
-
-        private static void UpdateDefineSymbol(string defineSymbol, bool addSymbol)
-        {
-            BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
             string definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
-            List<string> allDefines = definesString.Split(';').ToList();
+            return definesString.Split(';').ToList();
+        }
+        private static List<string> GetAllGlitch9Symbols(List<string> allDefines)
+        {
 
+            List<string> glitch9Defines = allDefines.Where(define => define.StartsWith(SYMBOL_PREFIX)).ToList();
+            return glitch9Defines;
+        }
+    
+        private static void UpdateDefineSymbols()
+        {
+            PackageSettings[] packageSettings = AssetDatabase.FindAssets($"t:{nameof(PackageSettings)}")
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<PackageSettings>)
+                .ToArray();
+
+            BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+            List<string> allDefines = GetAllDefines(buildTargetGroup);
+            List<string> currentGlitch9Symbols = GetAllGlitch9Symbols(allDefines);
+            HashSet<string> symbolsToAdd = new();
+
+            foreach (PackageSettings packageSetting in packageSettings)
+            {
+                if (packageSetting == null) continue;
+                if (!packageSetting.Define) continue;
+                
+                string symbol = packageSetting.DefineSymbol;
+                if (!symbol.StartsWith(SYMBOL_PREFIX))
+                {
+                    UnityEngine.Debug.LogWarning("This symbol does not start with the prefix 'GLITCH9_'.");
+                    continue;
+                }
+
+                symbolsToAdd.Add(symbol);
+            }
+
+            // 설정에 따라 심볼을 추가 또는 제거
+            foreach (string symbol in currentGlitch9Symbols)
+            {
+                if (!symbolsToAdd.Contains(symbol))
+                {
+                    UpdateDefineSymbol(buildTargetGroup, allDefines, symbol, false); // 존재하지만 추가되지 않은 심볼은 제거
+                }
+            }
+
+            foreach (string symbol in symbolsToAdd)
+            {
+                if (!currentGlitch9Symbols.Contains(symbol))
+                {
+                    UpdateDefineSymbol(buildTargetGroup, allDefines, symbol, true); // 설정 파일에 있는 심볼은 추가
+                }
+            }
+        }
+
+        private static void UpdateDefineSymbol(BuildTargetGroup buildTargetGroup, List<string> allDefines, string defineSymbol, bool addSymbol)
+        {
             bool symbolExists = allDefines.Contains(defineSymbol);
 
             if (addSymbol && !symbolExists)

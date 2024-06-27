@@ -11,7 +11,7 @@ namespace Glitch9
         public static void CreateGroup(string groupName)
         {
             // Get the Addressable Asset Settings which is the entry point to the Addressable Asset System.
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
             // Check if the group already exists.
             if (settings.FindGroup(groupName) != null) return;
@@ -25,10 +25,10 @@ namespace Glitch9
         public static void AddAsset(string groupName, string labelName, string assetPath, bool createGroup = true)
         {
             // Get the Addressable Asset Settings which is the entry point to the Addressable Asset System.
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
             // Check if the group already exists.
-            var group = settings.FindGroup(groupName);
+            AddressableAssetGroup group = settings.FindGroup(groupName);
             if (group == null)
             {
                 if (createGroup) CreateGroup(groupName);
@@ -36,8 +36,8 @@ namespace Glitch9
             }
 
             // Add assets to the group in the Addressable Asset Settings.
-            var guid = AssetDatabase.AssetPathToGUID(assetPath);
-            var entry = settings.CreateOrMoveEntry(guid, group);
+            string guid = AssetDatabase.AssetPathToGUID(assetPath);
+            AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, group);
             string fileName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
             entry.address = fileName;
             entry.SetLabel(labelName, true, true, true);

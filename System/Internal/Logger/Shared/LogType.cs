@@ -9,7 +9,7 @@ namespace Glitch9
         Verbose = 1 << 1,
         Warning = 1 << 2,
         Error = 1 << 3,
-        Critical = 1 << 4,
+        Exception = 1 << 4,
         NativeInfo = 1 << 5,
         NativeVerbose = 1 << 6,
         NativeWarning = 1 << 7,
