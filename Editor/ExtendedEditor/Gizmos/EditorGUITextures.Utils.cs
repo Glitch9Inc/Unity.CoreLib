@@ -42,6 +42,17 @@ namespace Glitch9.ExtendedEditor
             return GetTextureFromDictionary(subDir, textureName, _lightTextures);
         }
 
+        private static Texture2D Get(string subDir, string lightTextureName, string darkTextureName)
+        {
+            if (EGUI.IsDarkMode)
+            {
+                Texture2D tex = GetTextureFromDictionary(subDir, darkTextureName, _darkTextures);
+                if (tex != null) return tex;
+            }
+
+            return GetTextureFromDictionary(subDir, lightTextureName, _lightTextures);
+        }
+
         private static Texture2D GetTextureFromDictionary(string subDir, string textureName, IDictionary<string, Texture2D> dictionary)
         {
             if (!dictionary.TryGetValue(textureName, out Texture2D texture))

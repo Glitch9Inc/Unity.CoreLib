@@ -27,7 +27,8 @@ namespace Glitch9.Internal
 
         public static class NativeMediaPlayer
         {
-            private const string NAME = "Native Media Player";
+            public const string NAME = "Native Media Player";
+            public const int RELEASE_YEAR = 2022;
             private const string TOOLS_PATH = ROOT_TOOL_PATH + NAME + "/";
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
@@ -175,13 +176,12 @@ namespace Glitch9.Internal
             public const string PATH_REPORT_AN_ISSUE = PATH + NAME_REPORT_ISSUES;
             public const string PATH_RELOAD_SKINS = PATH + "Reload EditorGUI Skins";
             public const string PATH_RENAME_UI_PREFAB_RESOURCES = PATH + "Rename UIPrefabResource Files";
-            public const string PATH_FIX_EDITOR_FONT_SIZE = PATH + "Fix Editor Font Size";
+            public const string PATH_OPEN_PERSISTENT_DATA_PATH = PATH + "Open Persistent Data Path";
 
             public const int PRIORITY_REPORT_AN_ISSUE = STARTING_SUPPORT_MENU_PRIORITY;
-
             public const int PRIORITY_RELOAD_SKINS = PRIORITY_REPORT_AN_ISSUE + ADD_SEPARATOR;
             public const int PRIORITY_RENAME_UI_PREFAB_RESOURCES = PRIORITY_RELOAD_SKINS - 1;
-            public const int PRIORITY_FIX_EDITOR_FONT_SIZE = PRIORITY_RENAME_UI_PREFAB_RESOURCES - 1;
+            public const int PRIORITY_OPEN_PERSISTENT_DATA_PATH = PRIORITY_RENAME_UI_PREFAB_RESOURCES - 1;
 
 
             [MenuItem(PATH_REPORT_AN_ISSUE, priority = PRIORITY_REPORT_AN_ISSUE)]
@@ -190,12 +190,11 @@ namespace Glitch9.Internal
                 Application.OpenURL(URL_SUPPORT_REPO);
             }
 
-            //[MenuItem(PATH_FIX_EDITOR_FONT_SIZE, priority = PRIORITY_FIX_EDITOR_FONT_SIZE)]
-            //public static void FixEditorFontSize()
-            //{
-            //    // reset the editor font size
-
-            //}
+            [MenuItem(PATH_OPEN_PERSISTENT_DATA_PATH, priority = PRIORITY_OPEN_PERSISTENT_DATA_PATH)]
+            public static void OpenPersistentDataPath()
+            {
+                EditorUtility.RevealInFinder(Application.persistentDataPath);
+            }
         }
 
         public static class Utility

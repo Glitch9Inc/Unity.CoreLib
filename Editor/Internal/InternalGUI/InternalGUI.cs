@@ -6,6 +6,14 @@ using MessageType = UnityEditor.MessageType;
 
 namespace Glitch9.ExtendedEditor
 {
+    public enum EditorStatus
+    {
+        Unset,
+        Okay,
+        Error,
+        Warning,
+    }
+    
     public class InternalGUI
     {
         private const float BIG_BTN_HEIGHT = 30;
@@ -48,6 +56,44 @@ namespace Glitch9.ExtendedEditor
                     GUILayout.Label(subtitle, EGUIStyles.componentSubtitle);
                 }
                 GUILayout.EndVertical();
+            }
+            GUILayout.EndHorizontal();
+        }
+        
+        public static void StatusBox(string message, EditorStatus status)
+        {
+            Texture statusIcon;
+
+            switch (status)
+            {
+                case EditorStatus.Okay:
+                    statusIcon = EditorIcons.StatusCheck;
+                    break;
+                case EditorStatus.Error:
+                    statusIcon = EditorIcons.StatusError;
+                    break;
+                case EditorStatus.Warning:
+                    statusIcon = EditorIcons.StatusWarning;
+                    break;
+                default:
+                    statusIcon = null;
+                    break;
+            }
+
+            GUILayout.BeginHorizontal(EditorStyles.helpBox);
+            {
+                if (statusIcon != null)
+                {
+                    GUILayout.Label(statusIcon, GUILayout.Width(30), GUILayout.Height(30));
+                }
+
+                GUILayout.BeginVertical(); // Begin a vertical layout for centering
+                {
+                    GUILayout.FlexibleSpace(); // Add flexible space at the top
+                    GUILayout.Label(message, EditorStyles.wordWrappedLabel);
+                    GUILayout.FlexibleSpace(); // Add flexible space at the bottom
+                }
+                GUILayout.EndVertical(); // End the vertical layout
             }
             GUILayout.EndHorizontal();
         }
