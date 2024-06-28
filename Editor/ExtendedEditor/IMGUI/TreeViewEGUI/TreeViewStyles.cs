@@ -32,6 +32,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         {
             fontStyle = FontStyle.Bold,
             fontSize = 16,
+            fixedHeight = 20,
         });
  
         public static GUIStyle ChildWindowSubtitleLeft => Get(nameof(ChildWindowSubtitleLeft), new GUIStyle(GUI.skin.label)

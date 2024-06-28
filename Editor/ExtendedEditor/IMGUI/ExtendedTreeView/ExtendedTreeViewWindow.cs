@@ -151,7 +151,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             if (GUILayout.Button("Reload Data", GUILayout.Width(BOTTOM_BAR_BTN_WIDTH)))
             {
-                TreeView.UpdateTreeView();
+                TreeView.RefreshTreeView();
             }
         }
     }

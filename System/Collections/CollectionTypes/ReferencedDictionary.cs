@@ -1,29 +1,32 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Glitch9.Collections
 {
     [Serializable]
-    public class ReferencedDictionary<TKeyValuePair, TKey, TValue> : IDictionary<TKey, TValue> 
-        where TKeyValuePair : class, IKeyValuePair<TKey, TValue>, new() 
+    public class ReferencedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
         where TKey : notnull
     {
-        [SerializeReference] public List<TKeyValuePair> serializedList = new();
-        private readonly Dictionary<TKey, TValue> _dictionary = new();
+        public List<SerializedKeyValuePair<TKey, TValue>> serializedList = new();
 
-        public int Count => _dictionary.Count;
-        public bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)_dictionary).IsReadOnly;
-        
-        public ReferencedDictionary()
+        private Dictionary<TKey, TValue> Dictionary
         {
-            Deserialize();
+            get
+            {
+                if (_dictionary == null) Deserialize();
+                return _dictionary;
+            }
         }
+        private Dictionary<TKey, TValue> _dictionary;
+        public int Count => Dictionary.Count;
+        public bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)Dictionary).IsReadOnly;
+
+        
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return _dictionary.GetEnumerator();
+            return Dictionary.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -33,7 +36,7 @@ namespace Glitch9.Collections
 
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            _dictionary.Add(item.Key, item.Value);
+            Dictionary.Add(item.Key, item.Value);
             Serialize();
         }
 
@@ -41,32 +44,32 @@ namespace Glitch9.Collections
         {
             foreach (KeyValuePair<TKey, TValue> item in items)
             {
-                _dictionary.Add(item.Key, item.Value);
+                Dictionary.Add(item.Key, item.Value);
             }
             Serialize();
         }
 
         public void Clear()
         {
-            _dictionary.Clear();
+            Dictionary.Clear();
             Serialize();
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return _dictionary.ContainsKey(item.Key) && EqualityComparer<TValue>.Default.Equals(_dictionary[item.Key], item.Value);
+            return Dictionary.ContainsKey(item.Key) && EqualityComparer<TValue>.Default.Equals(Dictionary[item.Key], item.Value);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            ((ICollection<KeyValuePair<TKey, TValue>>)_dictionary).CopyTo(array, arrayIndex);
+            ((ICollection<KeyValuePair<TKey, TValue>>)Dictionary).CopyTo(array, arrayIndex);
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            if (_dictionary.ContainsKey(item.Key) && EqualityComparer<TValue>.Default.Equals(_dictionary[item.Key], item.Value))
+            if (Dictionary.ContainsKey(item.Key) && EqualityComparer<TValue>.Default.Equals(Dictionary[item.Key], item.Value))
             {
-                bool removed = _dictionary.Remove(item.Key);
+                bool removed = Dictionary.Remove(item.Key);
                 Serialize();
                 return removed;
             }
@@ -77,7 +80,7 @@ namespace Glitch9.Collections
         public bool RemoveAll(Predicate<KeyValuePair<TKey, TValue>> match)
         {
             List<TKey> keysToRemove = new();
-            foreach (KeyValuePair<TKey, TValue> pair in _dictionary)
+            foreach (KeyValuePair<TKey, TValue> pair in Dictionary)
             {
                 if (match(pair))
                 {
@@ -87,7 +90,7 @@ namespace Glitch9.Collections
 
             foreach (TKey key in keysToRemove)
             {
-                _dictionary.Remove(key);
+                Dictionary.Remove(key);
             }
 
             if (keysToRemove.Count > 0)
@@ -103,7 +106,7 @@ namespace Glitch9.Collections
         public List<TValue> FindAll(Predicate<TValue> match)
         {
             List<TValue> values = new();
-            foreach (KeyValuePair<TKey, TValue> pair in _dictionary)
+            foreach (KeyValuePair<TKey, TValue> pair in Dictionary)
             {
                 if (match(pair.Value))
                 {
@@ -116,18 +119,18 @@ namespace Glitch9.Collections
 
         public void Add(TKey key, TValue value)
         {
-            _dictionary.Add(key, value);
+            Dictionary.AddOrUpdate(key, value);
             Serialize();
         }
 
         public bool ContainsKey(TKey key)
         {
-            return _dictionary.ContainsKey(key);
+            return Dictionary.ContainsKey(key);
         }
 
         public bool Remove(TKey key)
         {
-            bool removed = _dictionary.Remove(key);
+            bool removed = Dictionary.Remove(key);
             if (removed)
             {
                 Serialize();
@@ -138,38 +141,38 @@ namespace Glitch9.Collections
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return _dictionary.TryGetValue(key, out value);
+            return Dictionary.TryGetValue(key, out value);
         }
 
         public TValue this[TKey key]
         {
-            get => _dictionary[key];
+            get => Dictionary[key];
             set
             {
-                _dictionary[key] = value;
+                Dictionary[key] = value;
                 Serialize();
             }
         }
 
-        public ICollection<TKey> Keys => _dictionary.Keys;
+        public ICollection<TKey> Keys => Dictionary.Keys;
 
-        public ICollection<TValue> Values => _dictionary.Values;
+        public ICollection<TValue> Values => Dictionary.Values;
 
         private void Serialize()
         {
             serializedList.Clear();
-            foreach (KeyValuePair<TKey, TValue> kvp in _dictionary)
+            foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)
             {
-                serializedList.Add(new TKeyValuePair { Key = kvp.Key, Value = kvp.Value });
+                serializedList.Add(new SerializedKeyValuePair<TKey, TValue> { key = kvp.Key, value = kvp.Value });
             }
         }
 
         private void Deserialize()
         {
-            _dictionary.Clear();
-            foreach (TKeyValuePair kvp in serializedList)
+            _dictionary = new();
+            foreach (SerializedKeyValuePair<TKey, TValue> kvp in serializedList)
             {
-                _dictionary[kvp.Key] = kvp.Value;
+                _dictionary[kvp.key] = kvp.value;
             }
         }
     }

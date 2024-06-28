@@ -308,6 +308,35 @@ namespace Glitch9.ExtendedEditor
             return selected;
         }
 
+        public static T EnumPopup<T>(Rect rect, T value) where T : Enum
+        {
+            return EnumPopup(rect, GUIContent.none, value);
+        }
+
+
+        public static T EnumPopup<T>(Rect rect, string label, T value) where T : Enum
+        {
+            return EnumPopup(rect, new GUIContent(label), value);
+        }
+
+        public static T EnumPopup<T>(Rect rect, GUIContent label, T value) where T : Enum
+        {
+            GUILayout.BeginHorizontal();
+
+            if (label != GUIContent.none)
+            {
+                rect = EditorGUI.PrefixLabel(rect, label);
+            }
+            string[] displayNames = EnumUtils.GetDisplayNames(typeof(T));
+            int enumIndex = Convert.ToInt32(value);
+            int newEnumIndex = EditorGUI.Popup(rect, enumIndex, displayNames);
+            T newValue = (T)Enum.ToObject(typeof(T), newEnumIndex);
+
+            GUILayout.EndHorizontal();
+            return newValue;
+        }
+
+        
         public static TEnum ResizableEnumPopup<TEnum>(Rect rect, TEnum selected) where TEnum : Enum
         {
             string[] names = Enum.GetNames(typeof(TEnum));

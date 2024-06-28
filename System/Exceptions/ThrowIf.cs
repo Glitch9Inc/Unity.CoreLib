@@ -7,7 +7,7 @@ namespace Glitch9
     /// <summary>
     /// Validate objects and throw exceptions when a condition is not met.
     /// </summary>
-    public class ValidateAndThrow
+    public class ThrowIf
     {
         /// <summary>
         /// Throws <see cref="ArgumentNullException"/> if the value is null.
@@ -15,7 +15,7 @@ namespace Glitch9
         /// <param name="value">The value to check.</param>
         /// <param name="paramName">The name of the parameter.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void ArgumentNotNull([NotNull] object value, string paramName)
+        public static void ArgumentIsNull([NotNull] object value, string paramName)
         {
             if (value == null) throw new ArgumentNullException(paramName);
         }
@@ -26,32 +26,31 @@ namespace Glitch9
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">The value to check.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void ArgumentNotNull<T>([NotNull] T value)
+        public static void ArgumentIsNull<T>([NotNull] T value)
         {
             if (value != null) return;
             string paramName = typeof(T).Name;
             throw new ArgumentNullException(paramName);
         }
 
-        public static void ArgumentNotNull(params object[] values)
+        public static void ArgumentIsNull(params (object value, string name)[] values)
         {
-            foreach (object value in values)
+            foreach ((object value, string name) pair in values)
             {
-                if (value == null)
+                if (pair.value == null)
                 {
-                    string paramName = value.GetType().Name;
-                    throw new ArgumentNullException(paramName);
+                    throw new ArgumentNullException(pair.name);
                 }
             }
         }
-  
+
         /// <summary>
         /// Throws <see cref="ArgumentNullException"/> if the string is null or empty.
         /// </summary>
         /// <param name="value">The value to check.</param>
         /// <param name="paramName">The name of the parameter.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void StringNotNullOrEmpty(string value, string paramName)
+        public static void StringIsNullOrEmpty(string value, string paramName)
         {
             if (string.IsNullOrEmpty(value)) throw new StringNullOrEmptyException(paramName);
         }
@@ -62,46 +61,51 @@ namespace Glitch9
         /// <param name="value">The value to check.</param>
         /// <param name="paramName">The name of the parameter.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void StringNotNullOrWhitespace(string value, string paramName)
+        public static void StringIsNullOrWhitespace(string value, string paramName)
         {
             if (string.IsNullOrWhiteSpace(value)) throw new StringNullOrWhiteSpaceException(paramName);
         }
 
-        public static void NotDefault<T>(T value, string paramName)
+        public static void IsDefault<T>(T value, string paramName)
         {
             if (value.Equals(default(T))) throw new ArgumentNullException(paramName);
         }
 
-        public static void NotLessThanZero(int value, string paramName)
+        public static void IsLessThanZero(int value, string paramName)
         {
             if (value < 0) throw new ArgumentOutOfRangeException(paramName);
         }
 
-        public static void NotLessThanZero(float value, string paramName)
+        public static void IsLessThanZero(float value, string paramName)
         {
             if (value < 0) throw new ArgumentOutOfRangeException(paramName);
         }
 
-        public static void NotLessThanZero(double value, string paramName)
+        public static void IsLessThanZero(double value, string paramName)
         {
             if (value < 0) throw new ArgumentOutOfRangeException(paramName);
         }
 
-        public static void NotLessThanZero(decimal value, string paramName)
+        public static void IsLessThanZero(decimal value, string paramName)
         {
             if (value < 0) throw new ArgumentOutOfRangeException(paramName);
         }
 
-        public static void NotLessThanZero(long value, string paramName)
+        public static void IsLessThanZero(long value, string paramName)
         {
             if (value < 0) throw new ArgumentOutOfRangeException(paramName);
         }
-        
+
 
         private const string k_Endpoint = "Endpoint";
-        public static void EndpointNotNull([NotNull] string value, string endpointName = k_Endpoint)
+        public static void EndpointIsNull([NotNull] string value, string endpointName = k_Endpoint)
         {
             if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(endpointName);
+        }
+
+        public static void ResultIsNull<T>(T result)
+        {
+            if (result == null) throw new InvalidOperationException($"Result: '{typeof(T).Name}' is null.");
         }
 
         private const string k_DefaultCurrencyName = "Funds";
@@ -117,12 +121,12 @@ namespace Glitch9
         private const string k_DefaultCollectionName = "Collection";
         private const string k_DefaultArrayName = "Array";
 
-        public static void CollectionNotNullOrEmpty<T>(ICollection<T> collection, string collectionName = k_DefaultCollectionName)
+        public static void CollectionIsNullOrEmpty<T>(ICollection<T> collection, string collectionName = k_DefaultCollectionName)
         {
             if (collection == null || collection.Count == 0) throw new ArgumentNullException(collectionName);
         }
 
-        public static void ListNotNullOrEmpty<T>(IList<T> array, string arrayName = k_DefaultArrayName)
+        public static void ListIsNullOrEmpty<T>(IList<T> array, string arrayName = k_DefaultArrayName)
         {
             if (array == null || array.Count == 0) throw new ArgumentNullException(arrayName);
         }

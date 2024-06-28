@@ -17,7 +17,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         public bool IsFiltered(TFilter filter)
         {
-            ValidateAndThrow.ArgumentNotNull(filter);
+            ThrowIf.ArgumentIsNull(filter);
             return filter.IsFiltered(Data);
         }
 

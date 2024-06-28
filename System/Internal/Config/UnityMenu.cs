@@ -62,21 +62,23 @@ namespace Glitch9.Internal
             public const string NAME_OPENAI_SETTINGS = "OpenAI Settings";
             public const string NAME_GEMINI_SETTINGS = "Gemini Settings";
             public const string NAME_LOGS_REPO = "Log Repository";
-            public const string NAME_MODEL_METADATA_REPO = "Model Metadata Repository";
+            public const string NAME_MODELS_REPO = "Model Metadata Repository";
             public const string NAME_FILES_REPO = "File Repository";
-            public const string NAME_AI_MODEL_METADATA = "AI Model Metadata";
+            public const string NAME_MODEL_METADATA = "Model Metadata";
 
             public const string CREATE_OPENAI_SETTINGS = CREATE_PATH + NAME_OPENAI_SETTINGS;
             public const string CREATE_GEMINI_SETTINGS = CREATE_PATH + NAME_GEMINI_SETTINGS;
-            public const string CREATE_LOGS = CREATE_PATH + NAME_LOGS_REPO;
-            public const string CREATE_FILES = CREATE_PATH + NAME_FILES_REPO;
-            public const string CREATE_AI_MODEL_METADATA = CREATE_PATH + NAME_AI_MODEL_METADATA;
+            public const string CREATE_LOGS_REPO = CREATE_PATH + NAME_LOGS_REPO;
+            public const string CREATE_MODELS_REPO = CREATE_PATH + NAME_MODELS_REPO;
+            public const string CREATE_FILES_REPO = CREATE_PATH + NAME_FILES_REPO;
+            public const string CREATE_MODEL_METADATA = CREATE_PATH + NAME_MODEL_METADATA;
 
             public const int ORDER_OPENAI_SETTINGS = STARTING_CREATE_MENU_ORDER;
             public const int ORDER_GEMINI_SETTINGS = ORDER_OPENAI_SETTINGS + NEXT_ROW;
-            public const int ORDER_LOGS = ORDER_GEMINI_SETTINGS + NEXT_ROW;
-            public const int ORDER_FILES = ORDER_LOGS + NEXT_ROW;
-            public const int ORDER_AI_MODEL_METADATA = ORDER_FILES + NEXT_ROW;
+            public const int ORDER_LOGS_REPO = ORDER_GEMINI_SETTINGS + NEXT_ROW;
+            public const int ORDER_MODELS_REPO = ORDER_LOGS_REPO + NEXT_ROW;
+            public const int ORDER_FILES_REPO = ORDER_MODELS_REPO + NEXT_ROW;
+            public const int ORDER_MODEL_METADATA = ORDER_FILES_REPO + NEXT_ROW;
 
             // Menus
             public const string NAME_COMPLETION = "Editor Completion";
@@ -85,7 +87,7 @@ namespace Glitch9.Internal
             public const string NAME_SPEECH = "Editor Speech";
 
             public const string NAME_LOG_MANAGER = "Request Log Manager";
-            public const string NAME_AI_MODEL_MANAGER = "AI Model Manager";
+            public const string NAME_AI_MODEL_MANAGER = "Model Manager";
             public const string NAME_ASSISTANT_MANAGER = "Assistant Manager";
             public const string NAME_FILE_MANAGER = "File Manager";
 

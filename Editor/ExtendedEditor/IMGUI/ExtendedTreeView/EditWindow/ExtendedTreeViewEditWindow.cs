@@ -22,7 +22,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 internal static readonly GUIContent k_ToolMenu = new(EditorIcons.Menu, "Open the tool menu");
             }
 
-            private const string FALLBACK_TITLE = "Unknown Item";
+            protected const string FALLBACK_TITLE = "Unknown Item";
             protected const float MIN_TEXT_FIELD_HEIGHT = 20;
             public TTreeViewItem Item { get; set; }
             public TTreeView TreeView { get; set; }
@@ -31,9 +31,8 @@ namespace Glitch9.ExtendedEditor.IMGUI
             public TData Data => Item?.Data;
             public TData UpdatedData { get; set; }
             public bool IsDirty => !Data.Equals(UpdatedData);
-
-
-            private string _title;
+            public GUIContent Title { get; set; }
+            
             private bool _isInitialized = false;
             private Vector2 _scrollPosition;
 
@@ -49,8 +48,13 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 if (_isInitialized) return;
                 _isInitialized = true;
-                _title = !string.IsNullOrEmpty(Data.Name) ? Data.Name : FALLBACK_TITLE;
+                CreateTitle();
                 UpdatedData = Data;
+            }
+
+            protected virtual void CreateTitle()
+            {
+                Title = new GUIContent(!string.IsNullOrEmpty(Data.Name) ? Data.Name : FALLBACK_TITLE);
             }
 
             protected abstract void DrawSubtitle();
@@ -71,11 +75,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 {
                     GUILayout.BeginHorizontal();
                     {
-                        GUILayout.Label(_title, TreeViewStyles.ChildWindowTitle);
+                        GUILayout.Label(Title, TreeViewStyles.ChildWindowTitle);
                         GUILayout.FlexibleSpace();
                         DrawToolMenuButton();
                     }
                     GUILayout.EndHorizontal();
+                    GUILayout.Space(5);
 
                     DrawSubtitle();
 

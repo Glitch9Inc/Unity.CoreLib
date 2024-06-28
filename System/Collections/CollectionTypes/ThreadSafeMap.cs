@@ -11,7 +11,7 @@ namespace Glitch9.Collections
 
         public ThreadSafeMap(Func<TKey, TValue> defaultFactory)
         {
-            ValidateAndThrow.ArgumentNotNull(defaultFactory, nameof(defaultFactory));
+            ThrowIf.ArgumentIsNull(defaultFactory, nameof(defaultFactory));
             _defaultFactory = defaultFactory;
             _concurrentStore = new ConcurrentDictionary<TKey, TValue>();
         }

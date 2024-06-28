@@ -9,8 +9,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
     {
         private static class Strings
         {
-            internal const string UNKNOWN_TIME = "Unknown";
+            internal const string UNKNOWN_TIME = "-";
             internal const string UNIX_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+            internal const string UNIX_DATE_FORMAT = "yyyy-MM-dd";
             internal const string BOOL_TRUE = "Yes";
             internal const string BOOL_FALSE = "No";
         }
@@ -39,7 +40,17 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
         public static void UnixTimeCell(Rect cellRect, UnixTime? unixTime, GUIStyle style = null)
         {
-            string timeString = unixTime == null ? Strings.UNKNOWN_TIME : unixTime.Value.ToString(Strings.UNIX_TIME_FORMAT);
+            string timeString;
+            if (unixTime == null || unixTime.Value < new UnixTime(1980, 1, 1, 1, 1, 1)) timeString = Strings.UNKNOWN_TIME;
+            else timeString = unixTime.Value.ToString(Strings.UNIX_TIME_FORMAT);
+            StringCell(cellRect, timeString, style);
+        }
+
+        public static void UnixDateCell(Rect cellRect, UnixTime? unixTime, GUIStyle style = null)
+        {
+            string timeString;
+            if (unixTime == null || unixTime.Value < new UnixTime(1980, 1, 1, 1, 1, 1)) timeString = Strings.UNKNOWN_TIME;
+            else timeString = unixTime.Value.ToString(Strings.UNIX_DATE_FORMAT);
             StringCell(cellRect, timeString, style);
         }
 

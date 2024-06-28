@@ -17,7 +17,17 @@ namespace Glitch9.ScriptableObjects
             if (LogIfNull()) return null;
             return Data.TryGetValue(id, out TData data) ? data : null;
         }
-        
+
+        public static bool TryGetValue(string id, out TData data)
+        {
+            if (LogIfNull())
+            {
+                data = null;
+                return false;
+            }
+            return Data.TryGetValue(id, out data);
+        }
+
         public static void Add(TData data)
         {
             if (LogIfNull()) return;
