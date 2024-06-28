@@ -22,7 +22,7 @@ namespace Glitch9.Collections
         public int Count => Dictionary.Count;
         public bool IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)Dictionary).IsReadOnly;
 
-        
+
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
@@ -169,6 +169,12 @@ namespace Glitch9.Collections
 
         private void Deserialize()
         {
+            if (serializedList == null)
+            {
+                serializedList = new List<SerializedKeyValuePair<TKey, TValue>>();
+                return;
+            }
+
             _dictionary = new();
             foreach (SerializedKeyValuePair<TKey, TValue> kvp in serializedList)
             {

@@ -130,6 +130,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             GUILayout.BeginHorizontal(TreeViewStyles.BottomBarStyle);
             {
+                if (GUILayout.Button(EditorIcons.Refresh))
+                {
+                    TreeView.RefreshTreeView(true, true);
+                    Repaint();
+                }
                 GUILayout.Label($"Showing {TreeView.ShowingCount} of {TreeView.TotalCount} items.");
                 GUILayout.FlexibleSpace();
                 BottomBar();
