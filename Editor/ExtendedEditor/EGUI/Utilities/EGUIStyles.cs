@@ -46,7 +46,6 @@ namespace Glitch9.ExtendedEditor
             fontStyle = FontStyle.Bold
         });
 
-
         public static GUIStyle title => Get(nameof(title), new GUIStyle(EditorStyles.boldLabel)
         {
             fontSize = 14,
@@ -115,7 +114,7 @@ namespace Glitch9.ExtendedEditor
 
         public static GUIStyle helpBox => Get(nameof(helpBox), new GUIStyle(EditorStyles.helpBox)
         {
-            padding = new RectOffset(15, 5, 5, 5),
+            padding = new RectOffset(7, 7, 5, 5),
             margin = new RectOffset(0, 0, 5, 5)
         });
 

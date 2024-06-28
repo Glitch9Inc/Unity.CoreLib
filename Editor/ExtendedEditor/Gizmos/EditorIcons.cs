@@ -14,7 +14,7 @@ namespace Glitch9.ExtendedEditor
         // Media
         //public static Texture PlayButton => Get("ic_play_arrow_black_36dp.png");
         //public static Texture PauseButton => Get("ic_pause_black_36dp.png");
-        public static Texture StopButton => Get("ic_stop_black_36dp.png");
+        //public static Texture StopButton => Get("ic_stop_black_36dp.png");
         public static Texture NextButton => Get("ic_skip_next_black_36dp.png");
         public static Texture PreviousButton => Get("ic_skip_previous_black_36dp.png");
         public static Texture FastForwardButton => Get("ic_fast_forward_black_36dp.png");

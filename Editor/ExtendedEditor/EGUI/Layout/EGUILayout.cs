@@ -209,11 +209,6 @@ namespace Glitch9.ExtendedEditor
 
         #region DateTime Fields
 
-        public static DateTime DateTimeField(string label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
-        {
-            return DateTimeField(new GUIContent(label), dateTime, year, month, day, hour, minute, second, options);
-        }
-
         public static DateTime DateTimeField(GUIContent label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
         {
             EditorGUILayout.BeginHorizontal(options);
@@ -272,67 +267,19 @@ namespace Glitch9.ExtendedEditor
             EditorGUILayout.EndHorizontal();
             return new DateTime(YY, MM, DD, hh, mm, ss);
         }
+        
+        public static DateTime DateTimeField(string label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
+            => DateTimeField(new GUIContent(label), dateTime, year, month, day, hour, minute, second, options);
         public static DateTime DateTimeField(DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
             => DateTimeField(GUIContent.none, dateTime, year, month, day, hour, minute, second, options);
         public static UnixTime UnixTimeField(string label, UnixTime unixTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
+            => UnixTimeField(new GUIContent(label), unixTime, year, month, day, hour, minute, second, options);
+        public static UnixTime UnixTimeField(GUIContent label, UnixTime unixTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false, params GUILayoutOption[] options)
         {
-            EditorGUILayout.BeginHorizontal(options);
-
-            if (label != null)
-            {
-                float labelWidth = EditorGUIUtility.labelWidth;
-                EditorGUILayout.LabelField(label, GUILayout.Width(labelWidth));
-            }
-
-            int YY = 2000;
-            int MM = 1;
-            int DD = 1;
-            int hh = 0;
-            int mm = 0;
-            int ss = 0;
-
-            const float SMALL_SPACE = 10f;
-            const float LARGE_SPACE = 20f;
-
-            if (year)
-            {
-                YY = EditorGUILayout.IntField(unixTime.Year, GUILayout.Width(50), GUILayout.ExpandWidth(true));
-                EditorGUILayout.LabelField("-", GUILayout.MaxWidth(SMALL_SPACE));
-            }
-
-            if (month)
-            {
-                MM = EditorGUILayout.IntField(unixTime.Month, GUILayout.Width(30), GUILayout.ExpandWidth(true));
-                EditorGUILayout.LabelField("-", GUILayout.MaxWidth(SMALL_SPACE));
-            }
-
-            if (day)
-            {
-                DD = EditorGUILayout.IntField(unixTime.Day, GUILayout.Width(30), GUILayout.ExpandWidth(true));
-            }
-
-            if (hour)
-            {
-                GUILayout.Space(LARGE_SPACE);
-                hh = EditorGUILayout.IntField(unixTime.Hour, GUILayout.Width(30), GUILayout.ExpandWidth(true));
-                EditorGUILayout.LabelField(":", GUILayout.MaxWidth(LARGE_SPACE));
-            }
-
-            if (minute)
-            {
-                mm = EditorGUILayout.IntField(unixTime.Minute, GUILayout.Width(30), GUILayout.ExpandWidth(true));
-                EditorGUILayout.LabelField(":", GUILayout.MaxWidth(SMALL_SPACE));
-            }
-
-            if (second)
-            {
-                ss = EditorGUILayout.IntField(unixTime.Second, GUILayout.Width(30));
-            }
-
-
-            EditorGUILayout.EndHorizontal();
-            return new UnixTime(YY, MM, DD, hh, mm, ss);
+            DateTime dateTime = unixTime.ToDateTime();
+            return new UnixTime(DateTimeField(label, dateTime, year, month, day, hour, minute, second, options));
         }
+        
         #endregion
 
         #region Button        

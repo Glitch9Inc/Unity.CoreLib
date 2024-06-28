@@ -59,6 +59,7 @@ namespace Glitch9.Internal
             private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
 
             // Scriptable Objects
+            public const string NAME_COMMON_SETTINGS = "AIDevKit Settings";
             public const string NAME_OPENAI_SETTINGS = "OpenAI Settings";
             public const string NAME_GEMINI_SETTINGS = "Gemini Settings";
             public const string NAME_LOGS_REPO = "Log Repository";
@@ -66,6 +67,7 @@ namespace Glitch9.Internal
             public const string NAME_FILES_REPO = "File Repository";
             public const string NAME_MODEL_METADATA = "Model Metadata";
 
+            public const string CREATE_COMMON_SETTINGS = CREATE_PATH + NAME_COMMON_SETTINGS;
             public const string CREATE_OPENAI_SETTINGS = CREATE_PATH + NAME_OPENAI_SETTINGS;
             public const string CREATE_GEMINI_SETTINGS = CREATE_PATH + NAME_GEMINI_SETTINGS;
             public const string CREATE_LOGS_REPO = CREATE_PATH + NAME_LOGS_REPO;
@@ -73,7 +75,8 @@ namespace Glitch9.Internal
             public const string CREATE_FILES_REPO = CREATE_PATH + NAME_FILES_REPO;
             public const string CREATE_MODEL_METADATA = CREATE_PATH + NAME_MODEL_METADATA;
 
-            public const int ORDER_OPENAI_SETTINGS = STARTING_CREATE_MENU_ORDER;
+            public const int ORDER_COMMON_SETTINGS = STARTING_CREATE_MENU_ORDER;
+            public const int ORDER_OPENAI_SETTINGS = ORDER_COMMON_SETTINGS + NEXT_ROW;
             public const int ORDER_GEMINI_SETTINGS = ORDER_OPENAI_SETTINGS + NEXT_ROW;
             public const int ORDER_LOGS_REPO = ORDER_GEMINI_SETTINGS + NEXT_ROW;
             public const int ORDER_MODELS_REPO = ORDER_LOGS_REPO + NEXT_ROW;

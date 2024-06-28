@@ -20,6 +20,7 @@ namespace Glitch9.ExtendedEditor
         public static Texture Reset => Refresh;
         public static Texture PlayButton => GetBuiltInIcon("PlayButton");
         public static Texture PauseButton => GetBuiltInIcon("PauseButton");
+        public static Texture StopButton => GetBuiltInIcon("PreMatQuad");
         public static Texture Settings => GetBuiltInIcon("Settings");
         public static Texture BuiltIn => Settings;
         public static Texture Edit => GetBuiltInIcon("d_editicon.sml");

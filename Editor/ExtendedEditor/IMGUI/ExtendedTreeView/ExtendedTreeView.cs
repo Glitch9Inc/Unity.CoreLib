@@ -46,13 +46,13 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     _filterSave = new EPrefs<TFilter>(filterPrefsKey, Activator.CreateInstance<TFilter>());
                     Filter = _filterSave.Value;
 
+                    _eventHandler = PrepareEventHandler(eventHandler);
+                    
                     // ReSharper disable once VirtualMemberCallInConstructor
                     SourceData = GetAllDataFromSource().ToList();
-
-                    _eventHandler = PrepareEventHandler(eventHandler);
+                    if (SourceData.IsNullOrEmpty()) Debug.LogWarning("No data found for tree view.");
 
                     RefreshTreeView(true);
-
                     multiColumnHeader.sortingChanged += OnSortingChanged;
                 }
                 catch (Exception e)
@@ -275,10 +275,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 ShowEditWindow(item);
             }
 
-            public void RefreshTreeView(bool filterUpdated = false)
+            public void RefreshTreeView(bool filterUpdated = false, bool reloadSourceData = false)
             {
                 //Debug.Log("Reloading TreeView...");
-
+                if (reloadSourceData) SourceData = GetAllDataFromSource().ToList();
+                
                 if (filterUpdated)
                 {
                     if (UpdateFilter())

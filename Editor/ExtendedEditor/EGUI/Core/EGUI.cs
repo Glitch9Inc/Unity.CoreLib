@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static log4net.Appender.RollingFileAppender;
 
 // ReSharper disable All
 #pragma warning disable IDE1006
@@ -321,8 +322,6 @@ namespace Glitch9.ExtendedEditor
 
         public static T EnumPopup<T>(Rect rect, GUIContent label, T value) where T : Enum
         {
-            GUILayout.BeginHorizontal();
-
             if (label != GUIContent.none)
             {
                 rect = EditorGUI.PrefixLabel(rect, label);
@@ -331,8 +330,6 @@ namespace Glitch9.ExtendedEditor
             int enumIndex = Convert.ToInt32(value);
             int newEnumIndex = EditorGUI.Popup(rect, enumIndex, displayNames);
             T newValue = (T)Enum.ToObject(typeof(T), newEnumIndex);
-
-            GUILayout.EndHorizontal();
             return newValue;
         }
 
@@ -423,5 +420,155 @@ namespace Glitch9.ExtendedEditor
             }
             return false;
         }
+
+
+
+        // DateTime Field
+        public static DateTime DateTimeField(Rect rect, GUIContent label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false)
+        {
+            float originalX = rect.x;
+            const float SMALL_SPACE = 10f;
+            const float LARGE_SPACE = 20f;
+
+            if (label != null)
+            {
+                float labelWidth = EditorGUIUtility.labelWidth;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, labelWidth, rect.height), label);
+                rect.x += labelWidth;
+            }
+
+            int YY = dateTime.Year;
+            int MM = dateTime.Month;
+            int DD = dateTime.Day;
+            int hh = dateTime.Hour;
+            int mm = dateTime.Minute;
+            int ss = dateTime.Second;
+
+            if (year)
+            {
+                rect.width = 50;
+                YY = EditorGUI.IntField(rect, YY);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), "-");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (month)
+            {
+                rect.width = 30;
+                MM = EditorGUI.IntField(rect, MM);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), "-");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (day)
+            {
+                rect.width = 30;
+                DD = EditorGUI.IntField(rect, DD);
+                rect.x += rect.width;
+            }
+
+            if (hour)
+            {
+                rect.x += LARGE_SPACE;
+                rect.width = 30;
+                hh = EditorGUI.IntField(rect, hh);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), ":");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (minute)
+            {
+                rect.width = 30;
+                mm = EditorGUI.IntField(rect, mm);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), ":");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (second)
+            {
+                rect.width = 30;
+                ss = EditorGUI.IntField(rect, ss);
+            }
+
+            return new DateTime(YY, MM, DD, hh, mm, ss);
+        }
+
+        public static UnixTime UnixTimeField(Rect rect, GUIContent label, UnixTime unixTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false)
+        {
+            float originalX = rect.x;
+            const float SMALL_SPACE = 10f;
+            const float LARGE_SPACE = 20f;
+
+            if (label != null)
+            {
+                float labelWidth = EditorGUIUtility.labelWidth;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, labelWidth, rect.height), label);
+                rect.x += labelWidth;
+            }
+
+            int YY = unixTime.Year;
+            int MM = unixTime.Month;
+            int DD = unixTime.Day;
+            int hh = unixTime.Hour;
+            int mm = unixTime.Minute;
+            int ss = unixTime.Second;
+
+            if (year)
+            {
+                rect.width = 50;
+                YY = EditorGUI.IntField(rect, YY);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), "-");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (month)
+            {
+                rect.width = 30;
+                MM = EditorGUI.IntField(rect, MM);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), "-");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (day)
+            {
+                rect.width = 30;
+                DD = EditorGUI.IntField(rect, DD);
+                rect.x += rect.width;
+            }
+
+            if (hour)
+            {
+                rect.x += LARGE_SPACE;
+                rect.width = 30;
+                hh = EditorGUI.IntField(rect, hh);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), ":");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (minute)
+            {
+                rect.width = 30;
+                mm = EditorGUI.IntField(rect, mm);
+                rect.x += rect.width + SMALL_SPACE;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, SMALL_SPACE, rect.height), ":");
+                rect.x += SMALL_SPACE;
+            }
+
+            if (second)
+            {
+                rect.width = 30;
+                ss = EditorGUI.IntField(rect, ss);
+            }
+
+            return new UnixTime(YY, MM, DD, hh, mm, ss);
+        }
+
     }
 }

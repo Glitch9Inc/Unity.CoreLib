@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,7 +11,7 @@ namespace Glitch9.ScriptableObjects
         where TSelf : ScriptableRepository<TRepo, TData, TSelf>
     {
         [SerializeField, SerializeReference] private TRepo data = new();
-        public static TRepo Data => Instance.data;
+        public static TRepo Data => Instance.data ??= new TRepo();
         public static int Count => Data.Count;
 
         public static TData Get(string id)
@@ -54,6 +56,11 @@ namespace Glitch9.ScriptableObjects
             if (LogIfNull()) return;
             Data.Clear();
             Instance.Save();
+        }
+
+        public static List<TData> ToList()
+        {
+            return Data.Values.ToList();
         }
 
         public static void RemoveInvalidEntries()
