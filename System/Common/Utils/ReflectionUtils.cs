@@ -159,7 +159,7 @@ namespace Glitch9
 
         public static bool IsVirtual(this PropertyInfo propertyInfo)
         {
-            Validate.Argument.NotNull(propertyInfo, nameof(propertyInfo));
+            ValidateAndThrow.ArgumentNotNull(propertyInfo, nameof(propertyInfo));
 
             MethodInfo? m = propertyInfo.GetGetMethod(true);
             if (m != null && m.IsVirtual)
@@ -178,7 +178,7 @@ namespace Glitch9
 
         public static MethodInfo GetBaseDefinition(this PropertyInfo propertyInfo)
         {
-            Validate.Argument.NotNull(propertyInfo, nameof(propertyInfo));
+            ValidateAndThrow.ArgumentNotNull(propertyInfo, nameof(propertyInfo));
 
             MethodInfo? m = propertyInfo.GetGetMethod(true);
             if (m != null)
@@ -298,7 +298,7 @@ namespace Glitch9
 
         public static bool IsNullable(Type t)
         {
-            Validate.Argument.NotNull(t, nameof(t));
+            ValidateAndThrow.ArgumentNotNull(t, nameof(t));
 
             if (t.IsValueType)
             {
@@ -310,7 +310,7 @@ namespace Glitch9
 
         public static bool IsNullableType(Type t)
         {
-            Validate.Argument.NotNull(t, nameof(t));
+            ValidateAndThrow.ArgumentNotNull(t, nameof(t));
 
             return (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
@@ -347,8 +347,8 @@ namespace Glitch9
 
         public static bool ImplementsGenericDefinition(Type type, Type genericInterfaceDefinition, [NotNullWhen(true)] out Type? implementingType)
         {
-            Validate.Argument.NotNull(type, nameof(type));
-            Validate.Argument.NotNull(genericInterfaceDefinition, nameof(genericInterfaceDefinition));
+            ValidateAndThrow.ArgumentNotNull(type, nameof(type));
+            ValidateAndThrow.ArgumentNotNull(genericInterfaceDefinition, nameof(genericInterfaceDefinition));
 
             if (!genericInterfaceDefinition.IsInterface || !genericInterfaceDefinition.IsGenericTypeDefinition)
             {
@@ -394,8 +394,8 @@ namespace Glitch9
 
         public static bool InheritsGenericDefinition(Type type, Type genericClassDefinition, out Type? implementingType)
         {
-            Validate.Argument.NotNull(type, nameof(type));
-            Validate.Argument.NotNull(genericClassDefinition, nameof(genericClassDefinition));
+            ValidateAndThrow.ArgumentNotNull(type, nameof(type));
+            ValidateAndThrow.ArgumentNotNull(genericClassDefinition, nameof(genericClassDefinition));
 
             if (!genericClassDefinition.IsClass || !genericClassDefinition.IsGenericTypeDefinition)
             {
@@ -431,7 +431,7 @@ namespace Glitch9
         /// <returns>The type of the typed collection's items.</returns>
         public static Type GetCollectionItemType(Type type)
         {
-            Validate.Argument.NotNull(type, nameof(type));
+            ValidateAndThrow.ArgumentNotNull(type, nameof(type));
 
             if (type.IsArray)
             {
@@ -456,7 +456,7 @@ namespace Glitch9
 
         public static void GetDictionaryKeyValueTypes(Type dictionaryType, out Type? keyType, out Type? valueType)
         {
-            Validate.Argument.NotNull(dictionaryType, nameof(dictionaryType));
+            ValidateAndThrow.ArgumentNotNull(dictionaryType, nameof(dictionaryType));
 
             if (ImplementsGenericDefinition(dictionaryType, typeof(IDictionary<,>), out Type? genericDictionaryType))
             {
@@ -488,7 +488,7 @@ namespace Glitch9
         /// <returns>The underlying type of the member.</returns>
         public static Type GetMemberUnderlyingType(MemberInfo member)
         {
-            Validate.Argument.NotNull(member, nameof(member));
+            ValidateAndThrow.ArgumentNotNull(member, nameof(member));
 
             switch (member.MemberType)
             {
@@ -534,7 +534,7 @@ namespace Glitch9
         /// </returns>
         public static bool IsIndexedProperty(PropertyInfo property)
         {
-            Validate.Argument.NotNull(property, nameof(property));
+            ValidateAndThrow.ArgumentNotNull(property, nameof(property));
 
             return (property.GetIndexParameters().Length > 0);
         }
@@ -547,8 +547,8 @@ namespace Glitch9
         /// <returns>The member's value on the object.</returns>
         public static object GetMemberValue(MemberInfo member, object target)
         {
-            Validate.Argument.NotNull(member, nameof(member));
-            Validate.Argument.NotNull(target, nameof(target));
+            ValidateAndThrow.ArgumentNotNull(member, nameof(member));
+            ValidateAndThrow.ArgumentNotNull(target, nameof(target));
 
             switch (member.MemberType)
             {
@@ -576,8 +576,8 @@ namespace Glitch9
         /// <param name="value">The value.</param>
         public static void SetMemberValue(MemberInfo member, object target, object? value)
         {
-            Validate.Argument.NotNull(member, nameof(member));
-            Validate.Argument.NotNull(target, nameof(target));
+            ValidateAndThrow.ArgumentNotNull(member, nameof(member));
+            ValidateAndThrow.ArgumentNotNull(target, nameof(target));
 
             switch (member.MemberType)
             {
@@ -799,7 +799,7 @@ namespace Glitch9
 
         public static Attribute[] GetAttributes(object attributeProvider, Type attributeType, bool inherit)
         {
-            Validate.Argument.NotNull(attributeProvider, nameof(attributeProvider));
+            ValidateAndThrow.ArgumentNotNull(attributeProvider, nameof(attributeProvider));
 
             object provider = attributeProvider;
 
@@ -874,7 +874,7 @@ namespace Glitch9
 
         public static IEnumerable<FieldInfo> GetFields(Type targetType, BindingFlags bindingAttr)
         {
-            Validate.Argument.NotNull(targetType, nameof(targetType));
+            ValidateAndThrow.ArgumentNotNull(targetType, nameof(targetType));
 
             List<MemberInfo> fieldInfos = new(targetType.GetFields(bindingAttr));
 #if !PORTABLE
@@ -912,7 +912,7 @@ namespace Glitch9
 
         public static IEnumerable<PropertyInfo> GetProperties(Type targetType, BindingFlags bindingAttr)
         {
-            Validate.Argument.NotNull(targetType, nameof(targetType));
+            ValidateAndThrow.ArgumentNotNull(targetType, nameof(targetType));
 
             List<PropertyInfo> propertyInfos = new(targetType.GetProperties(bindingAttr));
 

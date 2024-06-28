@@ -66,11 +66,11 @@ namespace Glitch9.ExtendedEditor
         public static Texture AI => Get("ic_ai.png");
         public static Texture Trash => Get("T_Delete.png");
         public static Texture NoImageHighRes => Get("no-image-high-res.png");
+        public static Texture History => Get("ic_history.png");
 
         // Custom Editor Status (Added on 2024.06.23)
         public static Texture StatusCheck => Get("ic_status_check.png");
         public static Texture StatusError => Get("ic_status_error.png");
         public static Texture StatusWarning => Get("ic_status_warning.png");
-
     }
 }

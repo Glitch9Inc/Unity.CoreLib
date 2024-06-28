@@ -98,7 +98,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (result.IsSuccess)
                 {
                     Repaint();
-                    if (result.IsSaved) TreeView.UpdateData(Item.Data);
+                    if (result.IsUpdated) TreeView.UpdateData(Item.Data);
                 }
             }
 

@@ -63,7 +63,11 @@ namespace Glitch9.ExtendedEditor
 
         public static Rect GetValueRect(this Rect rowRect, float labelWidth = -1)
         {
-            if (Math.Abs(labelWidth - (-1)) < EGUI.TOLERANCE) labelWidth = EditorGUIUtility.labelWidth;
+            if (Math.Abs(labelWidth - (-1)) < EGUI.TOLERANCE)
+            {
+                labelWidth = EditorGUIUtility.labelWidth;
+                labelWidth -= EditorGUI.indentLevel * 15;
+            }
             rowRect.x += labelWidth;
             rowRect.width -= labelWidth;
             return rowRect;

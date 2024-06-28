@@ -34,9 +34,19 @@ namespace Glitch9
         [JsonIgnore] public string FailReason { get; protected set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the result has been saved.
+        /// Gets or sets a value indicating whether the result has been saved to the server.
         /// </summary>
-        [JsonIgnore] public bool IsSaved { get; set; }
+        [JsonIgnore] public bool IsUpdated { get; set; }
+
+        /// <summary>
+        /// Returns true if it's a result of SSE event and the event is done.
+        /// </summary>
+        [JsonIgnore] public bool IsDone { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the exception associated with the result.
+        /// </summary>
+        [JsonIgnore] public Exception Exception { get; set; }
 
         /// <summary>
         /// Creates a successful result.
@@ -78,7 +88,7 @@ namespace Glitch9
         /// Creates a successful and saved result.
         /// </summary>
         /// <returns>A successful and saved <see cref="IResult"/>.</returns>
-        public static IResult Saved() => new Result { IsSuccess = true, IsSaved = true };
+        public static IResult Updated() => new Result { IsSuccess = true, IsUpdated = true };
     }
 
     /// <summary>

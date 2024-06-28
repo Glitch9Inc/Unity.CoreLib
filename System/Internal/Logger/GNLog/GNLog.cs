@@ -16,7 +16,7 @@ namespace Glitch9
             internal const string COLORED = "GNLog.Colored";
             internal const string LOG_ERROR_ON_ERROR_INSTANCE_CREATED = "GNLog.LogErrorOnErrorInstanceCreated";
             internal const string LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED = "GNLog.LogStackTraceOnErrorInstanceCreated";
-            internal const string SHOW_CALLER_FILE_PATH = "GNLog.ShowCallerFilePath";
+            internal const string SHOW_CALLER_MEMBER_NAME = "GNLog.ShowCallerMemberName";
         }
 
         private static class DefaultValues
@@ -31,7 +31,7 @@ namespace Glitch9
 
         public static Prefs<bool> IsEnabled { get; set; } = new(PrefsKeys.ENABLED, DefaultValues.ENABLED);
         public static Prefs<bool> IsColored { get; set; } = new(PrefsKeys.COLORED, DefaultValues.COLORED);
-        public static Prefs<bool> ShowCallerFilePath { get; set; } = new(PrefsKeys.SHOW_CALLER_FILE_PATH, DefaultValues.SHOW_CALLER_FILE_PATH);
+        public static Prefs<bool> ShowCallerMemberName { get; set; } = new(PrefsKeys.SHOW_CALLER_MEMBER_NAME, DefaultValues.SHOW_CALLER_FILE_PATH);
         public static Prefs<bool> LogErrorOnErrorInstanceCreated { get; set; } = new(PrefsKeys.LOG_ERROR_ON_ERROR_INSTANCE_CREATED, DefaultValues.LOG_ERROR_ON_ERROR_INSTANCE_CREATED);
         public static Prefs<bool> LogStackTraceOnErrorInstanceCreated { get; set; } = new(PrefsKeys.LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED, DefaultValues.LOG_STACKTRACE_ON_ERROR_INSTANCE_CREATED);
 
@@ -51,30 +51,30 @@ namespace Glitch9
                 case LogType.Verbose: k_CachedColors.Add(logType, Color.blue.ToHex()); break;
                 case LogType.Warning: k_CachedColors.Add(logType, ExColor.orange.ToHex()); break;
                 case LogType.Error: k_CachedColors.Add(logType, ExColor.clementine.ToHex()); break;
-                case LogType.Critical: k_CachedColors.Add(logType, ExColor.purple.ToHex()); break;
+                case LogType.Exception: k_CachedColors.Add(logType, ExColor.purple.ToHex()); break;
                 case LogType.NativeInfo: k_CachedColors.Add(logType, ExColor.gold.ToHex()); break;
                 case LogType.NativeError: k_CachedColors.Add(logType, ExColor.garnet.ToHex()); break;
             }
             return k_CachedColors[logType];
         }
 
-        public static void ContinueWithLogger(object sender, Issue issue, LogType logType, string callerMemberName = null, string callerFilePath = null)
+        public static void ContinueWithLogger(LogType logType, object sender, Issue issue, string callerMemberName = null, string callerFilePath = null)
         {
-            ContinueWithLogger(sender, issue.ToString(), logType, callerMemberName, callerFilePath);
+            ContinueWithLogger(logType, sender, issue.ToString(), callerMemberName, callerFilePath);
         }
 
-        public static void ContinueWithLogger(object sender, string msg, LogType logType, string callerMemberName = null, string callerFilePath = null)
+        public static void ContinueWithLogger(LogType logType, object sender, string msg, string callerMemberName = null, string callerFilePath = null)
         {
             using (StringBuilderPool.Get(out StringBuilder sb))
             {
-                string senderAsString = ParseSender(sender, callerMemberName);
+                string senderAsString = ParseSender(sender, callerFilePath);
 
                 sb.Append("<color=blue>[");
                 sb.Append(senderAsString);
-                
-                if (ShowCallerFilePath && !string.IsNullOrEmpty(callerFilePath))
+
+                if (ShowCallerMemberName && !string.IsNullOrEmpty(callerMemberName))
                 {
-                    sb.Append(Path.GetFileNameWithoutExtension(callerFilePath));
+                    sb.Append(callerMemberName);
                 }
 
                 sb.Append("]</color> ");
@@ -82,9 +82,9 @@ namespace Glitch9
                 bool isColored = IsColored;
 
                 if (isColored) sb.Append($"<color={GetColorHex(logType)}>");
-                
+
                 sb.Append(msg);
-                
+
                 if (isColored) sb.Append("</color>");
 
                 string log = sb.ToString();
@@ -106,7 +106,7 @@ namespace Glitch9
                         break;
                     case LogType.Error:
                     case LogType.NativeError:
-                    case LogType.Critical:
+                    case LogType.Exception:
                     case LogType.NativeCritical:
                         UnityEngine.Debug.LogError(log);
                         break;
@@ -132,22 +132,22 @@ namespace Glitch9
             return log;
 #endif
         }
-  
 
-        private static string ParseSender(object sender, string callerMemberName)
+
+        private static string ParseSender(object sender, string callerFilePath)
         {
             if (sender == null)
             {
-                if (string.IsNullOrEmpty(callerMemberName)) return DefaultValues.UNKNOWN_SENDER;
-                return callerMemberName;
+                if (string.IsNullOrEmpty(callerFilePath)) return DefaultValues.UNKNOWN_SENDER;
+                return Path.GetFileNameWithoutExtension(callerFilePath);
             }
 
             if (sender is string s)
             {
                 if (string.IsNullOrEmpty(s))
                 {
-                    if (string.IsNullOrEmpty(callerMemberName)) return DefaultValues.UNKNOWN_SENDER;
-                    return callerMemberName;
+                    if (string.IsNullOrEmpty(callerFilePath)) return DefaultValues.UNKNOWN_SENDER;
+                    else return Path.GetFileNameWithoutExtension(callerFilePath);
                 }
                 return s;
             }
