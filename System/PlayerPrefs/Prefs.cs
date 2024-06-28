@@ -11,6 +11,7 @@ namespace Glitch9
 
         private readonly bool _useEncryption = false;
         private readonly string _prefsKey;
+        private bool _alreadyTriedLoadingAndFailed = false;
         private T _cache;
         public T Value
         {
@@ -60,21 +61,36 @@ namespace Glitch9
                 return;
             }
 
+            ProcessLoading(defaultValue);
+        }
+
+
+        private void ProcessLoading(T defaultValue)
+        {
+            if (_alreadyTriedLoadingAndFailed) return;
+            
             try
             {
                 T savedValue = Load();
                 _cache = savedValue ?? defaultValue; // 로드된 값이 null이면 defaultValue 사용
-                if (_cache == null || savedValue == null) // 로드된 값이 null이거나 첫 로드에서 값을 얻지 못한 경우
+                if (savedValue != null)
                 {
-                    _cache = defaultValue;
-                    Save();
+                    _cache = savedValue;
                 }
             }
             catch (Exception e)
             {
-                GNLog.Exception(e);
-                _cache = defaultValue; // 예외 발생 시 defaultValue를 사용
-                Save();
+                if (_alreadyTriedLoadingAndFailed)
+                {
+                    GNLog.Exception(e);
+                }
+                else
+                {
+                    PlayerPrefs.DeleteKey(_prefsKey);
+                    Save();
+                    _alreadyTriedLoadingAndFailed = true;
+                    ProcessLoading(defaultValue);
+                }
             }
         }
 
