@@ -156,7 +156,7 @@ namespace Glitch9
         /// </summary>
         public static bool IsDictionaryType(Type type)
         {
-            ValidateAndThrow.ArgumentNotNull(type, nameof(type));
+            ThrowIf.ArgumentIsNull(type, nameof(type));
 
             if (typeof(IDictionary).IsAssignableFrom(type))
             {

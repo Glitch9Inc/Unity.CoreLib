@@ -104,6 +104,19 @@ namespace Glitch9.ScriptableObjects
             return tex;
         }
 
+        public static Texture2D LoadLightOrDarkTexture(string assetName, ref Dictionary<string, Texture2D> cache)
+        {
+            if (EditorGUIUtility.isProSkin) assetName = $"d_{assetName}";
+            if (cache.TryGetValue(assetName, out Texture2D icon)) return icon;
+            string[] guids = AssetDatabase.FindAssets($"{assetName} t:texture2D", null);
+            if (guids.Length == 0) return null;
+            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            if (path == null) return null;
+            Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            cache.Add(assetName, tex);
+            return tex;
+        }
+
         public static void PingScriptFile(Type type)
         {
             // Find all MonoScript objects in the project

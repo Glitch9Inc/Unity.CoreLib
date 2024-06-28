@@ -11,7 +11,7 @@ namespace Glitch9
         /// <summary>
         /// Gets a value indicating whether the result is successful.
         /// </summary>
-        [JsonIgnore] public bool IsSuccess { get; protected set; }
+        [JsonIgnore] public bool IsSuccess { get; protected set; } = true;
 
         /// <summary>
         /// Gets a value indicating whether the result is a failure.

@@ -11,6 +11,7 @@ namespace Glitch9
         public static implicit operator Error(string errorMessage) => new(errorMessage);
 
         [JsonIgnore] public Issue Issue { get; set; }
+        [JsonIgnore] public string ErrorMessage { get; set; }
         [JsonIgnore] public string StackTrace { get; set; }
 
         public Error()
@@ -25,7 +26,7 @@ namespace Glitch9
 
         public Error(Exception exception, params string[] additionalMessages)
         {
-            TextOutput = exception.Message;
+            ErrorMessage = exception.Message;
             StackTrace = exception.StackTrace;
             JoinMessage(additionalMessages);
             GNLog.Error(this);
@@ -34,7 +35,7 @@ namespace Glitch9
         public Error(Issue issue, params string[] additionalMessages)
         {
             Issue = issue;
-            TextOutput = issue.GetMessage();
+            ErrorMessage = issue.GetMessage();
             JoinMessage(additionalMessages);
             GNLog.Error(this);
         }
@@ -50,22 +51,22 @@ namespace Glitch9
 
             if (!string.IsNullOrEmpty(TextOutput))
             {
-                TextOutput += "\n" + joinedString;
+                ErrorMessage += "\n" + joinedString;
             }
             else
             {
-                TextOutput = joinedString;
+                ErrorMessage = joinedString;
             }
         }
 
-        public override string ToString() => TextOutput;
-        public string ToString(bool includeStackTrace) => includeStackTrace ? $"{TextOutput}\n{StackTrace}" : TextOutput;
+        public override string ToString() => ErrorMessage;
+        public string ToString(bool includeStackTrace) => includeStackTrace ? $"{ErrorMessage}\n{StackTrace}" : ErrorMessage;
 
         public static bool operator ==(Error left, Error right)
         {
             if (ReferenceEquals(left, right)) return true;
             if (left is null || right is null) return false;
-            return Equals(left.TextOutput, right.TextOutput);
+            return Equals(left.ErrorMessage, right.ErrorMessage);
         }
 
         public static bool operator !=(Error left, Error right) => !(left == right);

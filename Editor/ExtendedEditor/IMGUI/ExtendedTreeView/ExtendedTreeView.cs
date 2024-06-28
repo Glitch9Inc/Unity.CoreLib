@@ -31,7 +31,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             private List<TreeViewItem> _cachedItems;
             private List<TreeViewItem> _rows;
-            
+
             private TTreeViewEditWindow _editWindowInstance;
 
 
@@ -51,7 +51,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
                     _eventHandler = PrepareEventHandler(eventHandler);
 
-                    UpdateTreeView(true);
+                    RefreshTreeView(true);
 
                     multiColumnHeader.sortingChanged += OnSortingChanged;
                 }
@@ -64,12 +64,12 @@ namespace Glitch9.ExtendedEditor.IMGUI
             public void OnSortingChanged(MultiColumnHeader multiColumnHeaderParam)
             {
                 Debug.Log("Sorting changed: " + multiColumnHeaderParam.sortedColumnIndex);
-                UpdateTreeView();
+                RefreshTreeView();
             }
 
             public void OnSearchStringChanged()
             {
-                UpdateTreeView();
+                RefreshTreeView();
             }
 
             public void ResetFilter()
@@ -141,7 +141,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     return root;
                 }
 
-                UpdateTreeView();
+                RefreshTreeView();
                 if (_cachedItems == null) return root;
                 SetupParentsAndChildrenFromDepths(root, _cachedItems);
                 return root;
@@ -182,7 +182,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 bool ascending = multiColumnHeader.IsSortedAscending(columnIndex);
 
                 _rows.Sort(Comparison);
-                
+
                 RequiresRefresh = false;
                 OnTreeViewUpdated();
                 return _rows;
@@ -242,7 +242,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             {
                 if (success)
                 {
-                    UpdateTreeView();
+                    RefreshTreeView();
                 }
             }
 
@@ -275,7 +275,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 ShowEditWindow(item);
             }
 
-            public void UpdateTreeView(bool filterUpdated = false)
+            public void RefreshTreeView(bool filterUpdated = false)
             {
                 //Debug.Log("Reloading TreeView...");
 
@@ -322,8 +322,9 @@ namespace Glitch9.ExtendedEditor.IMGUI
                         int id = i + 1000;
                         TData data = SourceData[i];
                         if (data == null) continue;
+                        string name = data.Name ?? $"NoName ({id})";
 
-                        if (Activator.CreateInstance(typeof(TTreeViewItem), id, 0, data.Name, data) is not TTreeViewItem newItem)
+                        if (Activator.CreateInstance(typeof(TTreeViewItem), id, 0, name, data) is not TTreeViewItem newItem)
                         {
                             throw new Exception($"Failed to create new {typeof(TTreeViewItem).Name} instance.");
                         }
@@ -378,12 +379,14 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 if (data == null) return;
                 Debug.Log($"Setting data set of {data.Count} to TreeView.");
                 SourceData = data;
-                UpdateTreeView();
+                RefreshTreeView();
             }
 
             public void UpdateData(TData data)
             {
                 if (data == null) return;
+                if (string.IsNullOrEmpty(data.Id)) return;
+                
                 Debug.Log($"Updating data {data.Id} in TreeView.");
                 TData existingData = SourceData.FirstOrDefault(d => d.Id == data.Id);
                 if (existingData == null)
@@ -396,7 +399,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 int index = SourceData.IndexOf(existingData);
                 SourceData[index] = data;
 
-                UpdateTreeView();
+                RefreshTreeView();
             }
 
             public void AddItem(TTreeViewItem item)
@@ -411,7 +414,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     SourceData.Add(item.Data);
                 }
 
-                UpdateTreeView();
+                RefreshTreeView();
             }
 
             public void UpdateItem(TTreeViewItem item)
@@ -427,7 +430,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     _cachedItems.Add(item);
                 }
 
-                if (item.Data != null)
+                if (item.Data != null && !string.IsNullOrEmpty(item.Data.Id))
                 {
                     TData existingData = SourceData.FirstOrDefault(d => d.Id == item.Data.Id);
                     if (existingData == null)
@@ -441,7 +444,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     SourceData[index] = item.Data;
                 }
 
-                UpdateTreeView();
+                RefreshTreeView();
             }
 
             public void RemoveItem(TTreeViewItem item)
@@ -461,7 +464,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     SourceData.Remove(item.Data);
                 }
 
-                UpdateTreeView();
+                RefreshTreeView();
 
                 //Debug.LogWarning($"Item {item.displayName} not found in cached items.");
             }

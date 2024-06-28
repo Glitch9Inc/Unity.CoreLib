@@ -1,18 +1,16 @@
 using System;
+using UnityEngine;
 
 namespace Glitch9
 {
     public class IssueException : Exception
     {
         public Issue Issue { get; set; }
-        public IssueException() { }
-        public IssueException(Issue issue, string message = null) : base(message)
+ 
+        public IssueException(Issue issue, string message = null) : base($"{issue.GetMessage()}: {message ?? string.Empty}")
         {
+            //Debug.LogException(this);
             Issue = issue;
-        }
-        public IssueException(Exception e, string message = null) : base(message, e)
-        {
-            Issue = e.Convert();
         }
     }
 }

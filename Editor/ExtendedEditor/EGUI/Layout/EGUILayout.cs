@@ -231,40 +231,42 @@ namespace Glitch9.ExtendedEditor
             int mm = 0;
             int ss = 0;
 
+            const float SMALL_SPACE = 10f;
+            const float LARGE_SPACE = 20f;
+
             if (year)
             {
-                YY = EditorGUILayout.IntField(dateTime.Year, GUILayout.Width(50));
-                EditorGUILayout.LabelField("Year", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                YY = EditorGUILayout.IntField(dateTime.Year, GUILayout.Width(50), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField("-", GUILayout.MaxWidth(SMALL_SPACE));
             }
 
             if (month)
             {
-                MM = EditorGUILayout.IntField(dateTime.Month, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Mon", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                MM = EditorGUILayout.IntField(dateTime.Month, GUILayout.Width(30), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField("-", GUILayout.MaxWidth(SMALL_SPACE));
             }
 
             if (day)
             {
-                DD = EditorGUILayout.IntField(dateTime.Day, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Day", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                DD = EditorGUILayout.IntField(dateTime.Day, GUILayout.MaxWidth(30), GUILayout.ExpandWidth(true));
             }
 
             if (hour)
             {
-                hh = EditorGUILayout.IntField(dateTime.Hour, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Hr", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                GUILayout.Space(LARGE_SPACE);
+                hh = EditorGUILayout.IntField(dateTime.Hour, GUILayout.Width(30), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(":", GUILayout.MaxWidth(SMALL_SPACE));
             }
 
             if (minute)
             {
-                mm = EditorGUILayout.IntField(dateTime.Minute, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Min", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                mm = EditorGUILayout.IntField(dateTime.Minute, GUILayout.Width(30), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(":", GUILayout.MaxWidth(SMALL_SPACE));
             }
 
             if (second)
             {
-                ss = EditorGUILayout.IntField(dateTime.Second, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Sec", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                ss = EditorGUILayout.IntField(dateTime.Second, GUILayout.Width(30), GUILayout.ExpandWidth(true));
             }
 
             EditorGUILayout.EndHorizontal();
@@ -289,40 +291,42 @@ namespace Glitch9.ExtendedEditor
             int mm = 0;
             int ss = 0;
 
+            const float SMALL_SPACE = 10f;
+            const float LARGE_SPACE = 20f;
+
             if (year)
             {
-                YY = EditorGUILayout.IntField(unixTime.Year, GUILayout.Width(50));
-                EditorGUILayout.LabelField("Year", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                YY = EditorGUILayout.IntField(unixTime.Year, GUILayout.Width(50), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField("-", GUILayout.MaxWidth(SMALL_SPACE));
             }
 
             if (month)
             {
-                MM = EditorGUILayout.IntField(unixTime.Month, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Mon", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                MM = EditorGUILayout.IntField(unixTime.Month, GUILayout.Width(30), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField("-", GUILayout.MaxWidth(SMALL_SPACE));
             }
 
             if (day)
             {
-                DD = EditorGUILayout.IntField(unixTime.Day, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Day", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                DD = EditorGUILayout.IntField(unixTime.Day, GUILayout.Width(30), GUILayout.ExpandWidth(true));
             }
 
             if (hour)
             {
-                hh = EditorGUILayout.IntField(unixTime.Hour, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Hr", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                GUILayout.Space(LARGE_SPACE);
+                hh = EditorGUILayout.IntField(unixTime.Hour, GUILayout.Width(30), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(":", GUILayout.MaxWidth(LARGE_SPACE));
             }
 
             if (minute)
             {
-                mm = EditorGUILayout.IntField(unixTime.Minute, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Min", GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                mm = EditorGUILayout.IntField(unixTime.Minute, GUILayout.Width(30), GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(":", GUILayout.MaxWidth(SMALL_SPACE));
             }
 
             if (second)
             {
                 ss = EditorGUILayout.IntField(unixTime.Second, GUILayout.Width(30));
-                EditorGUILayout.LabelField("Sec", GUILayout.Width(20), GUILayout.ExpandWidth(true));
             }
 
 

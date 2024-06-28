@@ -113,6 +113,12 @@ namespace Glitch9.ExtendedEditor
         });
 
 
+        public static GUIStyle helpBox => Get(nameof(helpBox), new GUIStyle(EditorStyles.helpBox)
+        {
+            padding = new RectOffset(15, 5, 5, 5),
+            margin = new RectOffset(0, 0, 5, 5)
+        });
+
         private static GUIStyle Border(GUIBorder direction, RectOffset padding)
         {
             string key = $"{direction}_{padding.left},{padding.right},{padding.top},{padding.bottom}";
