@@ -188,7 +188,7 @@ namespace Glitch9.ScriptableObjects
 #if UNITY_EDITOR
             return LoadAsset<T>(assetPath, create);
 #else
-            return LoadResourceInternal<T>(assetPath);
+            return LoadResourceInternal<T>(customPathWithFileName);
 #endif
         }
 
@@ -203,12 +203,18 @@ namespace Glitch9.ScriptableObjects
 
         private static T LoadResourceInternal<T>(string path) where T : ScriptableObject
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                return Resources.Load<T>(typeof(T).Name);
+            }
+            
             if (Path.HasExtension(path)) // if path contains extension, remove it
             {
                 string fileName = Path.GetFileNameWithoutExtension(path);
                 string dir = Path.GetDirectoryName(path);
                 path = $"{dir}/{fileName}";
             }
+
             T asset = Resources.Load<T>(path);
             if (asset == null) Debug.LogWarning($"{path} does not exist in the Resources folder.");
             return asset;

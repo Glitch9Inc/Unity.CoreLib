@@ -8,10 +8,7 @@ namespace Glitch9
     public class Prefs<T>
     {
         public static implicit operator T(Prefs<T> prefs) => prefs.Value;
-
-        private readonly bool _useEncryption = false;
         private readonly string _prefsKey;
-        private bool _alreadyTriedLoadingAndFailed = false;
         private T _cache;
         public T Value
         {
@@ -29,68 +26,37 @@ namespace Glitch9
             }
         }
 
-        public Prefs(string prefsKey, bool useEncryption = false)
+        public Prefs(string prefsKey, T defaultValue)
         {
+            if (string.IsNullOrEmpty(prefsKey)) throw new ArgumentException("prefsKey cannot be null or empty");
             _prefsKey = prefsKey;
-            _useEncryption = useEncryption;
+            ProcessLoading(defaultValue);
+        }
+
+        private void SaveDefaultValue(T defaultValue)
+        {
+            _cache = defaultValue;
+            Save();
+        }
+
+        private void ProcessLoading(T defaultValue)
+        {
+            if (!PlayerPrefs.HasKey(_prefsKey))
+            {
+                SaveDefaultValue(defaultValue);
+                return;
+            }
 
             try
             {
                 T savedValue = Load();
-                if (savedValue != null)
-                {
-                    _cache = savedValue;
-                }
+                _cache = savedValue ?? defaultValue;
             }
             catch (Exception e)
             {
                 GNLog.Exception(e);
-            }
-        }
-
-        public Prefs(string prefsKey, T defaultValue, bool useEncryption = false)
-        {
-            if (string.IsNullOrEmpty(prefsKey)) throw new ArgumentException("prefsKey cannot be null or empty");
-            _prefsKey = prefsKey;
-            _useEncryption = useEncryption;
-
-            if (!PlayerPrefs.HasKey(_prefsKey))
-            {
-                _cache = defaultValue;
-                Save();
-                return;
-            }
-
-            ProcessLoading(defaultValue);
-        }
-
-
-        private void ProcessLoading(T defaultValue)
-        {
-            if (_alreadyTriedLoadingAndFailed) return;
-            
-            try
-            {
-                T savedValue = Load();
-                _cache = savedValue ?? defaultValue; // 로드된 값이 null이면 defaultValue 사용
-                if (savedValue != null)
-                {
-                    _cache = savedValue;
-                }
-            }
-            catch (Exception e)
-            {
-                if (_alreadyTriedLoadingAndFailed)
-                {
-                    GNLog.Exception(e);
-                }
-                else
-                {
-                    PlayerPrefs.DeleteKey(_prefsKey);
-                    Save();
-                    _alreadyTriedLoadingAndFailed = true;
-                    ProcessLoading(defaultValue);
-                }
+                PlayerPrefs.DeleteKey(_prefsKey);
+                SaveDefaultValue(defaultValue);
             }
         }
 
