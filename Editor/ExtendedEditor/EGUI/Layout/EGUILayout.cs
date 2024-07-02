@@ -60,7 +60,7 @@ namespace Glitch9.ExtendedEditor
         public static bool Toggle(GUIContent content, bool isOn, params GUILayoutOption[] options)
         {
             if (isOn) GUI.backgroundColor = new Color(0.5f, 0.9f, 0.9f);
-            if (GUILayout.Button(content, options))
+            if (GUILayout.Button(content, EGUIStyles.miniButton, options))
             {
                 isOn = !isOn;
             }
