@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Glitch9.UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -8,35 +7,6 @@ namespace Glitch9
 {
     public static class FindExtensions
     {
-        public static T GetComponentInChildrenWithUIType<T>(this Transform transform, UIType uiType, bool includeInactive = false) where T : UnityEngine.Component
-        {
-            // 위에 에넘을 참조하여 TextMeshPro나 UnityEngine.UI.Image를 찾습니다.
-            string[] keywords = uiType.GetKeywords();
-            if (keywords == null) return null;
-            return transform.GetComponentInChildrenWithName<T>(includeInactive, keywords);
-        }
-
-        public static Component GetComponentInChildrenWithUIType(this Transform transform, UIType uiType, bool includeInactive = false)
-        {
-            // 위에 에넘을 참조하여 TextMeshPro나 UnityEngine.UI.Image를 찾습니다.
-            string[] keywords = uiType.GetKeywords();
-            if (keywords == null) return null;
-
-            Type type = uiType switch
-            {
-                UIType.TMP_Title => typeof(TMPro.TextMeshProUGUI),
-                UIType.TMP_Subtitle => typeof(TMPro.TextMeshProUGUI),
-                UIType.TMP_Desc => typeof(TMPro.TextMeshProUGUI),
-                UIType.IMG_Icon => typeof(UnityEngine.UI.Image),
-                UIType.IMG_Fill => typeof(UnityEngine.UI.Image),
-                UIType.IMG_Background => typeof(UnityEngine.UI.Image),
-                UIType.IMG_Illust => typeof(UnityEngine.UI.Image),
-                _ => null
-            };
-
-            return transform.GetComponentInChildrenWithName(type, includeInactive, keywords);
-        }
-
         public static T Find<T, TSelf>(this TSelf self, T defaultComponent, string chileName) where TSelf : MonoBehaviour
         {
             if (defaultComponent != null) return defaultComponent;
@@ -192,7 +162,7 @@ namespace Glitch9
 
         private static GameObject CreateGameObject(string name, Transform parent)
         {
-            GameObject obj = new GameObject(name);
+            GameObject obj = new(name);
             obj.transform.SetParent(parent);
             obj.transform.localPosition = Vector3.zero;
             obj.transform.localScale = Vector3.one;
@@ -203,7 +173,7 @@ namespace Glitch9
             rectTransform.pivot = new Vector2(0.5f, 0.5f);
             rectTransform.anchoredPosition = Vector2.zero;
             rectTransform.sizeDelta = Vector2.zero;
-            
+
             return obj;
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Glitch9.Collections
 {
@@ -19,6 +20,11 @@ namespace Glitch9.Collections
         public TValue Get(TKey key)
         {
             return _concurrentStore.GetOrAdd(key, _defaultFactory);
+        }
+
+        public Dictionary<TKey, TValue> GetDictionary()
+        {
+            return new Dictionary<TKey, TValue>(_concurrentStore);
         }
     }
 }

@@ -62,6 +62,14 @@ namespace Glitch9
         public static IResult Success(string outputMessage) => new Result { IsSuccess = true, TextOutput = outputMessage };
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Result<T> Success<T>(T value) => new Result<T> { IsSuccess = true, Value = value };
+        
+        /// <summary>
         /// Creates a failed result with an optional failure reason.
         /// </summary>
         /// <param name="failReason">The reason for the failure.</param>
@@ -97,10 +105,13 @@ namespace Glitch9
     /// <typeparam name="T">The type of the value.</typeparam>
     public class Result<T> : Result
     {
+        public static implicit operator T(Result<T> result) => result.Value;
+        public static implicit operator Result<T>(T value) => Success(value) as Result<T>;
+
         /// <summary>
         /// Gets the value associated with the result.
         /// </summary>
-        [JsonIgnore] public T Value { get; private set; }
+        [JsonIgnore] public T Value { get; set; }
 
         /// <summary>
         /// Creates a successful result with a specified value.
@@ -108,6 +119,7 @@ namespace Glitch9
         /// <param name="value">The value to associate with the result.</param>
         /// <returns>A successful <see cref="IResult"/> with a value.</returns>
         public static IResult Success(T value) => new Result<T> { IsSuccess = true, Value = value };
+
 
         /// <summary>
         /// Creates a failed result with a specified value and an optional failure reason.

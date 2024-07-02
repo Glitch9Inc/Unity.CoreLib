@@ -18,7 +18,7 @@ namespace Glitch9.Collections
             return (Value1?.GetHashCode() ?? 0) ^ (Value2?.GetHashCode() ?? 0);
         }
 
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             if (!(obj is MultiKey<T1, T2> key))
             {

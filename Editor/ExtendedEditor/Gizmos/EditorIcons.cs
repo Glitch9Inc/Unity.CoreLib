@@ -72,5 +72,11 @@ namespace Glitch9.ExtendedEditor
         public static Texture StatusCheck => Get("ic_status_check.png");
         public static Texture StatusError => Get("ic_status_error.png");
         public static Texture StatusWarning => Get("ic_status_warning.png");
+
+        public static Texture LightModeOn => Get("ic_lightmode_on.png");
+        public static Texture LightModeOff => Get("ic_lightmode_off.png");
+        public static Texture DarkModeOn => Get("ic_darkmode_on.png");
+        public static Texture DarkModeOff => Get("ic_darkmode_off.png");
+        public static Texture LightModeSwitch => Get("ic_lightmode_switch.png");
     }
 }

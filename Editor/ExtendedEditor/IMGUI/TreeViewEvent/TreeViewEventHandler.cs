@@ -21,6 +21,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
             return new TreeViewEventBuilder(this, itemEvent);
         }
 
+        public TreeViewEventBuilder CreateEvent(string customEvent)
+        {
+            return new TreeViewEventBuilder(this, customEvent);
+        }
+
         public void ShowRightClickMenu(TTreeViewItem item, Action<bool> refreshTreeView)
         {
             if (Events.IsNullOrEmpty()) return;
@@ -200,6 +205,14 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 _handler = handler;
                 _event = new TreeViewEvent();
                 WithItemEvent(itemEvent);
+            }
+
+            public TreeViewEventBuilder(TreeViewEventHandler<TTreeViewItem, TData, TFilter> handler, string customEvent)
+            {
+                _handler = handler;
+                _event = new TreeViewEvent();
+                _event.TreeViewItemEvent = TreeViewItemEvent.Custom;
+                _event.MenuName = customEvent;
             }
 
             public TreeViewEventBuilder WithItemEvent(TreeViewItemEvent itemEvent, bool setDefaultMenuName = true, bool setDefaultConfirmationMessage = true)

@@ -89,7 +89,7 @@ namespace Glitch9.Internal
             public const string NAME_DALLE = "Editor DALL·E";
             public const string NAME_SPEECH = "Editor Speech";
 
-            public const string NAME_LOG_MANAGER = "Request Log Manager";
+            public const string NAME_LOG_MANAGER = "Request History";
             public const string NAME_AI_MODEL_MANAGER = "Model Manager";
             public const string NAME_ASSISTANT_MANAGER = "Assistant Manager";
             public const string NAME_FILE_MANAGER = "File Manager";
@@ -275,6 +275,17 @@ namespace Glitch9.Internal
             public const string NAME_AI_DIALOG_GENERATOR = "AI Dialog Generator";
             public const string PATH_AI_DIALOG_GENERATOR = TOOL_PATH + NAME_AI_DIALOG_GENERATOR;
             public const int PRIORITY_AI_DIALOG_GENERATOR = STARTING_TOOLS_MENU_PRIORITY;
+        }
+
+        public static class MaterialDesign
+        {
+            private const string NAME = "Material Design";
+            private const string TOOL_PATH = ROOT_TOOL_PATH + NAME + "/";
+            private const string CREATE_PATH = ROOT_CREATE_PATH + NAME + "/";
+
+            public const string COLOR_SCHEME_NAME = "Color Scheme";
+            public const string COLOR_SCHEME_CREATE = CREATE_PATH + COLOR_SCHEME_NAME;
+            public const int COLOR_SCHEME_ORDER = STARTING_CREATE_MENU_ORDER;
         }
 
         #endregion

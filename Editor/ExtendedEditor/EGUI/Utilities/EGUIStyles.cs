@@ -1,3 +1,4 @@
+
 using Glitch9.UI;
 using System.Collections.Generic;
 using UnityEditor;
@@ -80,8 +81,8 @@ namespace Glitch9.ExtendedEditor
         {
             padding = new RectOffset(1, 1, 1, 1),
             margin = new RectOffset(2, 2, 2, 2),
-            fixedHeight = 20,
-            fixedWidth = 20,
+            fixedHeight = 18,
+            fixedWidth = 18,
         });
 
         public static GUIStyle iconButton => Get(nameof(iconButton), new GUIStyle(EditorStyles.iconButton)
@@ -117,6 +118,7 @@ namespace Glitch9.ExtendedEditor
             padding = new RectOffset(7, 7, 5, 5),
             margin = new RectOffset(0, 0, 5, 5)
         });
+
 
         private static GUIStyle Border(GUIBorder direction, RectOffset padding)
         {
@@ -243,7 +245,7 @@ namespace Glitch9.ExtendedEditor
             string key = $"box_{alignment}_{fontSize}_{color}_{margin.left},{margin.right},{margin.top},{margin.bottom}_{padding.left},{padding.right},{padding.top},{padding.bottom}";
             if (!_cache.TryGetValue(key, out GUIStyle style))
             {
-                style = new GUIStyle
+                style = new GUIStyle(EditorStyles.label)
                 {
                     border = new RectOffset(5, 5, 5, 5),
                     margin = margin,

@@ -1,5 +1,6 @@
 using Glitch9.Collections;
 using System;
+using System.Collections.Generic;
 
 namespace Glitch9
 {
@@ -10,6 +11,11 @@ namespace Glitch9
         public static T Get(object type)
         {
             return k_TypeAttributeCache.Get(type);
+        }
+
+        public static Dictionary<object, T> GetDictionary()
+        {
+            return k_TypeAttributeCache.GetDictionary();
         }
     }
 }

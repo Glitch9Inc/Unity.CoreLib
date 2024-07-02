@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using static log4net.Appender.RollingFileAppender;
 
 // ReSharper disable All
 #pragma warning disable IDE1006
@@ -95,9 +94,9 @@ namespace Glitch9.ExtendedEditor
             => EGUIStyles.Box(color, margin);
 
         // Margin + Padding
-        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None) 
+        public static GUIStyle Box(int margin, int padding, GUIColor color = GUIColor.None)
             => EGUIStyles.Box(color, new RectOffset(margin, margin, margin, margin), new RectOffset(padding, padding, padding, padding));
-        public static GUIStyle Box(RectOffset margin, RectOffset padding, GUIColor color = GUIColor.None) 
+        public static GUIStyle Box(RectOffset margin, RectOffset padding, GUIColor color = GUIColor.None)
             => EGUIStyles.Box(color, margin, padding);
 
         // Color goes last. When only need color
@@ -162,7 +161,6 @@ namespace Glitch9.ExtendedEditor
 
         #endregion
 
-
         #region BoxField
         public static void BoxField(Rect rect, string label, GUIColor color) =>
             EditorGUI.LabelField(rect, label, EGUIStyles.Box(TextAnchor.MiddleCenter, color));
@@ -189,7 +187,6 @@ namespace Glitch9.ExtendedEditor
             EditorGUI.LabelField(rect, label, EGUIStyles.TreeViewField(alignment, fontSize, color));
 
         #endregion
-
 
         #region ListPopup
 
@@ -236,8 +233,6 @@ namespace Glitch9.ExtendedEditor
 
         public static string StringListDropdown(Rect rect, string currentValue, IList<string> list, GUIContent label = null)
             => GenericDropdownField(rect, currentValue, list, label);
-
-        #endregion
 
         public static string ResizableStringPopup(Rect rect, string currentValue, IList<string> list, GUIContent label = null)
         {
@@ -309,11 +304,14 @@ namespace Glitch9.ExtendedEditor
             return selected;
         }
 
+        #endregion
+
+        #region  EnumPopup
+
         public static T EnumPopup<T>(Rect rect, T value) where T : Enum
         {
             return EnumPopup(rect, GUIContent.none, value);
         }
-
 
         public static T EnumPopup<T>(Rect rect, string label, T value) where T : Enum
         {
@@ -333,7 +331,6 @@ namespace Glitch9.ExtendedEditor
             return newValue;
         }
 
-        
         public static TEnum ResizableEnumPopup<TEnum>(Rect rect, TEnum selected) where TEnum : Enum
         {
             string[] names = Enum.GetNames(typeof(TEnum));
@@ -359,6 +356,10 @@ namespace Glitch9.ExtendedEditor
 
             return selectedCopy;
         }
+
+        #endregion
+
+        #region ProgressBar
 
         private static int s_ProgressBarHash = "ProgressBar".GetHashCode();
 
@@ -421,9 +422,10 @@ namespace Glitch9.ExtendedEditor
             return false;
         }
 
+        #endregion
 
+        #region TimeField
 
-        // DateTime Field
         public static DateTime DateTimeField(Rect rect, GUIContent label, DateTime dateTime, bool year, bool month, bool day, bool hour = false, bool minute = false, bool second = false)
         {
             float originalX = rect.x;
@@ -570,5 +572,6 @@ namespace Glitch9.ExtendedEditor
             return new UnixTime(YY, MM, DD, hh, mm, ss);
         }
 
+        #endregion
     }
 }

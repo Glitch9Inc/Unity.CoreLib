@@ -1,6 +1,7 @@
 using Glitch9.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -146,7 +147,12 @@ namespace Glitch9.ExtendedEditor
 
         #region Info Fields
 
-        public static void InfoField(string label, string info, float labelWidth = -1f, int infoFontSize = 12, bool boldLabel = false, params GUILayoutOption[] options)
+        public static void InfoField(string label, string content, float labelWidth = -1f, int fontSize = 12, bool boldLabel = false, params GUILayoutOption[] options)
+        {
+            InfoField(label, new GUIContent(content), labelWidth, fontSize, boldLabel, options);
+        }
+
+        public static void InfoField(string label, GUIContent content, float labelWidth = -1f, int fontSize = 12, bool boldLabel = false, params GUILayoutOption[] options)
         {
             GUILayout.BeginHorizontal(options);
             {
@@ -157,7 +163,7 @@ namespace Glitch9.ExtendedEditor
                 GUIStyle infoStyle = new(EditorStyles.label);
 
                 infoStyle.alignment = TextAnchor.MiddleLeft;
-                infoStyle.fontSize = infoFontSize;
+                infoStyle.fontSize = fontSize;
 
                 if (boldLabel)
                 {
@@ -169,8 +175,10 @@ namespace Glitch9.ExtendedEditor
                     labelStyle = infoStyle;
                 }
 
+                if (string.IsNullOrEmpty(content.text)) content.text = "-";
+
                 EditorGUILayout.LabelField(label, labelStyle, GUILayout.Width(labelWidth));
-                EditorGUILayout.LabelField(info, infoStyle, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                EditorGUILayout.LabelField(content, infoStyle, GUILayout.Height(EditorGUIUtility.singleLineHeight));
             }
             GUILayout.EndHorizontal();
         }
@@ -822,6 +830,61 @@ namespace Glitch9.ExtendedEditor
                 }
             }
             GUILayout.EndHorizontal();
+        }
+
+        #endregion
+
+        #region File Path
+
+        public static string FilePathField(string label, string path, string extension, string defaultPath)
+        {
+            return FilePathField(new GUIContent(label), path, extension, defaultPath);
+        }
+        
+        public static string FilePathField(GUIContent label, string path, string extension, string defaultPath)
+        {
+            GUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth));
+                path = EditorGUILayout.TextField(path);
+                if (GUILayout.Button("...", GUILayout.Width(30)))
+                {
+                    string directory = Path.GetDirectoryName(path);
+                    string fileName = Path.GetFileName(path);
+                    string newFilePath = EditorUtility.OpenFilePanel("Select File", directory, extension);
+                    if (!string.IsNullOrEmpty(newFilePath))
+                    {
+                        path = newFilePath;
+                    }
+                }
+            }
+            GUILayout.EndHorizontal();
+            return path;
+        }
+
+        public static string DirectoryPathField(string label, string path, string defaultPath)
+        {
+            return DirectoryPathField(new GUIContent(label), path, defaultPath);
+        }
+
+        public static string DirectoryPathField(GUIContent label, string path, string defaultPath)
+        {
+            GUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth));
+                path = GUILayout.TextField(path);
+                GUILayout.Space(-5);
+                if (GUILayout.Button("...", GUILayout.Width(30)))
+                {
+                    string newDirectoryPath = EditorUtility.OpenFolderPanel("Select Directory", path, "");
+                    if (!string.IsNullOrEmpty(newDirectoryPath))
+                    {
+                        path = newDirectoryPath;
+                    }
+                }
+            }
+            GUILayout.EndHorizontal();
+            return path;
         }
 
         #endregion

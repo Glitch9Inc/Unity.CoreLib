@@ -541,5 +541,17 @@ namespace Glitch9
                 if (pair.Value.Equals(value)) yield return pair.Key;
             }
         }
+
+        public static Dictionary<TKey, TValue> SetNullIfEmpty<TKey, TValue>(this Dictionary<TKey, TValue> dict)
+        {
+            if (dict.IsNullOrEmpty()) dict = null;
+            return dict;
+        }
+
+        public static List<T> SetNullIfEmpty<T>(this List<T> list)
+        {
+            if (list.IsNullOrEmpty()) list = null;
+            return list;
+        }
     }
 }

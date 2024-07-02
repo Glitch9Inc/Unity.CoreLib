@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Glitch9.ExtendedEditor
 {
-    public static class EGUIExtensions
+    public static class RectExtensions
     {
         public static Rect GetSingleLightHeightRow(this Rect rect, int row)
         {

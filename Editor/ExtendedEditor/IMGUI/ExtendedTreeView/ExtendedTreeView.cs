@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using TreeView = UnityEditor.IMGUI.Controls.TreeView;
@@ -82,6 +83,11 @@ namespace Glitch9.ExtendedEditor.IMGUI
             /// </summary>
             /// <returns></returns>
             protected abstract IEnumerable<TData> GetAllDataFromSource();
+
+            protected virtual void RemoveDataFromSource(TData data)
+            {
+                Debug.LogWarning("RemoveDataFromSource not implemented.");
+            }
 
             public void OnDestroy()
             {
@@ -355,13 +361,36 @@ namespace Glitch9.ExtendedEditor.IMGUI
 
             protected override void ContextClickedItem(int id)
             {
-                base.ContextClickedItem(id);
+                IList<int> selection = GetSelection();
 
-                TreeViewItem item = FindItem(id, rootItem);
-                if (item is TTreeViewItem treeViewItem)
+                if (selection.Count > 1)
                 {
-                    OnRightClickedItem(treeViewItem);
+                    List<TTreeViewItem> bulkItems = new();
+                    foreach (int selectedId in selection)
+                    {
+                        TreeViewItem item = FindItem(selectedId, rootItem);
+                        if (item is TTreeViewItem treeViewItem)
+                        {
+                            bulkItems.Add(treeViewItem);
+                        }
+                    }
+
+                    OnRightClickedBulkItems(bulkItems);
                 }
+                else
+                {
+                    TreeViewItem item = FindItem(id, rootItem);
+                    if (item is TTreeViewItem treeViewItem)
+                    {
+                        OnRightClickedItem(treeViewItem);
+                    }
+                }
+            }
+
+
+            protected virtual void OnRightClickedBulkItems(IList<TTreeViewItem> bulkItems)
+            {
+                // Do nothing
             }
 
             protected override void DoubleClickedItem(int id)
@@ -465,11 +494,21 @@ namespace Glitch9.ExtendedEditor.IMGUI
                     SourceData.Remove(item.Data);
                 }
 
+                RemoveDataFromSource(item.Data);
                 RefreshTreeView();
 
                 //Debug.LogWarning($"Item {item.displayName} not found in cached items.");
             }
 
+            public void RemoveItems(IList<TTreeViewItem> selectedItems)
+            {
+                if (selectedItems == null || selectedItems.Count == 0) return;
+
+                foreach (TTreeViewItem item in selectedItems)
+                {
+                    RemoveItem(item);
+                }
+            }
         }
     }
 }

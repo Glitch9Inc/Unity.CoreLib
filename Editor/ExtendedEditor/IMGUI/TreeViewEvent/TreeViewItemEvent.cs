@@ -8,6 +8,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         Remove,
         Revert,
         Copy,
-        Paste
+        Paste,
+        Custom
     }
 }

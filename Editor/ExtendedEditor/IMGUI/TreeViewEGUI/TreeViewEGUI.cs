@@ -10,7 +10,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
         private static class Strings
         {
             internal const string UNKNOWN_TIME = "-";
-            internal const string UNIX_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+            internal const string UNIX_TIME_FORMAT = "yyyy-MM-dd HH:mm tt";
             internal const string UNIX_DATE_FORMAT = "yyyy-MM-dd";
             internal const string BOOL_TRUE = "Yes";
             internal const string BOOL_FALSE = "No";
@@ -34,6 +34,30 @@ namespace Glitch9.ExtendedEditor.IMGUI
                 }
                 else return;
             }
+            if (style == null) GUI.Label(cellRect, text);
+            else GUI.Label(cellRect, text, style);
+        }
+
+
+        public static void PriceCell(Rect cellRect, Price price, string defaultText = null, GUIStyle style = null)
+        {
+            string text;
+
+            if (price == null)
+            {
+                if (defaultText != null)
+                {
+                    //EGUI.Label(cellRect, text, ExColor.charcoal);
+                    text = defaultText;
+                }
+                else return;
+            }
+            else
+            {
+                if (price == 0) text = defaultText;
+                else text = price.ToString();
+            }
+            
             if (style == null) GUI.Label(cellRect, text);
             else GUI.Label(cellRect, text, style);
         }
@@ -119,7 +143,7 @@ namespace Glitch9.ExtendedEditor.IMGUI
             normal = { textColor = ExColor.charcoal },
         };
 
-        public static int IntPopupMenu( string prefix, int selected, int[] optionValues, params GUILayoutOption[] options)
+        public static int IntPopupMenu(string prefix, int selected, int[] optionValues, params GUILayoutOption[] options)
         {
             string[] optionNames = new string[optionValues.Length];
             for (int i = 0; i < optionValues.Length; i++)

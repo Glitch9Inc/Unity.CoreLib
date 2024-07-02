@@ -95,7 +95,11 @@ namespace Glitch9
         public static implicit operator Price(decimal value) => new((float)value);
         public static implicit operator (float value, bool isEstimate)(Price price) => (price?.priceInUsd ?? 0, price?.isEstimate ?? false);
 
-        public override string ToString() => isEstimate ? $"${priceInUsd} {currencyCode} (estimate)" : $"${priceInUsd} {currencyCode}";
+        public override string ToString()
+        {
+            string formattedPrice = priceInUsd.ToString("0.##########");
+            return isEstimate ? $"${formattedPrice} {currencyCode} (estimate)" : $"${formattedPrice} {currencyCode}";
+        }
         public int CompareTo(object obj) => obj is Price price ? priceInUsd.CompareTo(price?.priceInUsd ?? 0) : priceInUsd.CompareTo(obj);
 
         public static Price operator +(Price a, Price b) => new(a?.priceInUsd ?? 0 + b?.priceInUsd ?? 0);

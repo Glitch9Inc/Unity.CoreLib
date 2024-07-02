@@ -36,16 +36,17 @@ namespace Glitch9.Internal
             { Glitch9Library.AIDevKit, new []
             {
                 "Glitch9/AIDevKit/Core/Common",
-                "Glitch9/AIDevKit/Core/Resources",
-                "Glitch9/AIDevKit/Core/Demos/Common",
+                "Glitch9/AIDevKit/Core/OpenAI",
+                "Glitch9/AIDevKit/Core/Google",
+                "Glitch9/AIDevKit/Resources",
                 "Glitch9/AIDevKit/Documentation",
             }},
             { Glitch9Library.AIDevKit_OpenAI, new []{"Glitch9/AIDevKit/Core/OpenAI"}},
             { Glitch9Library.AIDevKit_PlayHT,new []{ "Glitch9/AIDevKit/Core/PlayHT"}},
             { Glitch9Library.AIDevKit_Pro, new []
             {
-                "Glitch9/AIDevKit/Pro",
-                "Glitch9/AIDevKit/Demos/Pro",
+                "Glitch9/AIDevKit/Core/Pro",
+                "Glitch9/AIDevKit/Demos",
             }},
             { Glitch9Library.AIDevKit_CodeGen, new []{"Glitch9/AIDevKit/Tools/CodeGen"}},
             { Glitch9Library.AIDevKit_CommitGet, new []{"Glitch9/AIDevKit/Tools/CommitGet"}},

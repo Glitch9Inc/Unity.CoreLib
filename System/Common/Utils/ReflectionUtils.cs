@@ -1,12 +1,9 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 
 namespace Glitch9
@@ -161,7 +158,7 @@ namespace Glitch9
         {
             ThrowIf.ArgumentIsNull(propertyInfo, nameof(propertyInfo));
 
-            MethodInfo? m = propertyInfo.GetGetMethod(true);
+            MethodInfo m = propertyInfo.GetGetMethod(true);
             if (m != null && m.IsVirtual)
             {
                 return true;
@@ -180,7 +177,7 @@ namespace Glitch9
         {
             ThrowIf.ArgumentIsNull(propertyInfo, nameof(propertyInfo));
 
-            MethodInfo? m = propertyInfo.GetGetMethod(true);
+            MethodInfo m = propertyInfo.GetGetMethod(true);
             if (m != null)
             {
                 return m.GetBaseDefinition();
@@ -203,97 +200,6 @@ namespace Glitch9
             }
 
             return false;
-        }
-
-        public static Type? GetObjectType(object? v)
-        {
-            return v?.GetType();
-        }
-
-        public static string GetTypeName(Type t, TypeNameAssemblyFormatHandling assemblyFormat, ISerializationBinder? binder)
-        {
-            string fullyQualifiedTypeName = GetFullyQualifiedTypeName(t, binder);
-
-            switch (assemblyFormat)
-            {
-                case TypeNameAssemblyFormatHandling.Simple:
-                    return RemoveAssemblyDetails(fullyQualifiedTypeName);
-                case TypeNameAssemblyFormatHandling.Full:
-                    return fullyQualifiedTypeName;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private static string GetFullyQualifiedTypeName(Type t, ISerializationBinder? binder)
-        {
-            if (binder != null)
-            {
-                binder.BindToName(t, out string? assemblyName, out string? typeName);
-#if (NET20 || NET35)
-                // for older SerializationBinder implementations that didn't have BindToName
-                if (assemblyName == null & typeName == null)
-                {
-                    return t.AssemblyQualifiedName;
-                }
-#endif
-                return typeName + (assemblyName == null ? "" : ", " + assemblyName);
-            }
-
-            return t.AssemblyQualifiedName!;
-        }
-
-        private static string RemoveAssemblyDetails(string fullyQualifiedTypeName)
-        {
-            StringBuilder builder = new();
-
-            // loop through the type name and filter out qualified assembly details from nested type names
-            bool writingAssemblyName = false;
-            bool skippingAssemblyDetails = false;
-            bool followBrackets = false;
-            for (int i = 0; i < fullyQualifiedTypeName.Length; i++)
-            {
-                char current = fullyQualifiedTypeName[i];
-                switch (current)
-                {
-                    case '[':
-                        writingAssemblyName = false;
-                        skippingAssemblyDetails = false;
-                        followBrackets = true;
-                        builder.Append(current);
-                        break;
-                    case ']':
-                        writingAssemblyName = false;
-                        skippingAssemblyDetails = false;
-                        followBrackets = false;
-                        builder.Append(current);
-                        break;
-                    case ',':
-                        if (followBrackets)
-                        {
-                            builder.Append(current);
-                        }
-                        else if (!writingAssemblyName)
-                        {
-                            writingAssemblyName = true;
-                            builder.Append(current);
-                        }
-                        else
-                        {
-                            skippingAssemblyDetails = true;
-                        }
-                        break;
-                    default:
-                        followBrackets = false;
-                        if (!skippingAssemblyDetails)
-                        {
-                            builder.Append(current);
-                        }
-                        break;
-                }
-            }
-
-            return builder.ToString();
         }
 
         public static bool IsNullable(Type t)
@@ -345,7 +251,7 @@ namespace Glitch9
             return ImplementsGenericDefinition(type, genericInterfaceDefinition, out _);
         }
 
-        public static bool ImplementsGenericDefinition(Type type, Type genericInterfaceDefinition, [NotNullWhen(true)] out Type? implementingType)
+        public static bool ImplementsGenericDefinition(Type type, Type genericInterfaceDefinition, [NotNullWhen(true)] out Type implementingType)
         {
             ThrowIf.ArgumentIsNull(type, nameof(type));
             ThrowIf.ArgumentIsNull(genericInterfaceDefinition, nameof(genericInterfaceDefinition));
@@ -386,43 +292,7 @@ namespace Glitch9
             implementingType = null;
             return false;
         }
-
-        public static bool InheritsGenericDefinition(Type type, Type genericClassDefinition)
-        {
-            return InheritsGenericDefinition(type, genericClassDefinition, out _);
-        }
-
-        public static bool InheritsGenericDefinition(Type type, Type genericClassDefinition, out Type? implementingType)
-        {
-            ThrowIf.ArgumentIsNull(type, nameof(type));
-            ThrowIf.ArgumentIsNull(genericClassDefinition, nameof(genericClassDefinition));
-
-            if (!genericClassDefinition.IsClass || !genericClassDefinition.IsGenericTypeDefinition)
-            {
-                throw new ArgumentNullException("'{0}' is not a generic class definition.".Format(genericClassDefinition));
-            }
-
-            return InheritsGenericDefinitionInternal(type, genericClassDefinition, out implementingType);
-        }
-
-        private static bool InheritsGenericDefinitionInternal(Type type, Type genericClassDefinition, out Type? implementingType)
-        {
-            Type? currentType = type;
-            do
-            {
-                if (currentType.IsGenericType && genericClassDefinition == currentType.GetGenericTypeDefinition())
-                {
-                    implementingType = currentType;
-                    return true;
-                }
-
-                currentType = currentType.BaseType;
-            }
-            while (currentType != null);
-
-            implementingType = null;
-            return false;
-        }
+        
 
         /// <summary>
         /// Gets the type of the typed collection's items.
@@ -437,7 +307,7 @@ namespace Glitch9
             {
                 return type.GetElementType();
             }
-            if (ImplementsGenericDefinition(type, typeof(IEnumerable<>), out Type? genericListType))
+            if (ImplementsGenericDefinition(type, typeof(IEnumerable<>), out Type genericListType))
             {
                 if (genericListType!.IsGenericTypeDefinition)
                 {
@@ -452,33 +322,6 @@ namespace Glitch9
             }
 
             throw new Exception("Type {0} is not a collection.".Format(type));
-        }
-
-        public static void GetDictionaryKeyValueTypes(Type dictionaryType, out Type? keyType, out Type? valueType)
-        {
-            ThrowIf.ArgumentIsNull(dictionaryType, nameof(dictionaryType));
-
-            if (ImplementsGenericDefinition(dictionaryType, typeof(IDictionary<,>), out Type? genericDictionaryType))
-            {
-                if (genericDictionaryType!.IsGenericTypeDefinition)
-                {
-                    throw new Exception("Type {0} is not a dictionary.".Format(dictionaryType));
-                }
-
-                Type[] dictionaryGenericArguments = genericDictionaryType!.GetGenericArguments();
-
-                keyType = dictionaryGenericArguments[0];
-                valueType = dictionaryGenericArguments[1];
-                return;
-            }
-            if (typeof(IDictionary).IsAssignableFrom(dictionaryType))
-            {
-                keyType = null;
-                valueType = null;
-                return;
-            }
-
-            throw new Exception("Type {0} is not a dictionary.".Format(dictionaryType));
         }
 
         /// <summary>
@@ -503,26 +346,6 @@ namespace Glitch9
                 default:
                     throw new ArgumentException("MemberInfo must be of type FieldInfo, PropertyInfo, EventInfo or MethodInfo", nameof(member));
             }
-        }
-
-        public static bool IsByRefLikeType(Type type)
-        {
-            if (!type.IsValueType)
-            {
-                return false;
-            }
-
-            // IsByRefLike flag on type is not available in netstandard2.0
-            Attribute[] attributes = GetAttributes(type, null, false);
-            for (int i = 0; i < attributes.Length; i++)
-            {
-                if (string.Equals(attributes[i].GetType().FullName, "System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -827,35 +650,7 @@ namespace Glitch9
             }
         }
 
-        private static int? GetAssemblyDelimiterIndex(string fullyQualifiedTypeName)
-        {
-            // we need to get the first comma following all surrounded in brackets because of generic types
-            // e.g. System.Collections.Generic.Dictionary`2[[System.String, mscorlib,Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-            int scope = 0;
-            for (int i = 0; i < fullyQualifiedTypeName.Length; i++)
-            {
-                char current = fullyQualifiedTypeName[i];
-                switch (current)
-                {
-                    case '[':
-                        scope++;
-                        break;
-                    case ']':
-                        scope--;
-                        break;
-                    case ',':
-                        if (scope == 0)
-                        {
-                            return i;
-                        }
-                        break;
-                }
-            }
-
-            return null;
-        }
-
-        public static MemberInfo? GetMemberInfoFromType(Type targetType, MemberInfo memberInfo)
+        public static MemberInfo GetMemberInfoFromType(Type targetType, MemberInfo memberInfo)
         {
             const BindingFlags bindingAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
@@ -889,7 +684,7 @@ namespace Glitch9
 #if !PORTABLE
         private static void GetChildPrivateFields(IList<MemberInfo> initialFields, Type type, BindingFlags bindingAttr)
         {
-            Type? targetType = type;
+            Type targetType = type;
 
             // fix weirdness with private FieldInfos only being returned for the current Type
             // find base type fields and add them to result
@@ -955,7 +750,7 @@ namespace Glitch9
 
             // also find base properties that have been hidden by subtype properties with the same name
 
-            Type? targetType = type;
+            Type targetType = type;
             while ((targetType = targetType.BaseType) != null)
             {
                 foreach (PropertyInfo propertyInfo in targetType.GetProperties(bindingAttr))
@@ -1013,60 +808,6 @@ namespace Glitch9
                     }
                 }
             }
-        }
-
-        public static bool IsMethodOverridden(Type currentType, Type methodDeclaringType, string method)
-        {
-            bool isMethodOverriden = currentType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Any(info =>
-                    info.Name == method &&
-                    // check that the method overrides the original on DynamicObjectProxy
-                    info.DeclaringType != methodDeclaringType
-                    && info.GetBaseDefinition().DeclaringType == methodDeclaringType
-                );
-
-            return isMethodOverriden;
-        }
-
-        public static object GetDefaultValue(Type type)
-        {
-            if (!type.IsValueType)
-            {
-                return null;
-            }
-
-            switch (TypeUtils.GetTypeCode(type))
-            {
-                case TypeCode.Boolean:
-                    return false;
-                case TypeCode.Char:
-                case TypeCode.SByte:
-                case TypeCode.Byte:
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                    return 0;
-                case TypeCode.Int64:
-                case TypeCode.UInt64:
-                    return 0L;
-                case TypeCode.Single:
-                    return 0f;
-                case TypeCode.Double:
-                    return 0.0;
-                case TypeCode.Decimal:
-                    return 0m;
-                case TypeCode.DateTime:
-                    return new DateTime();
-            }
-
-            if (IsNullable(type))
-            {
-                return null;
-            }
-
-            // possibly use IL initobj for perf here?
-            return Activator.CreateInstance(type);
         }
     }
 }
