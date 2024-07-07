@@ -1,9 +1,9 @@
-using Glitch9.Internal;
+
 using UnityEngine;
 
 namespace Glitch9.UI.MaterialDesign
 {
-    [CreateAssetMenu(fileName = UnityMenu.MaterialDesign.COLOR_SCHEME_NAME, menuName = UnityMenu.MaterialDesign.COLOR_SCHEME_CREATE, order = UnityMenu.MaterialDesign.COLOR_SCHEME_ORDER)]
+    //[CreateAssetMenu(fileName = UnityMenu.MaterialDesign.COLOR_SCHEME_NAME, menuName = UnityMenu.MaterialDesign.COLOR_SCHEME_CREATE, order = UnityMenu.MaterialDesign.COLOR_SCHEME_ORDER)]
     public class ColorScheme : ScriptableObject
     {
         private static class Tooltips
