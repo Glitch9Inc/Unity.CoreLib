@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23d91311c0a435b49a5184c238587b72, type: 3}
+  m_Name: Lavender
+  m_EditorClassIdentifier: 
+  primary:
+    role: 1
+    color: {r: 0.40392157, g: 0.3137255, b: 0.6431373, a: 1}
+    onColor: {r: 1, g: 1, b: 1, a: 1}
+    container: {r: 0.91764706, g: 0.8666667, b: 1, a: 1}
+    onContainer: {r: 0.12941177, g: 0, b: 0.3647059, a: 1}
+    dim: {r: 0.0025155544, g: 0.3066047, b: 0.8, a: 1}
+    bright: {r: 0.0037733319, g: 0.45990708, b: 1, a: 1}
+    variant: {r: 0.0034588873, g: 0.4215815, b: 1, a: 1}
+    onVariant: {r: 0.034588873, g: 1, b: 1, a: 1}
+  secondary:
+    role: 2
+    color: {r: 0.38431373, g: 0.35686275, b: 0.44313726, a: 1}
+    onColor: {r: 1, g: 1, b: 1, a: 1}
+    container: {r: 0.9098039, g: 0.87058824, b: 0.972549, a: 1}
+    onContainer: {r: 0.11372549, g: 0.09803922, b: 0.16862746, a: 1}
+    dim: {r: 0, g: 0, b: 0, a: 0}
+    bright: {r: 0, g: 0, b: 0, a: 0}
+    variant: {r: 0, g: 0, b: 0, a: 0}
+    onVariant: {r: 0, g: 0, b: 0, a: 0}
+  tertiary:
+    role: 3
+    color: {r: 0.49019608, g: 0.32156864, b: 0.3764706, a: 1}
+    onColor: {r: 1, g: 1, b: 1, a: 1}
+    container: {r: 1, g: 0.84705883, b: 0.89411765, a: 1}
+    onContainer: {r: 0.19215687, g: 0.06666667, b: 0.11372549, a: 1}
+    dim: {r: 0, g: 0, b: 0, a: 0}
+    bright: {r: 0, g: 0, b: 0, a: 0}
+    variant: {r: 0, g: 0, b: 0, a: 0}
+    onVariant: {r: 0, g: 0, b: 0, a: 0}
+  surface:
+    role: 5
+    color: {r: 1, g: 1, b: 1, a: 1}
+    onColor: {r: 0.10980392, g: 0.105882354, b: 0.12156863, a: 1}
+    container: {r: 0.90588236, g: 0.8784314, b: 0.9254902, a: 1}
+    onContainer: {r: 0.28627452, g: 0.27058825, b: 0.30980393, a: 1}
+    dim: {r: 0.84147674, g: 0.7780348, b: 0.8867924, a: 1}
+    bright: {r: 1, g: 1, b: 1, a: 1}
+    variant: {r: 0, g: 0, b: 0, a: 0}
+    onVariant: {r: 0.9058824, g: 0.87843144, b: 0.92549026, a: 1}
+  outline:
+    role: 6
+    color: {r: 0.4745098, g: 0.45490196, b: 0.49411765, a: 1}
+    onColor: {r: 0, g: 0, b: 0, a: 0}
+    container: {r: 0, g: 0, b: 0, a: 0}
+    onContainer: {r: 0, g: 0, b: 0, a: 0}
+    dim: {r: 0, g: 0, b: 0, a: 0}
+    bright: {r: 0, g: 0, b: 0, a: 0}
+    variant: {r: 0, g: 0, b: 0, a: 0}
+    onVariant: {r: 0, g: 0, b: 0, a: 0}
+  error:
+    role: 4
+    color: {r: 0.7294118, g: 0.1019608, b: 0.1019608, a: 1}
+    onColor: {r: 1, g: 1, b: 1, a: 1}
+    container: {r: 1, g: 0.854902, b: 0.8392157, a: 1}
+    onContainer: {r: 0.254902, g: 0, b: 0.007843138, a: 1}
+    dim: {r: 0.5835294, g: 0.08156864, b: 0.08156864, a: 1}
+    bright: {r: 0.87529415, g: 0.122352965, b: 0.122352965, a: 1}
+    variant: {r: 0.80235296, g: 0.11215688, b: 0.11215688, a: 1}
+    onVariant: {r: 1, g: 1, b: 1, a: 1}
